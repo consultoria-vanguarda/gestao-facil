@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '@/api/supabaseClient';
 import { getMainLandingUrl, getTenantContext } from '@/lib/tenant';
 import { setCurrentOrganizationId } from '@/lib/organizationScope';
@@ -11,6 +12,7 @@ const buildTenantNotFoundError = () => ({
 });
 
 export const TenantProvider = ({ children }) => {
+  const location = useLocation();
   const [tenant, setTenant] = useState(null);
   const [settings, setSettings] = useState(null);
   const [organizationId, setOrganizationId] = useState(null);
@@ -29,7 +31,7 @@ export const TenantProvider = ({ children }) => {
       try {
         const { data, error } = await supabase.rpc('resolve_tenant_by_host', {
           input_host: hostname,
-          fallback_slug: defaultTenantSlug,
+          fallback_slug: defaultTenantSlug ?? null,
         });
 
         if (error) throw error;
@@ -80,7 +82,7 @@ export const TenantProvider = ({ children }) => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [location.search]);
 
   useEffect(() => {
     if (tenantError?.type !== 'tenant_not_found') return;
