@@ -26,7 +26,7 @@ export const TenantProvider = ({ children }) => {
       setIsLoadingTenant(true);
       setTenantError(null);
 
-      const { hostname, defaultTenantSlug } = getTenantContext();
+      const { hostname, defaultTenantSlug } = getTenantContext(location.search);
 
       try {
         const { data, error } = await supabase.rpc('resolve_tenant_by_host', {

@@ -31,9 +31,17 @@ export const getDefaultTenantSlug = () => {
   return value ? normalizeHostname(value) : null;
 };
 
-export const getTenantSlugFromUrlParam = () => {
-  if (typeof window === 'undefined') return null;
-  const params = new URLSearchParams(window.location.search || '');
+/**
+ * @param {string} [search] - query string, ex. "?slug=app". Se omitido, usa window.location.search.
+ */
+export const getTenantSlugFromUrlParam = (search) => {
+  const searchString =
+    typeof search === 'string'
+      ? search
+      : typeof window !== 'undefined'
+        ? window.location.search || ''
+        : '';
+  const params = new URLSearchParams(searchString);
   const raw =
     params.get('tenant') ||
     params.get('slug') ||
@@ -56,9 +64,18 @@ export const getMainLandingUrl = () => {
   }
 };
 
-export const getTenantContext = () => {
+/**
+ * @param {string} [searchOverride] - query string do React Router (?slug=app), evita corrida com window.
+ */
+export const getTenantContext = (searchOverride) => {
   const hostname = getHostname();
-  const tenantSlugFromUrl = getTenantSlugFromUrlParam();
+  const searchString =
+    typeof searchOverride === 'string'
+      ? searchOverride
+      : typeof window !== 'undefined'
+        ? window.location.search || ''
+        : '';
+  const tenantSlugFromUrl = getTenantSlugFromUrlParam(searchString);
   const tenantSlugFromHost = getTenantSlugFromHostname(hostname);
   const defaultTenantSlug = tenantSlugFromUrl || getDefaultTenantSlug();
   return {
