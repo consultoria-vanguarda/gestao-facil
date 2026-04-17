@@ -299,7 +299,8 @@ export async function invokeEdgeFunctionWithSession(functionName, body) {
 export const base44 = {
   auth: {
     me: async () => {
-      requireCurrentOrganizationId();
+      // Não usar requireCurrentOrganizationId() aqui: o escopo global pode ainda não estar
+      // sincronizado com o TenantContext (ordem de efeitos), e o perfil define a org.
       // getUser() sem sessão local dispara AuthSessionMissingError; getSession() só lê o storage.
       const {
         data: { session },
