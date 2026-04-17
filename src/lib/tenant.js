@@ -31,6 +31,19 @@ export const getDefaultTenantSlug = () => {
   return value ? normalizeHostname(value) : null;
 };
 
+export const getTenantSlugFromUrlParam = () => {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search || '');
+  const raw =
+    params.get('tenant') ||
+    params.get('slug') ||
+    params.get('organization') ||
+    params.get('org');
+  if (!raw) return null;
+  const slug = normalizeHostname(raw);
+  return slug || null;
+};
+
 export const getMainLandingUrl = () => {
   const raw = (import.meta.env.VITE_MAIN_LANDING_URL || '').trim();
   if (!raw) return null;
@@ -45,11 +58,16 @@ export const getMainLandingUrl = () => {
 
 export const getTenantContext = () => {
   const hostname = getHostname();
+  const tenantSlugFromUrl = getTenantSlugFromUrlParam();
+  const tenantSlugFromHost = getTenantSlugFromHostname(hostname);
+  const defaultTenantSlug = tenantSlugFromUrl || getDefaultTenantSlug();
   return {
     hostname,
-    tenantSlug: getTenantSlugFromHostname(hostname),
+    tenantSlug: tenantSlugFromUrl || tenantSlugFromHost,
     baseDomain: getBaseDomainFromHostname(hostname),
-    defaultTenantSlug: getDefaultTenantSlug(),
+    defaultTenantSlug,
+    tenantSlugFromUrl,
+    tenantSlugFromHost,
     isLocalhost: LOCAL_HOSTS.has(hostname),
   };
 };

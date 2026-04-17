@@ -1,6 +1,6 @@
 /**
  * Cria (ou atualiza) usuário administrador da plataforma (user_type = saas_admin).
- * O perfil fica vinculado à organização `vanguarda` (ou VITE_SEED_TENANT_SLUG).
+ * O perfil fica vinculado à organização `app` (ou VITE_SEED_TENANT_SLUG).
  *
  * Requer no .env.local:
  *   VITE_SUPABASE_URL (ou SUPABASE_URL)
@@ -10,7 +10,7 @@
  *   SAAS_ADMIN_EMAIL (padrão: saas-admin@local.dev)
  *   SAAS_ADMIN_PASSWORD (padrão: saas-admin-2026)
  *   SAAS_ADMIN_NAME (padrão: Admin plataforma)
- *   VITE_SEED_TENANT_SLUG (padrão: vanguarda)
+ *   VITE_SEED_TENANT_SLUG (padrão: app)
  *
  * Uso: npm run seed:saas-admin
  */
@@ -54,7 +54,7 @@ const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 const SAAS_ADMIN_EMAIL = (env.SAAS_ADMIN_EMAIL || 'saas-admin@local.dev').trim();
 const SAAS_ADMIN_PASSWORD = env.SAAS_ADMIN_PASSWORD || 'saas-admin-2026';
 const SAAS_ADMIN_NAME = env.SAAS_ADMIN_NAME || 'Admin plataforma';
-const TENANT_SLUG = (env.VITE_SEED_TENANT_SLUG || env.VITE_DEFAULT_TENANT_SLUG || 'vanguarda').trim().toLowerCase();
+const TENANT_SLUG = (env.VITE_SEED_TENANT_SLUG || env.VITE_DEFAULT_TENANT_SLUG || 'app').trim().toLowerCase();
 
 if (!url || !serviceKey) {
   console.error(
