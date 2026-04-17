@@ -8,7 +8,7 @@ This project contains everything you need to run your app locally.
 
 **Edit the code in your local development environment**
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+Any change pushed to the r epo will also be reflected in the Base44 Builder.
 
 **Prerequisites:** 
 
