@@ -29,14 +29,27 @@ export const TenantProvider = ({ children }) => {
       const { hostname, defaultTenantSlug } = getTenantContext(location.search);
 
       try {
-        const { data, error } = await supabase.rpc('resolve_tenant_by_host', {
-          input_host: hostname,
-          fallback_slug: defaultTenantSlug ?? null,
-        });
+        let row = null;
 
-        if (error) throw error;
+        // 1) Slug explícito (query ou env): não depende do hostname (*.vercel.app etc.).
+        if (defaultTenantSlug) {
+          const bySlug = await supabase.rpc('resolve_tenant_by_slug', {
+            p_slug: defaultTenantSlug,
+          });
+          if (bySlug.error) throw bySlug.error;
+          row = bySlug.data?.[0] ?? null;
+        }
 
-        const row = data?.[0];
+        // 2) Resolução por domínio/subdomínio + fallback (comportamento anterior).
+        if (!row) {
+          const byHost = await supabase.rpc('resolve_tenant_by_host', {
+            input_host: hostname,
+            fallback_slug: defaultTenantSlug ?? null,
+          });
+          if (byHost.error) throw byHost.error;
+          row = byHost.data?.[0] ?? null;
+        }
+
         if (!row) {
           if (!cancelled) {
             setTenant(null);
