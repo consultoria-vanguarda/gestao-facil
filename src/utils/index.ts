@@ -1,3 +1,5 @@
+import { getStoredTenantSlug } from '@/lib/tenant';
+
 export function createPageUrl(pageName: string) {
     const basePath = '/' + pageName.replace(/ /g, '-');
 
@@ -6,11 +8,15 @@ export function createPageUrl(pageName: string) {
     }
 
     const current = new URLSearchParams(window.location.search || '');
-    const tenant =
+    let tenant =
         current.get('tenant') ||
         current.get('slug') ||
         current.get('organization') ||
         current.get('org');
+
+    if (!tenant) {
+        tenant = getStoredTenantSlug() || '';
+    }
 
     if (!tenant) {
         return basePath;

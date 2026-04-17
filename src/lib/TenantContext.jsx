@@ -26,7 +26,7 @@ export const TenantProvider = ({ children }) => {
       setIsLoadingTenant(true);
       setTenantError(null);
 
-      const { hostname, defaultTenantSlug } = getTenantContext(location.search);
+      const { hostname, defaultTenantSlug } = getTenantContext(location);
 
       try {
         let row = null;
@@ -95,7 +95,7 @@ export const TenantProvider = ({ children }) => {
     return () => {
       cancelled = true;
     };
-  }, [location.search]);
+  }, [location.pathname, location.search, location.hash]);
 
   useEffect(() => {
     if (tenantError?.type !== 'tenant_not_found') return;

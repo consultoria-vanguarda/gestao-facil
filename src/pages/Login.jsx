@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,8 @@ import { getTenantContext } from '@/lib/tenant';
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { tenantSlug } = getTenantContext();
+  const location = useLocation();
+  const { tenantSlug } = getTenantContext(location);
 
   const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
 

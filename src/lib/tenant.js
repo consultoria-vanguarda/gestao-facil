@@ -85,6 +85,43 @@ export const getTenantSlugFromLoginRedirect = (search) => {
   }
 };
 
+/** Ex.: #slug=app ou #/path?tenant=app (às vezes preservado quando query some). */
+export const getTenantSlugFromHashParam = (hash) => {
+  const h = String(hash || '').trim();
+  if (!h || h === '#') return null;
+  const withoutHash = h.startsWith('#') ? h.slice(1) : h;
+  const qIdx = withoutHash.indexOf('?');
+  const querySlice =
+    qIdx >= 0 ? withoutHash.slice(qIdx + 1) : withoutHash.includes('=') ? withoutHash : '';
+  if (!querySlice) return null;
+  const params = new URLSearchParams(querySlice.startsWith('?') ? querySlice.slice(1) : querySlice);
+  let raw =
+    params.get('tenant') ||
+    params.get('slug') ||
+    params.get('organization') ||
+    params.get('org');
+  if (!raw) {
+    const m = withoutHash.match(/(?:^|[?&#])(?:tenant|slug|organization|org)=([^&#]+)/i);
+    if (m) raw = decodeURIComponent(m[1]);
+  }
+  if (!raw) return null;
+  return normalizeHostname(raw) || null;
+};
+
+/** Mescla query do Router com window (evita race onde location.search vem vazio). */
+function mergeSearchStrings(routerSearch, windowSearch) {
+  const r = typeof routerSearch === 'string' ? routerSearch : '';
+  const w = typeof windowSearch === 'string' ? windowSearch : '';
+  if (r && r.length > 0) return r;
+  if (w && w.length > 0) return w;
+  return '';
+}
+
+/** Exportado para links (`createPageUrl`) quando a barra de URL já perdeu ?slug=. */
+export function getStoredTenantSlug() {
+  return readStoredTenantSlug();
+}
+
 function readStoredTenantSlug() {
   if (typeof window === 'undefined') return null;
   try {
@@ -127,18 +164,31 @@ export const getMainLandingUrl = () => {
 };
 
 /**
- * @param {string} [searchOverride] - query string do React Router (?slug=app), evita corrida com window.
+ * @param {string | { pathname?: string; search?: string; hash?: string }} [locationLike] - useLocation() ou query string.
  */
-export const getTenantContext = (searchOverride) => {
+export const getTenantContext = (locationLike) => {
   const hostname = getHostname();
-  const searchString =
-    typeof searchOverride === 'string'
-      ? searchOverride
-      : typeof window !== 'undefined'
-        ? window.location.search || ''
+  const routerSearch =
+    typeof locationLike === 'string'
+      ? locationLike
+      : locationLike?.search != null
+        ? locationLike.search
         : '';
+  const windowSearch = typeof window !== 'undefined' ? window.location.search || '' : '';
+  const searchString = mergeSearchStrings(routerSearch, windowSearch);
+
+  const routerHash =
+    typeof locationLike === 'object' && locationLike != null && locationLike.hash != null
+      ? locationLike.hash
+      : '';
+  const windowHash = typeof window !== 'undefined' ? window.location.hash || '' : '';
+  const hashString = routerHash || windowHash || '';
+
   let tenantSlugFromUrl =
-    getTenantSlugFromUrlParam(searchString) || getTenantSlugFromLoginRedirect(searchString);
+    getTenantSlugFromUrlParam(searchString) ||
+    getTenantSlugFromHashParam(hashString) ||
+    getTenantSlugFromLoginRedirect(searchString) ||
+    getTenantSlugFromLoginRedirect(windowSearch);
 
   if (!tenantSlugFromUrl) {
     tenantSlugFromUrl = readStoredTenantSlug();
