@@ -151,6 +151,11 @@ export function clearStoredTenantSlug() {
   }
 }
 
+/** Expõe persistência do slug (ex.: após login quando o tenant da URL era o default errado). */
+export function storeTenantSlugForSession(slug) {
+  persistTenantSlug(slug);
+}
+
 export const getMainLandingUrl = () => {
   const raw = (import.meta.env.VITE_MAIN_LANDING_URL || '').trim();
   if (!raw) return null;

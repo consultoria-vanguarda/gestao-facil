@@ -8,6 +8,7 @@ import React, {
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
 import { useTenant } from '@/lib/TenantContext';
+import { storeTenantSlugForSession } from '@/lib/tenant';
 
 const AuthContext = createContext();
 
@@ -56,6 +57,15 @@ export const AuthProvider = ({ children }) => {
           currentUser.organization_id !== organizationId &&
           currentUser?.user_type !== 'saas_admin'
         ) {
+          // Em Vercel sem subdomínio, o tenant costuma cair no default (ex. app) quando a URL
+          // não tem ?slug=. Redireciona para o slug real do utilizador em vez de deslogar.
+          const slug = currentUser.organization_slug;
+          if (slug && typeof window !== 'undefined') {
+            storeTenantSlugForSession(slug);
+            const next = `${window.location.origin}/?slug=${encodeURIComponent(slug)}`;
+            window.location.replace(next);
+            return;
+          }
           setUser(null);
           setIsAuthenticated(false);
           setAuthError({
