@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { getTenantContext } from '@/lib/tenant';
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { tenantSlug } = getTenantContext();
 
   const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
 
@@ -66,7 +68,11 @@ export default function LoginPage() {
         <CardContent className="p-6 space-y-4">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-900">Login</h1>
-            <p className="text-sm text-slate-600">Acesse com seu e-mail e senha</p>
+            <p className="text-sm text-slate-600">
+              {tenantSlug
+                ? `Acesse a organização ${tenantSlug} com seu e-mail e senha`
+                : 'Acesse com seu e-mail e senha'}
+            </p>
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>

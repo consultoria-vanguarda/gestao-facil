@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   ChevronDown,
-  FileText
+  FileText,
+  Shield
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -39,6 +40,8 @@ const adminMenuItems = [
   { name: 'Valores/Hora', icon: BarChart3, page: 'HourlyRates' },
 ];
 
+const saasAdminExtraItem = { name: 'Admin SaaS', icon: Shield, page: 'SaasAdmin' };
+
 const consultantMenuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'ConsultantDashboard' },
   { name: 'Meus Projetos', icon: FolderKanban, page: 'ConsultantProjects' },
@@ -59,11 +62,14 @@ export default function Layout({ children, currentPageName }) {
   // Evita um segundo fetch + ecrã "Carregando..." (que parecia refresh ao voltar o foco).
   const userType = user?.user_type || 'admin';
 
-  const menuItems = userType === 'admin' 
-    ? adminMenuItems 
-    : userType === 'consultant' 
-      ? consultantMenuItems 
-      : clientMenuItems;
+  const menuItems =
+    userType === 'saas_admin'
+      ? [...adminMenuItems, saasAdminExtraItem]
+      : userType === 'admin'
+        ? adminMenuItems
+        : userType === 'consultant'
+          ? consultantMenuItems
+          : clientMenuItems;
 
   const handleLogout = async () => {
     await base44.auth.logout();

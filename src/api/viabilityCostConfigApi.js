@@ -1,7 +1,9 @@
 import { supabase } from './supabaseClient';
+import { requireCurrentOrganizationId } from '@/lib/organizationScope';
 
-/** Linha singleton na tabela `viability_cost_config`. */
-export const VIABILITY_COST_CONFIG_ROW_ID = 'viability_cost_cfg_row_000000001';
+/** Gera ID estável (VARCHAR(32)) por tenant. */
+export const getViabilityCostConfigRowId = (organizationId) =>
+  String(organizationId || '').replace(/-/g, '').slice(0, 32);
 
 /**
  * @typedef {Object} ViabilityCostConfig
@@ -9,6 +11,7 @@ export const VIABILITY_COST_CONFIG_ROW_ID = 'viability_cost_cfg_row_000000001';
  * @property {string} [created_date]
  * @property {string} [updated_date]
  * @property {string|null} [created_by]
+ * @property {string} organization_id
  * @property {number} valorHoraConsultor
  * @property {number} custoHospedagemDiaria
  * @property {number} custoAlimentacaoDiaria
@@ -30,6 +33,7 @@ function mapRowToConfig(row) {
     created_date: row.created_date,
     updated_date: row.updated_date,
     created_by: row.created_by,
+    organization_id: row.organization_id,
     valorHoraConsultor: num(row.valor_hora_consultor),
     custoHospedagemDiaria: num(row.custo_hospedagem_diaria),
     custoAlimentacaoDiaria: num(row.custo_alimentacao_diaria),
@@ -45,10 +49,13 @@ function mapRowToConfig(row) {
  */
 export async function getViabilityCostConfig() {
   try {
+    const orgId = requireCurrentOrganizationId();
+    const rowId = getViabilityCostConfigRowId(orgId);
     const { data, error } = await supabase
       .from('viability_cost_config')
       .select('*')
-      .eq('id', VIABILITY_COST_CONFIG_ROW_ID)
+      .eq('id', rowId)
+      .eq('organization_id', orgId)
       .maybeSingle();
 
     if (error) {
@@ -82,10 +89,13 @@ export async function upsertViabilityCostConfig({
   createdBy,
 }) {
   try {
+    const orgId = requireCurrentOrganizationId();
+    const rowId = getViabilityCostConfigRowId(orgId);
     const now = new Date().toISOString();
     const row = {
-      id: VIABILITY_COST_CONFIG_ROW_ID,
+      id: rowId,
       updated_date: now,
+      organization_id: orgId,
       valor_hora_consultor: valorHoraConsultor,
       custo_hospedagem_diaria: custoHospedagemDiaria,
       custo_alimentacao_diaria: custoAlimentacaoDiaria,

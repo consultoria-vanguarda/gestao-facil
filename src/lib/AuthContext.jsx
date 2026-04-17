@@ -7,16 +7,31 @@ import React, {
 } from 'react';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
+import { useTenant } from '@/lib/TenantContext';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const { organizationId, isLoadingTenant, tenantError } = useTenant();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
+    if (isLoadingTenant) {
+      setIsLoadingAuth(true);
+      return;
+    }
+
+    if (tenantError?.type === 'tenant_not_found') {
+      setUser(null);
+      setIsAuthenticated(false);
+      setAuthError(null);
+      setIsLoadingAuth(false);
+      return;
+    }
+
     let cancelled = false;
 
     const syncFromSession = async (session, { showGlobalLoader = false } = {}) => {
@@ -34,6 +49,23 @@ export const AuthProvider = ({ children }) => {
         if (showGlobalLoader && !cancelled) setIsLoadingAuth(true);
         const currentUser = await base44.auth.me();
         if (cancelled) return;
+
+        if (
+          organizationId &&
+          currentUser?.organization_id &&
+          currentUser.organization_id !== organizationId &&
+          currentUser?.user_type !== 'saas_admin'
+        ) {
+          setUser(null);
+          setIsAuthenticated(false);
+          setAuthError({
+            type: 'tenant_mismatch',
+            message: 'Usuário autenticado em tenant diferente do domínio atual.',
+          });
+          await supabase.auth.signOut();
+          return;
+        }
+
         setUser(currentUser);
         setIsAuthenticated(true);
         setAuthError(null);
@@ -79,7 +111,7 @@ export const AuthProvider = ({ children }) => {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [isLoadingTenant, organizationId, tenantError?.type]);
 
   /** Atualiza o perfil no contexto (ex.: após salvar nome em Configurações) sem ecrã de loading global. */
   const refreshUser = useCallback(async () => {

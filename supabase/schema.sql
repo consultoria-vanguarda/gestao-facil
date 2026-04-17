@@ -416,3 +416,46 @@ CREATE INDEX idx_billing_status       ON billing_entry(status);
 CREATE INDEX idx_expense_project      ON expense(project_id);
 CREATE INDEX idx_transaction_account  ON account_transaction(account_id);
 CREATE INDEX idx_tax_entry_project    ON tax_expense_entry(project_id);
+
+-- ────────────────────────────────────────────────────────────
+-- MULTI-TENANT (addendum)
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE organizations (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name          TEXT NOT NULL,
+    slug          TEXT NOT NULL UNIQUE,
+    custom_domain TEXT UNIQUE,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.profiles             ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.consultant           ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.client               ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.project              ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.project_schedule     ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.task                 ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.document             ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.time_entry           ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.expense              ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.message              ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.project_receivable   ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.project_payable      ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.service_report       ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.service_model        ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.service_area_config  ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.financial_account    ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.account_transaction  ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.chart_of_accounts    ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.tax_rate             ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.billing_entry        ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+ALTER TABLE public.tax_expense_entry    ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id);
+
+CREATE TABLE IF NOT EXISTS organization_settings (
+    organization_id UUID PRIMARY KEY REFERENCES organizations(id) ON DELETE CASCADE,
+    primary_color   TEXT,
+    secondary_color TEXT,
+    logo_url        TEXT,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

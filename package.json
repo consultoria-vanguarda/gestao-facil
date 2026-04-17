@@ -10,7 +10,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
-    "seed:test-user": "node scripts/create-test-user.mjs"
+    "seed:test-user": "node scripts/create-test-user.mjs",
+    "seed:saas-admin": "node scripts/seed-saas-admin.mjs"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.0",

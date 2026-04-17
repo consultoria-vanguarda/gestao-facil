@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { requireCurrentOrganizationId } from '@/lib/organizationScope';
 
 const generateId = () => {
   // IDs do schema são `VARCHAR(32)` sem hífen.
@@ -30,7 +31,11 @@ const applyFilters = (query, filters = {}) => {
 
 const createEntity = (tableName) => {
   const list = async (sort) => {
-    let query = supabase.from(tableName).select('*');
+    const orgId = requireCurrentOrganizationId();
+    let query = supabase
+      .from(tableName)
+      .select('*')
+      .eq('organization_id', orgId);
     const s = parseSort(sort);
     if (s) query = query.order(s.column, { ascending: s.direction === 'asc' });
     const { data, error } = await query;
@@ -39,7 +44,11 @@ const createEntity = (tableName) => {
   };
 
   const filter = async (filters, sort) => {
-    let query = supabase.from(tableName).select('*');
+    const orgId = requireCurrentOrganizationId();
+    let query = supabase
+      .from(tableName)
+      .select('*')
+      .eq('organization_id', orgId);
     query = applyFilters(query, filters);
     const s = parseSort(sort);
     if (s) query = query.order(s.column, { ascending: s.direction === 'asc' });
@@ -49,8 +58,10 @@ const createEntity = (tableName) => {
   };
 
   const create = async (data) => {
+    const orgId = requireCurrentOrganizationId();
     const row = { ...data };
     if (!row.id) row.id = generateId();
+    row.organization_id = orgId;
     const { data: created, error } = await supabase
       .from(tableName)
       .insert(row)
@@ -61,10 +72,16 @@ const createEntity = (tableName) => {
   };
 
   const update = async (id, data) => {
+    const orgId = requireCurrentOrganizationId();
     const { data: updated, error } = await supabase
       .from(tableName)
-      .update({ ...data, updated_date: data?.updated_date ?? new Date().toISOString() })
+      .update({
+        ...data,
+        organization_id: orgId,
+        updated_date: data?.updated_date ?? new Date().toISOString(),
+      })
       .eq('id', id)
+      .eq('organization_id', orgId)
       .select('*')
       .single();
     if (error) throw error;
@@ -72,15 +89,22 @@ const createEntity = (tableName) => {
   };
 
   const remove = async (id) => {
-    const { error } = await supabase.from(tableName).delete().eq('id', id);
+    const orgId = requireCurrentOrganizationId();
+    const { error } = await supabase
+      .from(tableName)
+      .delete()
+      .eq('id', id)
+      .eq('organization_id', orgId);
     if (error) throw error;
     return true;
   };
 
   const bulkCreate = async (records) => {
+    const orgId = requireCurrentOrganizationId();
     const rows = (records || []).map((r) => ({ ...r }));
     for (const row of rows) {
       if (!row.id) row.id = generateId();
+      row.organization_id = orgId;
     }
     const { error } = await supabase.from(tableName).insert(rows);
     if (error) throw error;
@@ -181,6 +205,7 @@ const invokeFunctionWithAnonFallback = async (name, payload) => {
 export const base44 = {
   auth: {
     me: async () => {
+      requireCurrentOrganizationId();
       // getUser() sem sessão local dispara AuthSessionMissingError; getSession() só lê o storage.
       const {
         data: { session },
@@ -197,11 +222,13 @@ export const base44 = {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, organization:organizations(id, name, slug, custom_domain)')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) {
+      if (profileError) throw profileError;
+
+      if (!profile) {
         // Se não existir profile, ainda assim devolvemos user_type=admin (fallback).
         return {
           id: user.id,
@@ -210,6 +237,10 @@ export const base44 = {
           user_type: 'admin',
           consultant_id: null,
           client_id: null,
+          organization_id: null,
+          organization_name: null,
+          organization_slug: null,
+          organization_custom_domain: null,
         };
       }
 
@@ -220,6 +251,10 @@ export const base44 = {
         user_type: profile.user_type ?? 'admin',
         consultant_id: profile.consultant_id,
         client_id: profile.client_id,
+        organization_id: profile.organization_id ?? null,
+        organization_name: profile.organization?.name ?? null,
+        organization_slug: profile.organization?.slug ?? null,
+        organization_custom_domain: profile.organization?.custom_domain ?? null,
       };
     },
 
@@ -236,6 +271,7 @@ export const base44 = {
     },
 
     updateMe: async (data) => {
+      const orgId = requireCurrentOrganizationId();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -250,8 +286,9 @@ export const base44 = {
       const full_name = data?.full_name ?? null;
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name })
-        .eq('id', user.id);
+        .update({ full_name, organization_id: orgId })
+        .eq('id', user.id)
+        .eq('organization_id', orgId);
 
       if (error) throw error;
       return true;

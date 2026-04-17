@@ -504,24 +504,59 @@ AS $$
 DECLARE
   c public.consultant%ROWTYPE;
   cl public.client%ROWTYPE;
+  has_business_name BOOLEAN;
 BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'profiles'
+      AND column_name = 'business_name'
+  ) INTO has_business_name;
+
   SELECT * INTO c FROM public.consultant WHERE email = NEW.email LIMIT 1;
   SELECT * INTO cl FROM public.client WHERE email = NEW.email LIMIT 1;
 
-  INSERT INTO public.profiles (id, email, full_name, user_type, consultant_id, client_id)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(c.name, cl.company_name, NEW.email),
-    CASE
-      WHEN c.id IS NOT NULL THEN 'consultant'
-      WHEN cl.id IS NOT NULL THEN 'client'
-      ELSE 'admin'
-    END,
-    c.id,
-    cl.id
-  )
-  ON CONFLICT (id) DO NOTHING;
+  IF has_business_name THEN
+    INSERT INTO public.profiles (
+      id,
+      email,
+      full_name,
+      business_name,
+      user_type,
+      consultant_id,
+      client_id
+    )
+    VALUES (
+      NEW.id,
+      NEW.email,
+      COALESCE(c.name, cl.company_name, NEW.email),
+      COALESCE(cl.company_name, c.name, NEW.email, 'Conta sem nome'),
+      CASE
+        WHEN c.id IS NOT NULL THEN 'consultant'
+        WHEN cl.id IS NOT NULL THEN 'client'
+        ELSE 'admin'
+      END,
+      c.id,
+      cl.id
+    )
+    ON CONFLICT (id) DO NOTHING;
+  ELSE
+    INSERT INTO public.profiles (id, email, full_name, user_type, consultant_id, client_id)
+    VALUES (
+      NEW.id,
+      NEW.email,
+      COALESCE(c.name, cl.company_name, NEW.email),
+      CASE
+        WHEN c.id IS NOT NULL THEN 'consultant'
+        WHEN cl.id IS NOT NULL THEN 'client'
+        ELSE 'admin'
+      END,
+      c.id,
+      cl.id
+    )
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
 
   RETURN NEW;
 END;
@@ -534,22 +569,57 @@ FOR EACH ROW
 EXECUTE FUNCTION public.handle_new_auth_user();
 
 -- Cria profiles para usuários já existentes (caso a migration rode em projeto com auth criado antes)
-INSERT INTO public.profiles (id, email, full_name, user_type, consultant_id, client_id)
-SELECT
-  u.id,
-  u.email,
-  COALESCE(c.name, cl.company_name, u.email),
-  CASE
-    WHEN c.id IS NOT NULL THEN 'consultant'
-    WHEN cl.id IS NOT NULL THEN 'client'
-    ELSE 'admin'
-  END,
-  c.id,
-  cl.id
-FROM auth.users u
-LEFT JOIN public.consultant c ON c.email = u.email
-LEFT JOIN public.client cl ON cl.email = u.email
-ON CONFLICT (id) DO NOTHING;
+DO $$
+DECLARE
+  has_business_name BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'profiles'
+      AND column_name = 'business_name'
+  ) INTO has_business_name;
+
+  IF has_business_name THEN
+    INSERT INTO public.profiles (
+      id, email, full_name, business_name, user_type, consultant_id, client_id
+    )
+    SELECT
+      u.id,
+      u.email,
+      COALESCE(c.name, cl.company_name, u.email),
+      COALESCE(cl.company_name, c.name, u.email, 'Conta sem nome'),
+      CASE
+        WHEN c.id IS NOT NULL THEN 'consultant'
+        WHEN cl.id IS NOT NULL THEN 'client'
+        ELSE 'admin'
+      END,
+      c.id,
+      cl.id
+    FROM auth.users u
+    LEFT JOIN public.consultant c ON c.email = u.email
+    LEFT JOIN public.client cl ON cl.email = u.email
+    ON CONFLICT (id) DO NOTHING;
+  ELSE
+    INSERT INTO public.profiles (id, email, full_name, user_type, consultant_id, client_id)
+    SELECT
+      u.id,
+      u.email,
+      COALESCE(c.name, cl.company_name, u.email),
+      CASE
+        WHEN c.id IS NOT NULL THEN 'consultant'
+        WHEN cl.id IS NOT NULL THEN 'client'
+        ELSE 'admin'
+      END,
+      c.id,
+      cl.id
+    FROM auth.users u
+    LEFT JOIN public.consultant c ON c.email = u.email
+    LEFT JOIN public.client cl ON cl.email = u.email
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+END $$;
 
 -- ======================================================================
 -- Storage: bucket base44-prod (necessário para URLs já presentes no front)

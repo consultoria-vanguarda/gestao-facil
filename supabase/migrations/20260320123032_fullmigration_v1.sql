@@ -7,6 +7,70 @@
 -- Desabilita checagem de FK durante a carga
 SET session_replication_role = replica;
 
+-- Compatibilidade com schema multi-tenant:
+-- se organization_id já for NOT NULL, relaxa temporariamente para permitir a carga histórica
+-- e preenchimento em lote ao final (tenant padrão: vanguarda).
+DO $$
+DECLARE
+  has_org_column BOOLEAN;
+  tenant_table TEXT;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'consultant'
+      AND column_name = 'organization_id'
+  ) INTO has_org_column;
+
+  IF NOT has_org_column THEN
+    RETURN;
+  END IF;
+
+  INSERT INTO public.organizations (name, slug, custom_domain)
+  VALUES ('Vanguarda', 'vanguarda', NULL)
+  ON CONFLICT (slug) DO UPDATE
+  SET name = EXCLUDED.name;
+
+  FOREACH tenant_table IN ARRAY ARRAY[
+    'consultant',
+    'client',
+    'project',
+    'project_schedule',
+    'task',
+    'document',
+    'time_entry',
+    'expense',
+    'message',
+    'project_receivable',
+    'project_payable',
+    'service_report',
+    'service_model',
+    'service_area_config',
+    'financial_account',
+    'account_transaction',
+    'chart_of_accounts',
+    'tax_rate',
+    'billing_entry',
+    'tax_expense_entry',
+    'profiles'
+  ]
+  LOOP
+    IF EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = tenant_table
+        AND column_name = 'organization_id'
+    ) THEN
+      EXECUTE format(
+        'ALTER TABLE public.%I ALTER COLUMN organization_id DROP NOT NULL',
+        tenant_table
+      );
+    END IF;
+  END LOOP;
+END $$;
+
 -- ────────────────────────────────────────────────────────────
 -- CONSULTORES
 -- ────────────────────────────────────────────────────────────
@@ -1168,4 +1232,81 @@ ON storage.objects
 FOR DELETE
 TO authenticated
 USING (bucket_id = 'base44-prod');
+
+-- Compatibilidade com schema multi-tenant:
+-- preenche organization_id nulo com tenant padrão e restaura NOT NULL.
+DO $$
+DECLARE
+  has_org_column BOOLEAN;
+  vanguarda_org_id UUID;
+  tenant_table TEXT;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'consultant'
+      AND column_name = 'organization_id'
+  ) INTO has_org_column;
+
+  IF NOT has_org_column THEN
+    RETURN;
+  END IF;
+
+  SELECT id
+    INTO vanguarda_org_id
+  FROM public.organizations
+  WHERE slug = 'vanguarda'
+  LIMIT 1;
+
+  IF vanguarda_org_id IS NULL THEN
+    RAISE EXCEPTION 'Organização padrão "vanguarda" não encontrada.';
+  END IF;
+
+  FOREACH tenant_table IN ARRAY ARRAY[
+    'consultant',
+    'client',
+    'project',
+    'project_schedule',
+    'task',
+    'document',
+    'time_entry',
+    'expense',
+    'message',
+    'project_receivable',
+    'project_payable',
+    'service_report',
+    'service_model',
+    'service_area_config',
+    'financial_account',
+    'account_transaction',
+    'chart_of_accounts',
+    'tax_rate',
+    'billing_entry',
+    'tax_expense_entry',
+    'profiles'
+  ]
+  LOOP
+    IF EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = tenant_table
+        AND column_name = 'organization_id'
+    ) THEN
+      EXECUTE format(
+        'UPDATE public.%I SET organization_id = $1 WHERE organization_id IS NULL',
+        tenant_table
+      ) USING vanguarda_org_id;
+
+      EXECUTE format(
+        'ALTER TABLE public.%I ALTER COLUMN organization_id SET NOT NULL',
+        tenant_table
+      );
+    END IF;
+  END LOOP;
+END $$;
+
+-- Reativa comportamento normal de constraints/triggers.
+SET session_replication_role = origin;
 

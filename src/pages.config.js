@@ -65,6 +65,7 @@ import ProjectReports from './pages/ProjectReports';
 import Projects from './pages/Projects';
 import ProjectsKanban from './pages/ProjectsKanban';
 import Reports from './pages/Reports';
+import SaasAdmin from './pages/SaasAdmin';
 import ServiceAreas from './pages/ServiceAreas';
 import Services from './pages/Services';
 import Settings from './pages/Settings';
@@ -90,6 +91,7 @@ export const PAGES = {
     "Projects": Projects,
     "ProjectsKanban": ProjectsKanban,
     "Reports": Reports,
+    "SaasAdmin": SaasAdmin,
     "ServiceAreas": ServiceAreas,
     "Services": Services,
     "Settings": Settings,

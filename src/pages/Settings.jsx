@@ -54,6 +54,7 @@ export default function Settings() {
   const userType = user?.user_type || 'admin';
   const userTypeLabels = {
     admin: 'Administrador',
+    saas_admin: 'Administrador da plataforma',
     consultant: 'Consultor',
     client: 'Cliente'
   };
