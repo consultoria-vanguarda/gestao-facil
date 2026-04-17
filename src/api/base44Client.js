@@ -259,8 +259,14 @@ export async function invokeEdgeFunctionWithSession(functionName, body) {
     }
     if (typeof body.message === 'string') return body.message;
     if (typeof body.msg === 'string') return body.msg;
+    if (typeof body.code === 'number' && typeof body.message === 'string') {
+      return body.message;
+    }
     return null;
   };
+
+  const isGenericEdgeMessage = (s) =>
+    typeof s === 'string' && /non-2xx|Edge Function returned/i.test(s);
 
   if (!res.ok) {
     const fromJson = extractMessage(json);
@@ -268,11 +274,19 @@ export async function invokeEdgeFunctionWithSession(functionName, body) {
       typeof json?.raw === 'string' && json.raw.length > 0 && json.raw.length < 800 && !json.raw.trim().startsWith('<')
         ? json.raw.trim()
         : null;
-    const msg =
+    let msg =
       fromJson ||
       fromRaw ||
       `${res.status} ${res.statusText || ''}`.trim() ||
       'Erro desconhecido na Edge Function';
+    if (isGenericEdgeMessage(msg) || (!fromJson && !fromRaw)) {
+      const snippet = (text || '').trim().slice(0, 900);
+      msg = snippet
+        ? `HTTP ${res.status} — ${snippet}`
+        : `HTTP ${res.status} — ${msg}`;
+    } else {
+      msg = `HTTP ${res.status} — ${msg}`;
+    }
     throw new Error(msg);
   }
   if (json?.error) {
