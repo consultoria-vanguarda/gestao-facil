@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { requireCurrentOrganizationId } from '@/lib/organizationScope';
+import { clearStoredTenantSlug } from '@/lib/tenant';
 
 const generateId = () => {
   // IDs do schema são `VARCHAR(32)` sem hífen.
@@ -259,6 +260,7 @@ export const base44 = {
     },
 
     logout: async (redirectUrl) => {
+      clearStoredTenantSlug();
       await supabase.auth.signOut();
       if (redirectUrl) window.location.href = redirectUrl;
     },
