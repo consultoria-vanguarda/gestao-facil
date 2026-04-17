@@ -68,18 +68,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
+    const anonClient = createClient(supabaseUrl, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-
+    const accessToken = authHeader.replace(/^Bearer\s+/i, '').trim();
     const {
       data: { user: caller },
       error: callerErr,
-    } = await userClient.auth.getUser();
+    } = await anonClient.auth.getUser(accessToken);
 
     if (callerErr || !caller?.id) {
-      return Response.json({ error: 'Sessão inválida.' }, { status: 401, headers: corsHeaders });
+      return Response.json(
+        { error: callerErr?.message || 'Sessão inválida ou token expirado. Faça login novamente.' },
+        { status: 401, headers: corsHeaders }
+      );
     }
 
     const admin = createClient(supabaseUrl, serviceKey, {
@@ -98,7 +100,13 @@ Deno.serve(async (req) => {
     }
 
     if (profile?.user_type !== 'saas_admin') {
-      return Response.json({ error: 'Acesso negado.' }, { status: 403, headers: corsHeaders });
+      return Response.json(
+        {
+          error:
+            'Apenas usuários com user_type = saas_admin podem criar admins de tenant. Verifique o perfil no Supabase (public.profiles).',
+        },
+        { status: 403, headers: corsHeaders }
+      );
     }
 
     const { data: org, error: orgErr } = await admin

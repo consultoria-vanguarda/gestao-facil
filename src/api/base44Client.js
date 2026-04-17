@@ -203,6 +203,85 @@ const invokeFunctionWithAnonFallback = async (name, payload) => {
   }
 };
 
+/**
+ * Chama Edge Function com JWT do usuário (Authorization).
+ * Mensagens explícitas quando a função não está deployada (404) ou há falha de rede.
+ */
+export async function invokeEdgeFunctionWithSession(functionName, body) {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !anonKey) {
+    throw new Error('Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.');
+  }
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
+  const url = `${String(supabaseUrl).replace(/\/$/, '')}/functions/v1/${functionName}`;
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: anonKey,
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(body ?? {}),
+    });
+  } catch (e) {
+    throw new Error(
+      `Não foi possível contactar a Edge Function "${functionName}". ` +
+        `Confirme o deploy no Supabase: supabase functions deploy ${functionName}. ` +
+        (e?.message || '')
+    );
+  }
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = { raw: text };
+  }
+  if (res.status === 404) {
+    throw new Error(
+      `Edge Function "${functionName}" não encontrada (404). Deploy: supabase functions deploy ${functionName}`
+    );
+  }
+
+  const extractMessage = (body) => {
+    if (!body || typeof body !== 'object') return null;
+    if (typeof body.error === 'string') return body.error;
+    if (body.error && typeof body.error === 'object' && typeof body.error.message === 'string') {
+      return body.error.message;
+    }
+    if (typeof body.message === 'string') return body.message;
+    if (typeof body.msg === 'string') return body.msg;
+    return null;
+  };
+
+  if (!res.ok) {
+    const fromJson = extractMessage(json);
+    const fromRaw =
+      typeof json?.raw === 'string' && json.raw.length > 0 && json.raw.length < 800 && !json.raw.trim().startsWith('<')
+        ? json.raw.trim()
+        : null;
+    const msg =
+      fromJson ||
+      fromRaw ||
+      `${res.status} ${res.statusText || ''}`.trim() ||
+      'Erro desconhecido na Edge Function';
+    throw new Error(msg);
+  }
+  if (json?.error) {
+    const m = extractMessage(json) || json.error;
+    throw new Error(typeof m === 'string' ? m : JSON.stringify(m));
+  }
+  return json;
+}
+
 export const base44 = {
   auth: {
     me: async () => {

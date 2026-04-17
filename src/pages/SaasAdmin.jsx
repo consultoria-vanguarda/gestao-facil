@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/api/supabaseClient';
+import { invokeEdgeFunctionWithSession } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Building2, Loader2, Plus, ShieldAlert, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,21 +131,12 @@ export default function SaasAdmin() {
 
   const inviteAdminMutation = useMutation({
     mutationFn: async ({ email, password, full_name, organization_slug }) => {
-      const { data, error } = await supabase.functions.invoke('saas-invite-tenant-admin', {
-        body: { email, password, full_name, organization_slug },
+      return invokeEdgeFunctionWithSession('saas-invite-tenant-admin', {
+        email,
+        password,
+        full_name,
+        organization_slug,
       });
-      if (error) {
-        let msg = error.message || 'Falha na função';
-        try {
-          const body = await error.context?.json?.();
-          if (body?.error) msg = body.error;
-        } catch {
-          /* ignore */
-        }
-        throw new Error(msg);
-      }
-      if (data?.error) throw new Error(data.error);
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saas-admin', 'profiles', selectedOrgId] });
