@@ -66,7 +66,7 @@ export default function Layout({ children, currentPageName }) {
 
   // Utilizador já foi resolvido no AuthProvider antes de renderizar rotas autenticadas.
   // Evita um segundo fetch + ecrã "Carregando..." (que parecia refresh ao voltar o foco).
-  const userType = user?.user_type || 'admin';
+  const userType = String(user?.user_type || 'admin').toLowerCase();
 
   const menuItems =
     userType === 'saas_admin'
@@ -86,15 +86,18 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-slate-50">
       {/* Top Header Navigation */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50">
-        <div className="h-full px-4 lg:px-8 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-8">
-            <Link to={createPageUrl('Dashboard')}>
+        <div className="h-full px-4 lg:px-8 flex items-center justify-between gap-3 min-w-0">
+          {/* Logo + menu desktop (scroll horizontal se couber no ecrã) */}
+          <div className="flex items-center gap-3 lg:gap-4 min-w-0 flex-1">
+            <Link to={createPageUrl('Dashboard')} className="shrink-0">
               <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG" alt="Vanguarda Consultoria" className="h-8 w-auto object-contain" />
             </Link>
             
             {/* Desktop Menu */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav
+              className="hidden lg:flex flex-1 min-w-0 items-center gap-0.5 overflow-x-auto overscroll-x-contain py-1 px-0.5 scroll-smooth [scrollbar-width:thin]"
+              aria-label="Navegação principal"
+            >
               {menuItems.map((item) => {
                 const to = item.viabilityTab ? createHourlyRatesViabilityUrl() : createPageUrl(item.page);
                 const isActive =
@@ -105,15 +108,15 @@ export default function Layout({ children, currentPageName }) {
                     key={item.viabilityTab ? `${item.page}-viability` : item.page}
                     to={to}
                     className={`
-                      flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                      flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all shrink-0
                       ${isActive 
                         ? 'bg-[#1e3a5f] text-white' 
                         : 'text-slate-600 hover:bg-slate-100'
                       }
                     `}
                   >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
+                    <item.icon className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap">{item.name}</span>
                   </Link>
                 );
               })}
@@ -121,7 +124,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -150,6 +153,22 @@ export default function Layout({ children, currentPageName }) {
                     )}
                   </div>
                 </DropdownMenuLabel>
+                {(userType === 'admin' ||
+                  userType === 'saas_admin' ||
+                  userType === 'consultant') && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to={createHourlyRatesViabilityUrl()}
+                        className="cursor-pointer flex items-center gap-2"
+                      >
+                        <Calculator className="w-4 h-4" />
+                        Análise de Viabilidade
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50"
