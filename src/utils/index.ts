@@ -38,3 +38,10 @@ export function createPageUrl(pageName: string) {
     const query = targetParams.toString();
     return query ? `${path}?${query}` : path;
 }
+
+/** Link para HourlyRates aberto na aba «Análise de Viabilidade» (mantém tenant na query). */
+export function createHourlyRatesViabilityUrl(): string {
+    const base = createPageUrl('HourlyRates');
+    const sep = base.includes('?') ? '&' : '?';
+    return `${base}${sep}tab=viability`;
+}

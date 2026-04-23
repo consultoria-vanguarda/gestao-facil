@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from './utils';
+import { Link, useLocation } from 'react-router-dom';
+import { createPageUrl, createHourlyRatesViabilityUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { 
@@ -17,7 +17,8 @@ import {
   X,
   ChevronDown,
   FileText,
-  Shield
+  Shield,
+  Calculator,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -38,6 +39,7 @@ const adminMenuItems = [
   { name: 'Financeiro', icon: BarChart3, page: 'Financial' },
 
   { name: 'Valores/Hora', icon: BarChart3, page: 'HourlyRates' },
+  { name: 'Análise de Viabilidade', icon: Calculator, page: 'HourlyRates', viabilityTab: true },
 ];
 
 const saasAdminExtraItem = { name: 'Admin SaaS', icon: Shield, page: 'SaasAdmin' };
@@ -47,6 +49,7 @@ const consultantMenuItems = [
   { name: 'Meus Projetos', icon: FolderKanban, page: 'ConsultantProjects' },
   { name: 'Minhas Horas', icon: Clock, page: 'ConsultantTimeEntries' },
   { name: 'Minhas Despesas', icon: Receipt, page: 'ConsultantExpenses' },
+  { name: 'Análise de Viabilidade', icon: Calculator, page: 'HourlyRates', viabilityTab: true },
 ];
 
 const clientMenuItems = [
@@ -57,6 +60,9 @@ const clientMenuItems = [
 export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const location = useLocation();
+  const viabilityTabActive =
+    new URLSearchParams(location.search || '').get('tab') === 'viability';
 
   // Utilizador já foi resolvido no AuthProvider antes de renderizar rotas autenticadas.
   // Evita um segundo fetch + ecrã "Carregando..." (que parecia refresh ao voltar o foco).
@@ -90,11 +96,14 @@ export default function Layout({ children, currentPageName }) {
             {/* Desktop Menu */}
             <nav className="hidden lg:flex items-center gap-1">
               {menuItems.map((item) => {
-                const isActive = currentPageName === item.page;
+                const to = item.viabilityTab ? createHourlyRatesViabilityUrl() : createPageUrl(item.page);
+                const isActive =
+                  currentPageName === item.page &&
+                  (!item.viabilityTab || viabilityTabActive);
                 return (
                   <Link
-                    key={item.page}
-                    to={createPageUrl(item.page)}
+                    key={item.viabilityTab ? `${item.page}-viability` : item.page}
+                    to={to}
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
                       ${isActive 
@@ -170,11 +179,14 @@ export default function Layout({ children, currentPageName }) {
           <div className="lg:hidden absolute top-16 left-0 right-0 bg-white border-b border-slate-200 shadow-lg">
             <nav className="p-4 space-y-1">
               {menuItems.map((item) => {
-                const isActive = currentPageName === item.page;
+                const to = item.viabilityTab ? createHourlyRatesViabilityUrl() : createPageUrl(item.page);
+                const isActive =
+                  currentPageName === item.page &&
+                  (!item.viabilityTab || viabilityTabActive);
                 return (
                   <Link
-                    key={item.page}
-                    to={createPageUrl(item.page)}
+                    key={item.viabilityTab ? `${item.page}-viability` : item.page}
+                    to={to}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-lg transition-all

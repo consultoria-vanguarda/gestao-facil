@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '../utils';
+import { createPageUrl, createHourlyRatesViabilityUrl } from '../utils';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calculator, ChevronDown } from 'lucide-react';
 
@@ -12,13 +12,6 @@ const menuLinks = [
   { label: 'Financeiro', page: 'Financial' },
   { label: 'Relatórios', page: 'Reports' },
 ];
-
-/** Valores/HourlyRates com o separador de aba de viabilidade. */
-function hourlyRatesViabilityUrl() {
-  const base = createPageUrl('HourlyRates');
-  const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}tab=viability`;
-}
 
 export default function Dashboard() {
   const [scrolled, setScrolled] = useState(false);
@@ -128,7 +121,7 @@ export default function Dashboard() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              to={hourlyRatesViabilityUrl()}
+              to={createHourlyRatesViabilityUrl()}
               className="group flex items-center gap-2 px-8 py-3.5 rounded-full border border-[#38bcd4]/40 bg-[#38bcd4]/10 text-white font-semibold text-sm hover:bg-[#38bcd4]/20 hover:border-[#38bcd4]/60 transition-all backdrop-blur-sm"
             >
               <Calculator className="w-4 h-4 shrink-0 text-[#7ee8ff]" />

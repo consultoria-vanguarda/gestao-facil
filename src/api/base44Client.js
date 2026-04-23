@@ -323,6 +323,11 @@ export const base44 = {
 
       if (profileError) throw profileError;
 
+      const normalizeProfileUserType = (raw) => {
+        if (raw == null || String(raw).trim() === '') return 'admin';
+        return String(raw).trim().toLowerCase();
+      };
+
       if (!profile) {
         // Se não existir profile, ainda assim devolvemos user_type=admin (fallback).
         return {
@@ -343,7 +348,7 @@ export const base44 = {
         id: user.id,
         email: user.email,
         full_name: profile.full_name ?? user.email,
-        user_type: profile.user_type ?? 'admin',
+        user_type: normalizeProfileUserType(profile.user_type),
         consultant_id: profile.consultant_id,
         client_id: profile.client_id,
         organization_id: profile.organization_id ?? null,
