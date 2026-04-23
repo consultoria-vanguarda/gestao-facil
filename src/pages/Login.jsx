@@ -6,12 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTenantContext } from '@/lib/tenant';
+import { useTenant } from '@/lib/TenantContext';
+
+const ORG_MISMATCH_MESSAGE =
+  'Este usuário não pertence a esta organização. Acesse pelo link ou slug corretos ou use outra conta.';
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { tenantSlug } = getTenantContext(location);
+  const { organizationId, tenantError } = useTenant();
 
   const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
 
@@ -49,11 +54,33 @@ export default function LoginPage() {
     const emailNorm = email.trim().toLowerCase();
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: emailNorm,
         password,
       });
       if (signInError) throw signInError;
+
+      const userId = signInData?.user?.id;
+      const tenantResolved = organizationId && !tenantError;
+
+      if (tenantResolved && userId) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('organization_id, user_type')
+          .eq('id', userId)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        const isSaasAdmin = profile?.user_type === 'saas_admin';
+        if (!isSaasAdmin) {
+          if (!profile || profile.organization_id !== organizationId) {
+            await supabase.auth.signOut();
+            setError(ORG_MISMATCH_MESSAGE);
+            return;
+          }
+        }
+      }
 
       navigate(redirect);
     } catch (err) {
