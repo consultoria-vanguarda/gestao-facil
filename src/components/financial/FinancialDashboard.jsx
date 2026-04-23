@@ -59,7 +59,8 @@ export default function FinancialDashboard() {
   const { period } = usePeriod();
   const periodStr = `${period.year}-${String(period.month).padStart(2, '0')}`;
   const periodLabel = format(new Date(period.year, period.month - 1, 1), "MMMM 'de' yyyy", { locale: ptBR });
-  const [forecastDate, setForecastDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [forecastDateInput, setForecastDateInput] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [forecastDateApplied, setForecastDateApplied] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [showForecastDetails, setShowForecastDetails] = useState(false);
 
   const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
@@ -110,7 +111,7 @@ export default function FinancialDashboard() {
 
   const cashForecast = useMemo(() => {
     const baseBalance = totalBalance || 0;
-    const target = String(forecastDate || '').trim();
+    const target = String(forecastDateApplied || '').trim();
 
     if (!target) {
       return {
@@ -182,7 +183,7 @@ export default function FinancialDashboard() {
       receivableItems,
       payableItems,
     };
-  }, [billings, payables, expenses, totalBalance, forecastDate]);
+  }, [billings, payables, expenses, totalBalance, forecastDateApplied]);
 
   return (
     <div className="space-y-6">
@@ -257,12 +258,25 @@ export default function FinancialDashboard() {
             </div>
             <div className="w-full sm:w-auto">
               <label className="text-xs text-slate-500 font-medium">Data da previsão</label>
-              <input
-                type="date"
-                value={forecastDate}
-                onChange={(e) => setForecastDate(e.target.value)}
-                className="mt-1 block w-full sm:w-auto border border-slate-200 rounded-lg px-3 py-2 text-sm"
-              />
+              <div className="mt-1 flex items-center gap-2">
+                <input
+                  type="date"
+                  value={forecastDateInput}
+                  onChange={(e) => setForecastDateInput(e.target.value)}
+                  className="block w-full sm:w-auto border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => setForecastDateApplied(forecastDateInput)}
+                  disabled={!forecastDateInput || forecastDateInput === forecastDateApplied}
+                >
+                  OK
+                </Button>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Data aplicada: {formatDatePtBr(forecastDateApplied)}
+              </p>
             </div>
           </div>
         </CardHeader>
