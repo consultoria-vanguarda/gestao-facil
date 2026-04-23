@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../components/ui/PageHeader';
 import { KM_RANGES, CONSULTING_HOUR_RANGES, CONSULTING_RATES, INSTRUCTIONAL_HOUR_RANGES, INSTRUCTIONAL_RATES, WORKSHOPS_DIAGNOSTICS_LECTURES } from '../components/utils/hourlyRateTables';
@@ -58,8 +59,27 @@ function formatLocalidadeCep(cidade, uf, cepDigits) {
   return 'Não identificado pelo mapa';
 }
 
+function readTabFromUrl() {
+  try {
+    const t = new URLSearchParams(window.location.search).get('tab');
+    if (TAB_KEYS.has(t)) return t;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 export default function HourlyRates() {
-  const [activeTab, setActiveTab] = useState(() => readStoredTab() || 'consulting');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => readTabFromUrl() || readStoredTab() || 'consulting');
+
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (TAB_KEYS.has(t)) {
+      setActiveTab(t);
+      persistTab(t);
+    }
+  }, [searchParams]);
   const [filterKm, setFilterKm] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -79,7 +99,8 @@ export default function HourlyRates() {
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me(),
   });
-  const isAdmin = (currentUser?.user_type || 'admin') === 'admin';
+  const ut = currentUser?.user_type ?? 'admin';
+  const isAdmin = ut === 'admin' || ut === 'saas_admin';
 
   useEffect(() => {
     let cancelled = false;

@@ -51,7 +51,7 @@ export async function getViabilityCostConfig() {
   try {
     const orgId = requireCurrentOrganizationId();
     const rowId = getViabilityCostConfigRowId(orgId);
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('viability_cost_config')
       .select('*')
       .eq('id', rowId)
@@ -61,6 +61,23 @@ export async function getViabilityCostConfig() {
     if (error) {
       return { data: null, error: new Error(error.message || 'Erro ao carregar configurações de viabilidade.') };
     }
+
+    // Migrações antigas guardavam id tipo viability_cost_cfg_row_* em vez do hash da org.
+    if (!data) {
+      const fb = await supabase
+        .from('viability_cost_config')
+        .select('*')
+        .eq('organization_id', orgId)
+        .maybeSingle();
+      if (fb.error) {
+        return {
+          data: null,
+          error: new Error(fb.error.message || 'Erro ao carregar configurações de viabilidade.'),
+        };
+      }
+      data = fb.data;
+    }
+
     return { data: mapRowToConfig(data), error: null };
   } catch (e) {
     return { data: null, error: e instanceof Error ? e : new Error(String(e)) };
@@ -90,7 +107,17 @@ export async function upsertViabilityCostConfig({
 }) {
   try {
     const orgId = requireCurrentOrganizationId();
-    const rowId = getViabilityCostConfigRowId(orgId);
+    let rowId = getViabilityCostConfigRowId(orgId);
+
+    const { data: existingRow } = await supabase
+      .from('viability_cost_config')
+      .select('id')
+      .eq('organization_id', orgId)
+      .maybeSingle();
+
+    if (existingRow?.id) {
+      rowId = existingRow.id;
+    }
     const now = new Date().toISOString();
     const row = {
       id: rowId,
