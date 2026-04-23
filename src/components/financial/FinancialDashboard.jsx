@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, TrendingDown, Landmark, AlertTriangle, CheckCircle2, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell
@@ -18,11 +19,48 @@ const fmtShort = (v) => {
   return fmt(v);
 };
 
+function normalizeDateKey(raw) {
+  if (!raw) return null;
+  const value = String(raw).trim();
+  if (!value) return null;
+
+  // Formato ISO (yyyy-mm-dd ou yyyy-mm-ddTHH:mm:ss...)
+  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.slice(0, 10);
+  }
+
+  // Formato BR (dd/mm/yyyy)
+  const br = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (br) {
+    const [, dd, mm, yyyy] = br;
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Fallback para strings de data parseáveis.
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return format(d, 'yyyy-MM-dd');
+}
+
+function isOnOrBefore(rawDate, targetDate) {
+  const d = normalizeDateKey(rawDate);
+  const t = normalizeDateKey(targetDate);
+  if (!d || !t) return false;
+  return d <= t;
+}
+
+function formatDatePtBr(rawDate) {
+  const key = normalizeDateKey(rawDate);
+  if (!key) return 'Sem data';
+  return format(new Date(`${key}T12:00:00`), 'dd/MM/yyyy');
+}
+
 export default function FinancialDashboard() {
   const { period } = usePeriod();
   const periodStr = `${period.year}-${String(period.month).padStart(2, '0')}`;
   const periodLabel = format(new Date(period.year, period.month - 1, 1), "MMMM 'de' yyyy", { locale: ptBR });
   const [forecastDate, setForecastDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [showForecastDetails, setShowForecastDetails] = useState(false);
 
   const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
   const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => base44.entities.ProjectPayable.list() });
@@ -85,25 +123,64 @@ export default function FinancialDashboard() {
 
     // Considera apenas o que está pendente e com vencimento até a data-alvo.
     const receivablesToDate = billings
-      .filter((b) => b.status === 'billed' && b.due_date && b.due_date <= target)
+      .filter((b) => ['billed', 'open'].includes(String(b.status || '').toLowerCase()))
+      .filter((b) => isOnOrBefore(b.due_date, target))
       .reduce((sum, b) => sum + (b.amount || 0), 0);
 
     const projectPayablesToDate = payables
-      .filter((p) => p.status === 'open' && p.due_date && p.due_date <= target)
+      .filter((p) => ['open', 'to_pay'].includes(String(p.status || '').toLowerCase()))
+      .filter((p) => isOnOrBefore(p.due_date, target))
       .reduce((sum, p) => sum + (p.amount || 0), 0);
 
     const expensesToDate = expenses
-      .filter((e) => e.status === 'to_pay' && e.due_date && e.due_date <= target)
+      .filter((e) => ['to_pay', 'open'].includes(String(e.status || '').toLowerCase()))
+      .filter((e) => isOnOrBefore(e.due_date, target))
       .reduce((sum, e) => sum + (e.amount || 0), 0);
 
     const payablesToDate = projectPayablesToDate + expensesToDate;
     const projectedBalance = baseBalance + receivablesToDate - payablesToDate;
+
+    const receivableItems = billings
+      .filter((b) => ['billed', 'open'].includes(String(b.status || '').toLowerCase()))
+      .filter((b) => isOnOrBefore(b.due_date, target))
+      .map((b) => ({
+        id: `billing-${b.id || Math.random()}`,
+        description: b.description || 'Receita faturada',
+        due_date: normalizeDateKey(b.due_date),
+        amount: b.amount || 0,
+      }))
+      .sort((a, b) => String(a.due_date || '').localeCompare(String(b.due_date || '')));
+
+    const payableProjectItems = payables
+      .filter((p) => ['open', 'to_pay'].includes(String(p.status || '').toLowerCase()))
+      .filter((p) => isOnOrBefore(p.due_date, target))
+      .map((p) => ({
+        id: `payable-${p.id || Math.random()}`,
+        description: p.description || 'Conta a pagar',
+        due_date: normalizeDateKey(p.due_date),
+        amount: p.amount || 0,
+      }));
+
+    const payableExpenseItems = expenses
+      .filter((e) => ['to_pay', 'open'].includes(String(e.status || '').toLowerCase()))
+      .filter((e) => isOnOrBefore(e.due_date, target))
+      .map((e) => ({
+        id: `expense-${e.id || Math.random()}`,
+        description: e.description || 'Despesa',
+        due_date: normalizeDateKey(e.due_date),
+        amount: e.amount || 0,
+      }));
+
+    const payableItems = [...payableProjectItems, ...payableExpenseItems]
+      .sort((a, b) => String(a.due_date || '').localeCompare(String(b.due_date || '')));
 
     return {
       baseBalance,
       receivablesToDate,
       payablesToDate,
       projectedBalance,
+      receivableItems,
+      payableItems,
     };
   }, [billings, payables, expenses, totalBalance, forecastDate]);
 
@@ -210,6 +287,63 @@ export default function FinancialDashboard() {
               </p>
             </div>
           </div>
+
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">
+              Receitas consideradas: <strong>{cashForecast.receivableItems?.length || 0}</strong> ·
+              Despesas consideradas: <strong>{cashForecast.payableItems?.length || 0}</strong>
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowForecastDetails((v) => !v)}
+            >
+              {showForecastDetails ? 'Ver menos' : 'Ver mais'}
+            </Button>
+          </div>
+
+          {showForecastDetails && (
+            <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-3">
+                <p className="text-sm font-semibold text-emerald-700 mb-2">Receitas a receber no período</p>
+                <div className="space-y-2 max-h-72 overflow-auto pr-1">
+                  {cashForecast.receivableItems?.length ? (
+                    cashForecast.receivableItems.map((item) => (
+                      <div key={item.id} className="rounded-md bg-white border border-emerald-100 p-2">
+                        <p className="text-sm font-medium text-slate-800">{item.description}</p>
+                        <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
+                          <span>Vence: {formatDatePtBr(item.due_date)}</span>
+                          <span className="font-semibold text-emerald-700">{fmt(item.amount)}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500">Nenhuma receita pendente até esta data.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-rose-200 bg-rose-50/40 p-3">
+                <p className="text-sm font-semibold text-rose-700 mb-2">Despesas a pagar no período</p>
+                <div className="space-y-2 max-h-72 overflow-auto pr-1">
+                  {cashForecast.payableItems?.length ? (
+                    cashForecast.payableItems.map((item) => (
+                      <div key={item.id} className="rounded-md bg-white border border-rose-100 p-2">
+                        <p className="text-sm font-medium text-slate-800">{item.description}</p>
+                        <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
+                          <span>Vence: {formatDatePtBr(item.due_date)}</span>
+                          <span className="font-semibold text-rose-700">{fmt(item.amount)}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500">Nenhuma despesa pendente até esta data.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
