@@ -5,18 +5,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { getTenantContext } from '@/lib/tenant';
-import { useTenant } from '@/lib/TenantContext';
+import { getTenantContext, storeTenantSlugForSession } from '@/lib/tenant';
 
 const ORG_MISMATCH_MESSAGE =
-  'Este usuário não pertence a esta organização. Acesse pelo link ou slug corretos ou use outra conta.';
+  'Este usuário não pertence a esta organização. Use o slug da sua organização na URL ou outra conta.';
+
+/**
+ * Se o redirect não pede tenant, acrescenta ?slug= da organização do utilizador.
+ * Se já pede outro slug (diferente do utilizador), devolve null (erro explícito).
+ */
+function mergeUserSlugIntoRedirect(redirectPath, userOrgSlug) {
+  if (!userOrgSlug) return redirectPath || '/';
+  const raw = redirectPath && String(redirectPath).trim() !== '' ? redirectPath : '/';
+  const normalized = raw.startsWith('/') ? raw : `/${raw}`;
+  const qIdx = normalized.indexOf('?');
+  const pathname = qIdx >= 0 ? normalized.slice(0, qIdx) : normalized;
+  const search = qIdx >= 0 ? normalized.slice(qIdx + 1) : '';
+  const params = new URLSearchParams(search);
+  const existing =
+    params.get('slug') ||
+    params.get('tenant') ||
+    params.get('organization') ||
+    params.get('org');
+  const want = String(userOrgSlug).trim().toLowerCase();
+  if (existing && String(existing).trim().toLowerCase() !== want) {
+    return null;
+  }
+  if (!existing) {
+    params.set('slug', want);
+  }
+  const q = params.toString();
+  return q ? `${pathname}?${q}` : pathname;
+}
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { tenantSlug } = getTenantContext(location);
-  const { organizationId, tenantError } = useTenant();
 
   const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
 
@@ -61,25 +87,49 @@ export default function LoginPage() {
       if (signInError) throw signInError;
 
       const userId = signInData?.user?.id;
-      const tenantResolved = organizationId && !tenantError;
 
-      if (tenantResolved && userId) {
+      if (userId) {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('organization_id, user_type')
+          .select('organization_id, user_type, organization:organizations(slug)')
           .eq('id', userId)
           .maybeSingle();
 
         if (profileError) throw profileError;
 
-        const isSaasAdmin = profile?.user_type === 'saas_admin';
-        if (!isSaasAdmin) {
-          if (!profile || profile.organization_id !== organizationId) {
-            await supabase.auth.signOut();
-            setError(ORG_MISMATCH_MESSAGE);
-            return;
-          }
+        const ut = String(profile?.user_type ?? '')
+          .trim()
+          .toLowerCase();
+        if (ut === 'saas_admin') {
+          navigate(redirect);
+          return;
         }
+
+        let userOrgSlug =
+          profile?.organization?.slug != null
+            ? String(profile.organization.slug).trim().toLowerCase()
+            : '';
+
+        if (!userOrgSlug && profile?.organization_id) {
+          const { data: orgRow } = await supabase
+            .from('organizations')
+            .select('slug')
+            .eq('id', profile.organization_id)
+            .maybeSingle();
+          userOrgSlug = orgRow?.slug ? String(orgRow.slug).trim().toLowerCase() : '';
+        }
+
+        const merged = mergeUserSlugIntoRedirect(redirect, userOrgSlug);
+        if (merged === null) {
+          await supabase.auth.signOut();
+          setError(ORG_MISMATCH_MESSAGE);
+          return;
+        }
+        if (userOrgSlug) {
+          storeTenantSlugForSession(userOrgSlug);
+        }
+        navigate(merged);
+        return;
       }
 
       navigate(redirect);
