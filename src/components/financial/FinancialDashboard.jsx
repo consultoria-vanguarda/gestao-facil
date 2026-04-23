@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { format, subMonths } from 'date-fns';
@@ -22,6 +22,7 @@ export default function FinancialDashboard() {
   const { period } = usePeriod();
   const periodStr = `${period.year}-${String(period.month).padStart(2, '0')}`;
   const periodLabel = format(new Date(period.year, period.month - 1, 1), "MMMM 'de' yyyy", { locale: ptBR });
+  const [forecastDate, setForecastDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
   const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => base44.entities.ProjectPayable.list() });
@@ -68,6 +69,43 @@ export default function FinancialDashboard() {
   const ResultIcon = resultado > 0 ? ArrowUpRight : resultado < 0 ? ArrowDownRight : Minus;
   const resultColor = resultado > 0 ? 'text-emerald-600' : resultado < 0 ? 'text-rose-600' : 'text-slate-500';
   const resultBg = resultado > 0 ? 'bg-emerald-50' : resultado < 0 ? 'bg-rose-50' : 'bg-slate-50';
+
+  const cashForecast = useMemo(() => {
+    const baseBalance = totalBalance || 0;
+    const target = String(forecastDate || '').trim();
+
+    if (!target) {
+      return {
+        baseBalance,
+        receivablesToDate: 0,
+        payablesToDate: 0,
+        projectedBalance: baseBalance,
+      };
+    }
+
+    // Considera apenas o que está pendente e com vencimento até a data-alvo.
+    const receivablesToDate = billings
+      .filter((b) => b.status === 'billed' && b.due_date && b.due_date <= target)
+      .reduce((sum, b) => sum + (b.amount || 0), 0);
+
+    const projectPayablesToDate = payables
+      .filter((p) => p.status === 'open' && p.due_date && p.due_date <= target)
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const expensesToDate = expenses
+      .filter((e) => e.status === 'to_pay' && e.due_date && e.due_date <= target)
+      .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    const payablesToDate = projectPayablesToDate + expensesToDate;
+    const projectedBalance = baseBalance + receivablesToDate - payablesToDate;
+
+    return {
+      baseBalance,
+      receivablesToDate,
+      payablesToDate,
+      projectedBalance,
+    };
+  }, [billings, payables, expenses, totalBalance, forecastDate]);
 
   return (
     <div className="space-y-6">
@@ -129,6 +167,51 @@ export default function FinancialDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Linha 1.5: Previsão de Fluxo de Caixa por data futura */}
+      <Card className="border-0 shadow-md">
+        <CardHeader className="pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <CardTitle className="text-base text-slate-900">Previsão de Fluxo de Caixa</CardTitle>
+              <p className="text-xs text-slate-500 mt-1">
+                Projeção com base no saldo atual, itens faturados a receber e despesas em aberto até a data.
+              </p>
+            </div>
+            <div className="w-full sm:w-auto">
+              <label className="text-xs text-slate-500 font-medium">Data da previsão</label>
+              <input
+                type="date"
+                value={forecastDate}
+                onChange={(e) => setForecastDate(e.target.value)}
+                className="mt-1 block w-full sm:w-auto border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="rounded-lg bg-slate-50 p-3">
+              <p className="text-xs text-slate-500">Saldo atual</p>
+              <p className="text-lg font-bold text-slate-900">{fmt(cashForecast.baseBalance)}</p>
+            </div>
+            <div className="rounded-lg bg-emerald-50 p-3">
+              <p className="text-xs text-emerald-700">A receber até a data</p>
+              <p className="text-lg font-bold text-emerald-700">{fmt(cashForecast.receivablesToDate)}</p>
+            </div>
+            <div className="rounded-lg bg-rose-50 p-3">
+              <p className="text-xs text-rose-700">A pagar até a data</p>
+              <p className="text-lg font-bold text-rose-700">{fmt(cashForecast.payablesToDate)}</p>
+            </div>
+            <div className="rounded-lg bg-blue-50 p-3">
+              <p className="text-xs text-blue-700">Saldo projetado</p>
+              <p className={`text-lg font-bold ${cashForecast.projectedBalance >= 0 ? 'text-blue-700' : 'text-rose-700'}`}>
+                {fmt(cashForecast.projectedBalance)}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Linha 2: Pipeline de receita (to_bill → billed → received) */}
       <div>
