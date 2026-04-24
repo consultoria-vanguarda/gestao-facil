@@ -34,6 +34,75 @@ const emptyForm = {
   status: 'planning', notes: ''
 };
 
+function RichTextArea({ name, value, onChange, rows = 4, style, placeholder, inputRef }) {
+  const applyFormat = (marker) => {
+    const el = inputRef?.current;
+    if (!el) return;
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    const before = value.slice(0, start);
+    const selected = value.slice(start, end);
+    const after = value.slice(end);
+    const wrapped = `${marker}${selected}${marker}`;
+    onChange({
+      target: {
+        name,
+        value: `${before}${wrapped}${after}`,
+      },
+    });
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(start + marker.length, end + marker.length);
+    });
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
+        <button
+          type="button"
+          onClick={() => applyFormat('**')}
+          title="Negrito"
+          style={{
+            border: '1px solid #cbd5e1',
+            backgroundColor: 'white',
+            borderRadius: '4px',
+            padding: '2px 8px',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => applyFormat('*')}
+          title="Itálico"
+          style={{
+            border: '1px solid #cbd5e1',
+            backgroundColor: 'white',
+            borderRadius: '4px',
+            padding: '2px 8px',
+            fontStyle: 'italic',
+            cursor: 'pointer',
+          }}
+        >
+          I
+        </button>
+      </div>
+      <textarea
+        ref={inputRef}
+        name={name}
+        value={value}
+        onChange={onChange}
+        rows={rows}
+        style={style}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
 function isHoliday(date) {
   const holidays = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','12-25'];
   const md = `${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -126,6 +195,11 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   const [ppParsedData, setPpParsedData] = useState(null);
   const [ppParseError, setPpParseError] = useState('');
   const [ppFileUrl, setPpFileUrl] = useState('');
+  const objectiveRef = React.useRef(null);
+  const needsRef = React.useRef(null);
+  const detailRef = React.useRef(null);
+  const produtoFinalRef = React.useRef(null);
+  const notesRef = React.useRef(null);
 
   useEffect(() => {
     if (open && project) {
@@ -1224,7 +1298,14 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
               {isConsulting && (
                 <div style={{ marginTop: '12px' }}>
                   <label style={labelStyle}>Objetivo</label>
-                  <textarea name="objective" value={formData.objective} onChange={handleChange} rows={3} style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }} />
+                  <RichTextArea
+                    name="objective"
+                    value={formData.objective}
+                    onChange={handleChange}
+                    rows={3}
+                    style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
+                    inputRef={objectiveRef}
+                  />
                 </div>
               )}
             </div>
@@ -1234,7 +1315,15 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
           {isConsulting && (
             <div style={sectionStyle}>
               <div style={sectionTitleStyle}>3. Necessidades do Cliente</div>
-              <textarea name="client_needs" value={formData.client_needs} onChange={handleChange} rows={4} style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }} placeholder="Descreva as necessidades do cliente..." />
+              <RichTextArea
+                name="client_needs"
+                value={formData.client_needs}
+                onChange={handleChange}
+                rows={4}
+                style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
+                placeholder="Descreva as necessidades do cliente..."
+                inputRef={needsRef}
+              />
             </div>
           )}
 
@@ -1244,13 +1333,27 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
               <div style={sectionTitleStyle}>4. Detalhamento do Serviço e Atividades</div>
               <div style={{ marginBottom: '16px' }}>
                 <label style={labelStyle}>Detalhamento do Serviço</label>
-                <textarea name="service_detail" value={formData.service_detail} onChange={handleChange} rows={4} style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }} placeholder="Descreva o serviço a ser realizado..." />
+                <RichTextArea
+                  name="service_detail"
+                  value={formData.service_detail}
+                  onChange={handleChange}
+                  rows={4}
+                  style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
+                  placeholder="Descreva o serviço a ser realizado..."
+                  inputRef={detailRef}
+                />
               </div>
               <div style={{ marginBottom: '16px' }}>
                 <label style={labelStyle}>Produto Final a ser disponibilizado ao cliente</label>
-                <textarea name="produto_final" value={formData.produto_final} onChange={handleChange} rows={3}
+                <RichTextArea
+                  name="produto_final"
+                  value={formData.produto_final}
+                  onChange={handleChange}
+                  rows={3}
                   style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
-                  placeholder={'PRODUTO FINAL A SER DISPONIBILIZADO PARA O CLIENTE:\n01 (um) PLANO DE NEGÓCIO.\nObs: Os custos de aquisição, implantação e treinamento não fazem parte da presente proposta.'} />
+                  placeholder={'PRODUTO FINAL A SER DISPONIBILIZADO PARA O CLIENTE:\n01 (um) PLANO DE NEGÓCIO.\nObs: Os custos de aquisição, implantação e treinamento não fazem parte da presente proposta.'}
+                  inputRef={produtoFinalRef}
+                />
                 <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Se não preenchido, será usado o texto padrão acima.</p>
               </div>
 
@@ -1566,21 +1669,39 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
             <>
               <div style={sectionStyle}>
                 <div style={sectionTitleStyle}>Informações Relativas à Situação da Empresa / Descrição da Necessidade do Cliente</div>
-                <textarea name="client_needs" value={formData.client_needs} onChange={handleChange} rows={5}
+                <RichTextArea
+                  name="client_needs"
+                  value={formData.client_needs}
+                  onChange={handleChange}
+                  rows={5}
                   style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
-                  placeholder="Descreva a situação da empresa e as necessidades do cliente..." />
+                  placeholder="Descreva a situação da empresa e as necessidades do cliente..."
+                  inputRef={needsRef}
+                />
               </div>
               <div style={sectionStyle}>
                 <div style={sectionTitleStyle}>Orientações Repassadas à Empresa Durante o Diagnóstico</div>
-                <textarea name="objective" value={formData.objective} onChange={handleChange} rows={5}
+                <RichTextArea
+                  name="objective"
+                  value={formData.objective}
+                  onChange={handleChange}
+                  rows={5}
                   style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
-                  placeholder="Descreva as orientações repassadas à empresa durante o diagnóstico..." />
+                  placeholder="Descreva as orientações repassadas à empresa durante o diagnóstico..."
+                  inputRef={objectiveRef}
+                />
               </div>
               <div style={sectionStyle}>
                 <div style={sectionTitleStyle}>Considerações do Consultor</div>
-                <textarea name="notes" value={formData.notes} onChange={handleChange} rows={5}
+                <RichTextArea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={5}
                   style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
-                  placeholder="Considerações do consultor sobre o diagnóstico..." />
+                  placeholder="Considerações do consultor sobre o diagnóstico..."
+                  inputRef={notesRef}
+                />
               </div>
               <div style={sectionStyle}>
                 <div style={sectionTitleStyle}>Configuração</div>

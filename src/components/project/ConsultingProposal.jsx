@@ -2,11 +2,12 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
 
 const SEBRAE_LOGO_URL =
   'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/8efa5bac6_image.png';
 
-const AREA_LABELS = {
+const LEGACY_AREA_LABELS = {
   finances: 'Finanças',
   marketing: 'Marketing',
   planning: 'Planejamento',
@@ -113,6 +114,98 @@ function drawJustifiedText(doc, text, x, y, maxWidth, lineHeight, fontSize, font
     }
   }
   return curY;
+}
+
+function styleToPdfFont(style) {
+  if (style.bold && style.italic) return 'bolditalic';
+  if (style.bold) return 'bold';
+  if (style.italic) return 'italic';
+  return 'normal';
+}
+
+function parseRichRuns(text, defaultBold = false) {
+  const runs = [];
+  let bold = !!defaultBold;
+  let italic = false;
+  let buffer = '';
+
+  const pushBuffer = () => {
+    if (!buffer) return;
+    const prev = runs[runs.length - 1];
+    const style = { bold, italic };
+    if (prev && prev.style.bold === style.bold && prev.style.italic === style.italic) {
+      prev.text += buffer;
+    } else {
+      runs.push({ text: buffer, style });
+    }
+    buffer = '';
+  };
+
+  for (let i = 0; i < text.length; i++) {
+    if (text.startsWith('**', i)) {
+      pushBuffer();
+      bold = !bold;
+      i += 1;
+      continue;
+    }
+    if (text[i] === '*') {
+      pushBuffer();
+      italic = !italic;
+      continue;
+    }
+    buffer += text[i];
+  }
+  pushBuffer();
+  return runs;
+}
+
+function measureText(doc, text, fontSize, style) {
+  doc.setFontSize(fontSize);
+  doc.setFont('helvetica', styleToPdfFont(style));
+  return doc.getTextWidth(text || '');
+}
+
+function wrapRichRuns(doc, runs, maxWidth, fontSize) {
+  const lines = [];
+  let current = [];
+  let currentW = 0;
+
+  const pushLine = () => {
+    if (current.length === 0) return;
+    lines.push(current);
+    current = [];
+    currentW = 0;
+  };
+
+  for (const run of runs) {
+    const parts = String(run.text || '').split(/(\s+)/).filter((p) => p.length > 0);
+    for (const part of parts) {
+      const isSpace = /^\s+$/.test(part);
+      if (isSpace && current.length === 0) continue;
+
+      const w = measureText(doc, part, fontSize, run.style);
+      if (!isSpace && current.length > 0 && currentW + w > maxWidth) {
+        pushLine();
+      }
+      if (isSpace && current.length === 0) continue;
+      current.push({ text: part, style: run.style });
+      currentW += w;
+    }
+  }
+  pushLine();
+  return lines;
+}
+
+function drawRichLine(doc, runs, x, y, fontSize, black) {
+  let cx = x;
+  for (const run of runs) {
+    if (!run.text) continue;
+    doc.setFontSize(fontSize);
+    doc.setFont('helvetica', styleToPdfFont(run.style));
+    doc.setTextColor(...black);
+    doc.text(run.text, cx, y);
+    cx += doc.getTextWidth(run.text);
+  }
 }
 
 // Draw a bordered box with justified text inside, returns height used
@@ -383,13 +476,21 @@ export async function downloadConsultingProposal(project, client) {
 
   // ─── Tokenize text into renderable justified lines ───────────────────────
   function tokenize(text, fontSize, bold = false) {
-    doc.setFontSize(fontSize);
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
     const result = [];
     for (const para of (text || '').split('\n')) {
       if (para.trim() === '') { result.push({ spacer: true }); continue; }
-      const lines = doc.splitTextToSize(para, contentW - 8);
-      lines.forEach((line, i, arr) => result.push({ text: line, isLast: i === arr.length - 1, bold }));
+      const richRuns = parseRichRuns(para, bold);
+      const lines = wrapRichRuns(doc, richRuns, contentW - 8, fontSize);
+      lines.forEach((lineRuns, i, arr) => {
+        const plainText = lineRuns.map((r) => r.text).join('');
+        result.push({
+          text: plainText,
+          runs: lineRuns,
+          hasRich: lineRuns.some((r) => r.style.bold || r.style.italic),
+          isLast: i === arr.length - 1,
+          bold,
+        });
+      });
     }
     return result;
   }
@@ -423,12 +524,14 @@ export async function downloadConsultingProposal(project, client) {
       for (let k = idx; k < idx + count && k < tokens.length; k++) {
         const tok = tokens[k];
         if (tok.spacer) { ty += lineH * 0.6; continue; }
-        doc.setFontSize(fontSize);
-        doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
         doc.setTextColor(...black);
-        if (!tok.isLast && !tok.bold) {
+        if (tok.runs && tok.runs.length > 0) {
+          drawRichLine(doc, tok.runs, marginL + pad, ty, fontSize, black);
+        } else if (!tok.isLast && !tok.bold && !tok.hasRich) {
           justifyLine(tok.text, marginL + pad, ty, maxW);
         } else {
+          doc.setFontSize(fontSize);
+          doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
           doc.text(tok.text, marginL + pad, ty);
         }
         ty += lineH;
@@ -493,7 +596,9 @@ export async function downloadConsultingProposal(project, client) {
   y = sectionTitle('2 - ÁREA/SUBÁREA', y, true);
   y += 2;
 
-  const areaLabel = project.area === 'custom' ? (project.custom_area || '') : (AREA_LABELS[project.area] || project.area || '');
+  const areaLabel = project.area === 'custom'
+    ? (project.custom_area || '')
+    : (SERVICE_AREAS?.[project.area]?.label || LEGACY_AREA_LABELS[project.area] || project.area || '');
   const subareaLabel = project.subarea || project.custom_subarea || '';
 
   // Linha superior do bloco área/subárea
@@ -512,12 +617,9 @@ export async function downloadConsultingProposal(project, client) {
   }
   y += 3;
 
-  // Objective box
+  // Objective box (suporta negrito/itálico via marcadores **texto** e *texto*)
   const objectiveText = '2.3. OBJETIVO: ' + (project.objective || '');
-  const objLines = doc.splitTextToSize(objectiveText, contentW - 6);
-  const objH = Math.max(14, objLines.length * 5 + 6);
-  borderedBox(marginL, y, contentW, objH, objectiveText, { fontSize: 10 });
-  y += objH + 6;
+  y = drawBoxMultiPage(tokenize(objectiveText, 10), y);
 
   // 3 - NECESSIDADES DO CLIENTE
   y = sectionTitle('3 - NECESSIDADES DO CLIENTE', y);
@@ -546,10 +648,24 @@ export async function downloadConsultingProposal(project, client) {
     y = drawBoxMultiPage(tokens4, y);
   }
 
+  // Pré-cálculo do cronograma para usar no item 5 e na tabela do item 6.
+  const scheduleRows = buildScheduleRows(project);
+  const monthsCovered = new Set(
+    scheduleRows
+      .map((r) => {
+        if (!r?.dateObj || Number.isNaN(new Date(r.dateObj).getTime())) return null;
+        const d = new Date(r.dateObj);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      })
+      .filter(Boolean)
+  );
+  const durationMonths = Math.max(1, monthsCovered.size || 0);
+  const monthsWord = numberToWordsInteger(durationMonths);
+
   // 5 - HORAS TÉCNICAS
   const estimatedHours = parseFloat(project.estimated_hours) || 0;
   const hoursWord = numberToWordsInteger(estimatedHours);
-  const hoursText = `Para a realização do trabalho foram estimadas ${estimatedHours} (${hoursWord}) horas técnicas a serem realizadas durante os meses de trabalho, contados a partir da data de início dos trabalhos conforme cronograma.`;
+  const hoursText = `Para a realização do trabalho foram estimadas ${estimatedHours} (${hoursWord}) horas técnicas a serem realizadas durante ${durationMonths} (${monthsWord}) meses de trabalho, contados a partir da data de início dos trabalhos conforme cronograma.`;
   
   // Calculate height based on borderedBox logic
   {
@@ -586,7 +702,6 @@ export async function downloadConsultingProposal(project, client) {
   y += 4;
 
   // Build schedule rows
-  const scheduleRows = buildScheduleRows(project);
   const startDateObj = project.start_date ? new Date(project.start_date + 'T12:00:00') : new Date();
 
   // Build table body with rowSpan for Atividades, Mês (per month block), Entregas

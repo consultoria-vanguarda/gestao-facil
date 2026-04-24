@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePeriod } from './PeriodContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -268,6 +269,7 @@ function PayModal({ expense, accounts, onConfirm, onClose, loading }) {
 export default function ExpensesTab() {
   const queryClient = useQueryClient();
   const { period } = usePeriod();
+  const { user } = useAuth();
   const [formOpen, setFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -279,6 +281,7 @@ export default function ExpensesTab() {
   const [filterPeriod, setFilterPeriod] = useState('current_month');
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
+  const [reverseLoadingId, setReverseLoadingId] = useState(null);
 
   const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => base44.entities.Expense.list('-due_date') });
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
@@ -342,6 +345,54 @@ export default function ExpensesTab() {
     queryClient.invalidateQueries({ queryKey: ['accounts'] });
     setPayingExpense(null);
     setPayLoading(false);
+  };
+
+  const handleReversePayment = async (expense) => {
+    if (!expense || expense.status !== 'paid') return;
+    const ok = window.confirm('Confirmar reversão desta despesa paga?');
+    if (!ok) return;
+
+    try {
+      setReverseLoadingId(expense.id);
+      const nowIso = new Date().toISOString();
+      const actorName = user?.full_name || user?.email || 'Usuário';
+      const actorId = user?.id || null;
+
+      // Reverte impacto no saldo da conta (se existir conta vinculada ao pagamento).
+      if (expense.payment_account_id) {
+        const account = financialAccounts.find((a) => a.id === expense.payment_account_id);
+        if (account) {
+          const newBalance = (account.current_balance || 0) + (expense.amount || 0);
+          await base44.entities.FinancialAccount.update(expense.payment_account_id, { current_balance: newBalance });
+        }
+
+        await base44.entities.AccountTransaction.create({
+          account_id: expense.payment_account_id,
+          type: 'credit',
+          amount: expense.amount || 0,
+          description: `Reversão de despesa paga: ${expense.description || 'Despesa'}`,
+          date: nowIso.slice(0, 10),
+          reference_type: 'payable_reversal',
+          reference_id: expense.id,
+          project_id: expense.project_id || undefined,
+        });
+      }
+
+      // Data e autor da reversão são sempre automáticos (não editáveis no formulário).
+      await base44.entities.Expense.update(expense.id, {
+        status: 'to_pay',
+        payment_date: null,
+        payment_account_id: null,
+        reversal_requested_at: nowIso,
+        reversal_requested_by_name: actorName,
+        reversal_requested_by_id: actorId,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    } finally {
+      setReverseLoadingId(null);
+    }
   };
 
   const globalPeriodStr = `${period.year}-${String(period.month).padStart(2, '0')}`;
@@ -462,6 +513,11 @@ export default function ExpensesTab() {
                         {expense.payment_date && (
                           <span className="ml-3 text-emerald-600">Pago em: {format(parseISO(expense.payment_date), 'dd/MM/yyyy')}</span>
                         )}
+                        {expense.reversal_requested_at && (
+                          <span className="ml-3 text-amber-700">
+                            Reversão: {format(parseISO(expense.reversal_requested_at), 'dd/MM/yyyy HH:mm')} por {expense.reversal_requested_by_name || 'Usuário'}
+                          </span>
+                        )}
                         {accountLabel && <span className="ml-2 font-medium text-slate-700">{accountLabel}</span>}
                       </p>
                       {expense.description && <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{expense.description}</p>}
@@ -492,6 +548,16 @@ export default function ExpensesTab() {
                           <DropdownMenuItem onClick={() => { setEditingExpense(expense); setFormOpen(true); }}>
                             <Pencil className="w-4 h-4 mr-2" /> Editar
                           </DropdownMenuItem>
+                          {expense.status === 'paid' && (
+                            <DropdownMenuItem
+                              disabled={reverseLoadingId === expense.id}
+                              onClick={() => handleReversePayment(expense)}
+                              className="text-amber-700"
+                            >
+                              <CheckCircle2 className="w-4 h-4 mr-2" />
+                              {reverseLoadingId === expense.id ? 'Revertendo...' : 'Reverter Pagamento'}
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => setDeleteConfirm(expense)} className="text-rose-600">
                             <Trash2 className="w-4 h-4 mr-2" /> Excluir
                           </DropdownMenuItem>
