@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,30 +11,30 @@ export default function ProjectsKanban() {
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => api.entities.Project.list(),
     staleTime: 30000,
   });
 
   const { data: consultants = [], isLoading: consultantsLoading } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
     staleTime: 30000,
   });
 
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
     queryKey: ['clients'],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
     staleTime: 30000,
   });
 
   const { data: timeEntries = [], isLoading: timeEntriesLoading } = useQuery({
     queryKey: ['timeEntries'],
-    queryFn: () => base44.entities.TimeEntry.list(),
+    queryFn: () => api.entities.TimeEntry.list(),
     staleTime: 30000,
   });
 
   const updateProjectMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Project.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Project.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },

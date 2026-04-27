@@ -1,9 +1,12 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+
 /** Mesma logomarca dos relatórios gerenciais (ReportsTab). */
-const LOGO_URL =
-  'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG';
+const LOGO_URL = publicStorageObjectUrl(
+  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
+);
 
 const BRAND = [30, 58, 95];
 

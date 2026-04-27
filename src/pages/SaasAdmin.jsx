@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/api/supabaseClient';
-import { invokeEdgeFunctionWithSession } from '@/api/base44Client';
+import { invokeEdgeFunctionWithSession } from '@/api/appApi';
 import { useAuth } from '@/lib/AuthContext';
 import { Building2, Loader2, Plus, ShieldAlert, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

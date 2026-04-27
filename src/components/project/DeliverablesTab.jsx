@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { Upload, FileCheck, ExternalLink, Loader2 } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -12,11 +12,11 @@ export default function DeliverablesTab({ project, onUpdate }) {
     if (!file) return;
     setUploading(u => ({ ...u, [idx]: true }));
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       const updatedActivities = activities.map((a, i) =>
         i === idx ? { ...a, deliverable_url: file_url, deliverable_name: file.name } : a
       );
-      await base44.entities.Project.update(project.id, { activities: updatedActivities });
+      await api.entities.Project.update(project.id, { activities: updatedActivities });
       onUpdate();
     } catch (e) {
       alert('Erro ao fazer upload do arquivo.');

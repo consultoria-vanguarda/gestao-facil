@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, MoreHorizontal, Pencil, Trash2, Calendar } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,28 +50,28 @@ export default function ConsultantExpenses() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['myExpenses', user?.consultant_id],
-    queryFn: () => base44.entities.Expense.filter({ consultant_id: user.consultant_id }, '-date'),
+    queryFn: () => api.entities.Expense.filter({ consultant_id: user.consultant_id }, '-date'),
     enabled: !!user?.consultant_id,
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['myProjects', user?.consultant_id],
-    queryFn: () => base44.entities.Project.filter({ consultant_id: user.consultant_id }),
+    queryFn: () => api.entities.Project.filter({ consultant_id: user.consultant_id }),
     enabled: !!user?.consultant_id,
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create({
+    mutationFn: (data) => api.entities.Expense.create({
       ...data,
       consultant_id: user.consultant_id
     }),
@@ -82,7 +82,7 @@ export default function ConsultantExpenses() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Expense.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myExpenses'] });
       setFormOpen(false);
@@ -91,7 +91,7 @@ export default function ConsultantExpenses() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Expense.delete(id),
+    mutationFn: (id) => api.entities.Expense.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myExpenses'] });
       setDeleteConfirm(null);

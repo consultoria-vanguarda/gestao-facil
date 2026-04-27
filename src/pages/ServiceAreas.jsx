@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { SERVICE_AREAS } from '../components/utils/serviceAreas';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Star, Search, Info, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -17,12 +17,12 @@ export default function ServiceAreas() {
   // Load saved config from DB
   const { data: configs = [], isLoading } = useQuery({
     queryKey: ['serviceAreaConfigs'],
-    queryFn: () => base44.entities.ServiceAreaConfig.list(),
+    queryFn: () => api.entities.ServiceAreaConfig.list(),
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.filter({ status: 'active' }),
+    queryFn: () => api.entities.Consultant.filter({ status: 'active' }),
   });
 
   // Build a map: areaKey -> { docId, active_subareas[] }
@@ -52,9 +52,9 @@ export default function ServiceAreas() {
         const next = current.includes(subareaId)
           ? current.filter(s => s !== subareaId)
           : [...current, subareaId];
-        return base44.entities.ServiceAreaConfig.update(existing.id, { active_subareas: next });
+        return api.entities.ServiceAreaConfig.update(existing.id, { active_subareas: next });
       } else {
-        return base44.entities.ServiceAreaConfig.create({ area_key: areaKey, active_subareas: [subareaId] });
+        return api.entities.ServiceAreaConfig.create({ area_key: areaKey, active_subareas: [subareaId] });
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serviceAreaConfigs'] }),
@@ -71,9 +71,9 @@ export default function ServiceAreas() {
       const next = allActive ? [] : allIds;
 
       if (existing) {
-        return base44.entities.ServiceAreaConfig.update(existing.id, { active_subareas: next });
+        return api.entities.ServiceAreaConfig.update(existing.id, { active_subareas: next });
       } else {
-        return base44.entities.ServiceAreaConfig.create({ area_key: areaKey, active_subareas: next });
+        return api.entities.ServiceAreaConfig.create({ area_key: areaKey, active_subareas: next });
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serviceAreaConfigs'] }),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, Upload, Trash2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 
 const REPORT_TYPES = [
   { value: 'presencial', label: 'Consultoria Presencial' },
@@ -46,7 +46,7 @@ export default function ServiceReportForm({ open, onClose, report, project, clie
     const file = e.target.files[0];
     if (!file) return;
     setUploadingImage(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setFormData(prev => ({ ...prev, results_images: [...prev.results_images, file_url] }));
     setUploadingImage(false);
     e.target.value = '';

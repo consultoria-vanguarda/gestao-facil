@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,27 +19,27 @@ export default function Reports() {
   
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => api.entities.Project.list(),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
-    queryFn: () => base44.entities.Task.list(),
+    queryFn: () => api.entities.Task.list(),
   });
 
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries'],
-    queryFn: () => base44.entities.TimeEntry.list(),
+    queryFn: () => api.entities.TimeEntry.list(),
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list(),
+    queryFn: () => api.entities.Expense.list(),
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   // Filtrar dados por projeto

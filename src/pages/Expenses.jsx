@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, MoreHorizontal, Pencil, Trash2, Check, X } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,21 +41,21 @@ export default function Expenses() {
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list('-date'),
+    queryFn: () => api.entities.Expense.list('-date'),
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => api.entities.Project.list(),
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create(data),
+    mutationFn: (data) => api.entities.Expense.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);
@@ -63,7 +63,7 @@ export default function Expenses() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Expense.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);
@@ -72,7 +72,7 @@ export default function Expenses() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Expense.delete(id),
+    mutationFn: (id) => api.entities.Expense.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setDeleteConfirm(null);
@@ -85,7 +85,7 @@ export default function Expenses() {
     } else if (Array.isArray(data)) {
       // Recurring: create multiple entries sequentially
       for (const entry of data) {
-        await base44.entities.Expense.create(entry);
+        await api.entities.Expense.create(entry);
       }
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../components/ui/PageHeader';
 import { KM_RANGES, CONSULTING_HOUR_RANGES, CONSULTING_RATES, INSTRUCTIONAL_HOUR_RANGES, INSTRUCTIONAL_RATES, WORKSHOPS_DIAGNOSTICS_LECTURES } from '../components/utils/hourlyRateTables';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { getViabilityCostConfig } from '@/api/viabilityCostConfigApi';
 import ViabilityCostConfigModal from '@/components/viability/ViabilityCostConfigModal';
 import { analisarViabilidadeProjeto } from '@/lib/viabilityEngine';
@@ -97,7 +97,7 @@ export default function HourlyRates() {
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
   const ut = currentUser?.user_type ?? 'admin';
   const isAdmin = ut === 'admin' || ut === 'saas_admin';
@@ -162,8 +162,8 @@ export default function HourlyRates() {
     setMotorDistanceMeta(null);
 
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
-      const response = await base44.functions.invoke('parseViabilityPdf', { file_url });
+      const { file_url } = await api.integrations.Core.UploadFile({ file: selectedFile });
+      const response = await api.functions.invoke('parseViabilityPdf', { file_url });
       const payload = response?.data;
 
       if (!payload?.success || !payload?.data) {
@@ -202,7 +202,7 @@ export default function HourlyRates() {
 
     setMotorLoading(true);
     try {
-      const response = await base44.functions.invoke('googleDistanceKm', {
+      const response = await api.functions.invoke('googleDistanceKm', {
         cep_origem: normalizeCepDigits(viabilityCostConfig.cepOrigem),
         cep_destino: normalizeCepDigits(analysisResult.cep_destino),
       });

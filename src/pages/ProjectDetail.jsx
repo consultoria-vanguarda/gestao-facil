@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
@@ -65,7 +65,7 @@ export default function ProjectDetail() {
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
-      const projects = await base44.entities.Project.filter({ id: projectId });
+      const projects = await api.entities.Project.filter({ id: projectId });
       return projects[0];
     },
     enabled: !!projectId,
@@ -74,7 +74,7 @@ export default function ProjectDetail() {
   const { data: client } = useQuery({
     queryKey: ['client', project?.client_id],
     queryFn: async () => {
-      const clients = await base44.entities.Client.filter({ id: project.client_id });
+      const clients = await api.entities.Client.filter({ id: project.client_id });
       return clients[0] || null;
     },
     enabled: !!project?.client_id,
@@ -84,7 +84,7 @@ export default function ProjectDetail() {
   const { data: consultant } = useQuery({
     queryKey: ['consultant', project?.consultant_id],
     queryFn: async () => {
-      const consultants = await base44.entities.Consultant.filter({ id: project.consultant_id });
+      const consultants = await api.entities.Consultant.filter({ id: project.consultant_id });
       return consultants[0] || null;
     },
     enabled: !!project?.consultant_id,
@@ -93,67 +93,67 @@ export default function ProjectDetail() {
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks', projectId],
-    queryFn: () => base44.entities.Task.filter({ project_id: projectId }),
+    queryFn: () => api.entities.Task.filter({ project_id: projectId }),
     enabled: !!projectId,
     staleTime: 1 * 60 * 1000,
   });
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents', projectId],
-    queryFn: () => base44.entities.Document.filter({ project_id: projectId }),
+    queryFn: () => api.entities.Document.filter({ project_id: projectId }),
     enabled: !!projectId,
     staleTime: 1 * 60 * 1000,
   });
 
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', projectId],
-    queryFn: () => base44.entities.TimeEntry.filter({ project_id: projectId }),
+    queryFn: () => api.entities.TimeEntry.filter({ project_id: projectId }),
     enabled: !!projectId,
     staleTime: 1 * 60 * 1000,
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', projectId],
-    queryFn: () => base44.entities.Expense.filter({ project_id: projectId }),
+    queryFn: () => api.entities.Expense.filter({ project_id: projectId }),
     enabled: !!projectId,
     staleTime: 1 * 60 * 1000,
   });
 
   const { data: messages = [] } = useQuery({
     queryKey: ['messages', projectId],
-    queryFn: () => base44.entities.Message.filter({ project_id: projectId }),
+    queryFn: () => api.entities.Message.filter({ project_id: projectId }),
     enabled: !!projectId,
     staleTime: 30 * 1000,
   });
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: serviceReports = [] } = useQuery({
     queryKey: ['serviceReport', projectId],
-    queryFn: () => base44.entities.ServiceReport.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ServiceReport.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
   const serviceReport = serviceReports[0] || null;
 
   const saveServiceReportMutation = useMutation({
     mutationFn: (data) => serviceReport
-      ? base44.entities.ServiceReport.update(serviceReport.id, data)
-      : base44.entities.ServiceReport.create(data),
+      ? api.entities.ServiceReport.update(serviceReport.id, data)
+      : api.entities.ServiceReport.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['serviceReport', projectId] });
       setServiceReportOpen(false);
@@ -161,14 +161,14 @@ export default function ProjectDetail() {
   });
 
   const updateProgressMutation = useMutation({
-    mutationFn: (progress) => base44.entities.Project.update(projectId, { progress }),
+    mutationFn: (progress) => api.entities.Project.update(projectId, { progress }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
   });
 
   const [updateError, setUpdateError] = useState('');
 
   const updateProjectMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.update(projectId, data),
+    mutationFn: (data) => api.entities.Project.update(projectId, data),
     onSuccess: () => {
       setUpdateError('');
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -181,7 +181,7 @@ export default function ProjectDetail() {
   });
 
   const createProjectMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.create(data),
+    mutationFn: (data) => api.entities.Project.create(data),
     onSuccess: (newProject) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       setCloneProjectOpen(false);
@@ -190,7 +190,7 @@ export default function ProjectDetail() {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: (data) => base44.entities.Task.create(data),
+    mutationFn: (data) => api.entities.Task.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -199,7 +199,7 @@ export default function ProjectDetail() {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Task.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Task.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -209,12 +209,12 @@ export default function ProjectDetail() {
   });
 
   const deleteTaskMutation = useMutation({
-    mutationFn: (id) => base44.entities.Task.delete(id),
+    mutationFn: (id) => api.entities.Task.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks', projectId] }),
   });
 
   const createTimeEntryMutation = useMutation({
-    mutationFn: (data) => base44.entities.TimeEntry.create(data),
+    mutationFn: (data) => api.entities.TimeEntry.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['timeEntries', projectId] });
       setTimeEntryFormOpen(false);
@@ -222,7 +222,7 @@ export default function ProjectDetail() {
   });
 
   const updateTimeEntryMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.TimeEntry.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.TimeEntry.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['timeEntries', projectId] });
       setTimeEntryFormOpen(false);
@@ -231,14 +231,14 @@ export default function ProjectDetail() {
   });
 
   const deleteTimeEntryMutation = useMutation({
-    mutationFn: (id) => base44.entities.TimeEntry.delete(id),
+    mutationFn: (id) => api.entities.TimeEntry.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['timeEntries', projectId] }),
   });
 
   const uploadDocumentMutation = useMutation({
     mutationFn: async (file) => {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      return base44.entities.Document.create({
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
+      return api.entities.Document.create({
         project_id: projectId,
         name: file.name,
         file_url,
@@ -251,7 +251,7 @@ export default function ProjectDetail() {
   });
 
   const deleteDocumentMutation = useMutation({
-    mutationFn: (id) => base44.entities.Document.delete(id),
+    mutationFn: (id) => api.entities.Document.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['documents', projectId] }),
   });
 
@@ -259,16 +259,16 @@ export default function ProjectDetail() {
     mutationFn: async () => {
       // Delete related financial records in parallel
       const [receivables, payables, schedules] = await Promise.all([
-        base44.entities.ProjectReceivable.filter({ project_id: projectId }),
-        base44.entities.ProjectPayable.filter({ project_id: projectId }),
-        base44.entities.ProjectSchedule.filter({ project_id: projectId }),
+        api.entities.ProjectReceivable.filter({ project_id: projectId }),
+        api.entities.ProjectPayable.filter({ project_id: projectId }),
+        api.entities.ProjectSchedule.filter({ project_id: projectId }),
       ]);
       await Promise.all([
-        ...receivables.map(r => base44.entities.ProjectReceivable.delete(r.id)),
-        ...payables.map(p => base44.entities.ProjectPayable.delete(p.id)),
-        ...schedules.map(s => base44.entities.ProjectSchedule.delete(s.id)),
+        ...receivables.map(r => api.entities.ProjectReceivable.delete(r.id)),
+        ...payables.map(p => api.entities.ProjectPayable.delete(p.id)),
+        ...schedules.map(s => api.entities.ProjectSchedule.delete(s.id)),
       ]);
-      await base44.entities.Project.delete(projectId);
+      await api.entities.Project.delete(projectId);
     },
     onSuccess: () => {
       window.location.href = createPageUrl('Projects');
@@ -276,7 +276,7 @@ export default function ProjectDetail() {
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: (content) => base44.entities.Message.create({
+    mutationFn: (content) => api.entities.Message.create({
       project_id: projectId,
       content,
       sender_name: user?.full_name,

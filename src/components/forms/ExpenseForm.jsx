@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Upload } from "lucide-react";
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import MoneyInput from "@/components/ui/MoneyInput";
 import { parseMoneyBRToNumber, validateISODate, validateMoney } from "@/lib/validators";
 
@@ -68,7 +68,7 @@ export default function ExpenseForm({ open, onClose, expense, onSave, loading, p
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setForm({...form, receipt_url: file_url});
     setUploading(false);
   };

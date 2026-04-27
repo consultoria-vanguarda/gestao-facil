@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users, Search, MoreHorizontal, Pencil, Trash2, Mail, Phone, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import PageHeader from '../components/ui/PageHeader';
@@ -19,25 +19,25 @@ export default function Consultants() {
 
   const { data: consultants = [], isLoading, error } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list('-created_date'),
+    queryFn: () => api.entities.Consultant.list('-created_date'),
     retry: 1,
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => api.entities.Project.list(),
     retry: 1,
   });
 
   // Buscar os schedules com folga (status cancelled, location FOLGA) para todos os projetos
   const { data: allSchedules = [] } = useQuery({
     queryKey: ['all-schedules-folga'],
-    queryFn: () => base44.entities.ProjectSchedule.filter({ status: 'cancelled' }),
+    queryFn: () => api.entities.ProjectSchedule.filter({ status: 'cancelled' }),
     retry: 1,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Consultant.create(data),
+    mutationFn: (data) => api.entities.Consultant.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['consultants'] });
       setFormOpen(false);
@@ -45,7 +45,7 @@ export default function Consultants() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Consultant.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Consultant.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['consultants'] });
       setFormOpen(false);
@@ -54,7 +54,7 @@ export default function Consultants() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Consultant.delete(id),
+    mutationFn: (id) => api.entities.Consultant.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['consultants'] });
       setDeleteConfirm(null);

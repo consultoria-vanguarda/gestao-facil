@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePeriod } from './PeriodContext';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +63,7 @@ function ExpenseFormModal({ open, onClose, expense, projects, consultants, chart
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setForm(p => ({ ...p, receipt_url: file_url }));
     setUploading(false);
   };
@@ -283,24 +283,24 @@ export default function ExpensesTab() {
   const [periodEnd, setPeriodEnd] = useState('');
   const [reverseLoadingId, setReverseLoadingId] = useState(null);
 
-  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => base44.entities.Expense.list('-due_date') });
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
-  const { data: consultants = [] } = useQuery({ queryKey: ['consultants'], queryFn: () => base44.entities.Consultant.list() });
-  const { data: chartAccounts = [] } = useQuery({ queryKey: ['chartOfAccounts'], queryFn: () => base44.entities.ChartOfAccounts.list() });
-  const { data: financialAccounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => base44.entities.FinancialAccount.list() });
+  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => api.entities.Expense.list('-due_date') });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
+  const { data: consultants = [] } = useQuery({ queryKey: ['consultants'], queryFn: () => api.entities.Consultant.list() });
+  const { data: chartAccounts = [] } = useQuery({ queryKey: ['chartOfAccounts'], queryFn: () => api.entities.ChartOfAccounts.list() });
+  const { data: financialAccounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => api.entities.FinancialAccount.list() });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create({ ...data, status: 'to_pay' }),
+    mutationFn: (data) => api.entities.Expense.create({ ...data, status: 'to_pay' }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setFormOpen(false); },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Expense.update(id, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setFormOpen(false); setEditingExpense(null); },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Expense.delete(id),
+    mutationFn: (id) => api.entities.Expense.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setDeleteConfirm(null); },
   });
 
@@ -309,7 +309,7 @@ export default function ExpensesTab() {
       updateMutation.mutate({ id: editingExpense.id, data });
     } else if (Array.isArray(data)) {
       for (const entry of data) {
-        await base44.entities.Expense.create({ ...entry, status: 'to_pay' });
+        await api.entities.Expense.create({ ...entry, status: 'to_pay' });
       }
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);
@@ -324,13 +324,13 @@ export default function ExpensesTab() {
     const account = financialAccounts.find(a => a.id === accountId);
     const newBalance = (account.current_balance || 0) - expense.amount;
 
-    await base44.entities.Expense.update(expense.id, {
+    await api.entities.Expense.update(expense.id, {
       status: 'paid',
       payment_date: payDate,
       payment_account_id: accountId,
     });
-    await base44.entities.FinancialAccount.update(accountId, { current_balance: newBalance });
-    await base44.entities.AccountTransaction.create({
+    await api.entities.FinancialAccount.update(accountId, { current_balance: newBalance });
+    await api.entities.AccountTransaction.create({
       account_id: accountId,
       type: 'debit',
       amount: expense.amount,
@@ -363,10 +363,10 @@ export default function ExpensesTab() {
         const account = financialAccounts.find((a) => a.id === expense.payment_account_id);
         if (account) {
           const newBalance = (account.current_balance || 0) + (expense.amount || 0);
-          await base44.entities.FinancialAccount.update(expense.payment_account_id, { current_balance: newBalance });
+          await api.entities.FinancialAccount.update(expense.payment_account_id, { current_balance: newBalance });
         }
 
-        await base44.entities.AccountTransaction.create({
+        await api.entities.AccountTransaction.create({
           account_id: expense.payment_account_id,
           type: 'credit',
           amount: expense.amount || 0,
@@ -379,7 +379,7 @@ export default function ExpensesTab() {
       }
 
       // Data e autor da reversão são sempre automáticos (não editáveis no formulário).
-      await base44.entities.Expense.update(expense.id, {
+      await api.entities.Expense.update(expense.id, {
         status: 'to_pay',
         payment_date: null,
         payment_account_id: null,

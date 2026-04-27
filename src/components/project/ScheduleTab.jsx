@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, Clock, MapPin, CheckCircle, Zap, DollarSign } from 'lucide-react';
@@ -342,7 +342,7 @@ async function checkConsultantConflicts(consultantId, proposedDates, currentProj
   if (!consultantId || !proposedDates.length) return { hasConflicts: false };
 
   // Get all schedules for this consultant across other projects
-  const allSchedules = await base44.entities.ProjectSchedule.filter({ consultant_id: consultantId });
+  const allSchedules = await api.entities.ProjectSchedule.filter({ consultant_id: consultantId });
   // Exclude current project and cancelled schedules (except day-off slots from Políticas Públicas)
   const otherProjectSchedules = allSchedules.filter(s =>
     s.project_id !== currentProjectId &&
@@ -356,7 +356,7 @@ async function checkConsultantConflicts(consultantId, proposedDates, currentProj
   const otherProjectIds = [...new Set(otherProjectSchedules.map(s => s.project_id))];
   const projectDetails = {};
   await Promise.all(otherProjectIds.map(async (pid) => {
-    const projs = await base44.entities.Project.filter({ id: pid });
+    const projs = await api.entities.Project.filter({ id: pid });
     const proj = projs[0];
     // Only consider projects that exist and are active (planning or in_progress)
     if (proj && (proj.status === 'planning' || proj.status === 'in_progress')) {
@@ -401,14 +401,14 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
 
   const { data: schedules = [] } = useQuery({
     queryKey: ['schedules', projectId],
-    queryFn: () => base44.entities.ProjectSchedule.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ProjectSchedule.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
 
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ProjectSchedule.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.ProjectSchedule.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['schedules', projectId] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -416,20 +416,20 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ProjectSchedule.delete(id),
+    mutationFn: (id) => api.entities.ProjectSchedule.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['schedules', projectId] })
   });
 
   const updateProjectMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.update(projectId, data),
+    mutationFn: (data) => api.entities.Project.update(projectId, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['project', projectId] })
   });
 
   const applySchedule = async (dates, config) => {
     // Delete ALL existing schedules in parallel batches of 10
-    const existing = await base44.entities.ProjectSchedule.filter({ project_id: projectId });
+    const existing = await api.entities.ProjectSchedule.filter({ project_id: projectId });
     for (let i = 0; i < existing.length; i += 10) {
-      await Promise.all(existing.slice(i, i + 10).map(s => base44.entities.ProjectSchedule.delete(s.id)));
+      await Promise.all(existing.slice(i, i + 10).map(s => api.entities.ProjectSchedule.delete(s.id)));
     }
 
     // Filter out entries without dates, then separate day-off entries from work entries
@@ -459,13 +459,13 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
       }));
 
     for (let i = 0; i < records.length; i += 50) {
-      await base44.entities.ProjectSchedule.bulkCreate(records.slice(i, i + 50));
+      await api.entities.ProjectSchedule.bulkCreate(records.slice(i, i + 50));
     }
 
     const startDate = finalDates[0]?.date || config.start_date;
 
     // Save config + end_date back to project (do NOT overwrite schedule_config — managed by ProjectForm)
-    await base44.entities.Project.update(projectId, {
+    await api.entities.Project.update(projectId, {
       start_date: startDate || config.start_date,
       estimated_hours: parseFloat(config.estimated_hours) || 0,
       hours_per_day: parseFloat(config.hours_per_day) || 0,
@@ -722,9 +722,9 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
     const phaseLabel = `Fase ${phaseIndex + 1} — ${session.date ? new Date(session.date + 'T12:00:00').toLocaleDateString('pt-BR') : ''}`;
 
     if (phaseAmount > 0) {
-      const existingBillings = await base44.entities.BillingEntry.filter({ phase_id: session.id });
+      const existingBillings = await api.entities.BillingEntry.filter({ phase_id: session.id });
       if (existingBillings.length === 0) {
-        await base44.entities.BillingEntry.create({
+        await api.entities.BillingEntry.create({
           project_id: projectId,
           phase_id: session.id,
           amount: phaseAmount,
@@ -813,7 +813,7 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
                   disabled={statusUpdating}
                   onClick={async () => {
                     setStatusUpdating(true);
-                    await base44.entities.Project.update(projectId, { status: 'in_progress' });
+                    await api.entities.Project.update(projectId, { status: 'in_progress' });
                     queryClient.invalidateQueries({ queryKey: ['project', projectId] });
                     setStatusUpdating(false);
                   }}
@@ -828,7 +828,7 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
                   disabled={statusUpdating}
                   onClick={async () => {
                     setStatusUpdating(true);
-                    await base44.entities.Project.update(projectId, { status: 'planning' });
+                    await api.entities.Project.update(projectId, { status: 'planning' });
                     queryClient.invalidateQueries({ queryKey: ['project', projectId] });
                     setStatusUpdating(false);
                   }}

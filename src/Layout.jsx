@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl, createHourlyRatesViabilityUrl } from './utils';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
+import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+
+const HEADER_LOGO_URL = publicStorageObjectUrl(
+  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
+);
 import { useAuth } from '@/lib/AuthContext';
 import { 
   LayoutDashboard, 
@@ -78,7 +83,7 @@ export default function Layout({ children, currentPageName }) {
           : clientMenuItems;
 
   const handleLogout = async () => {
-    await base44.auth.logout();
+    await api.auth.logout();
     window.location.assign('/login');
   };
 
@@ -90,7 +95,7 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo + menu desktop (scroll horizontal se couber no ecrã) */}
           <div className="flex items-center gap-3 lg:gap-4 min-w-0 flex-1">
             <Link to={createPageUrl('Dashboard')} className="shrink-0">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG" alt="Vanguarda Consultoria" className="h-8 w-auto object-contain" />
+              <img src={HEADER_LOGO_URL} alt="Vanguarda Consultoria" className="h-8 w-auto object-contain" />
             </Link>
             
             {/* Desktop Menu */}

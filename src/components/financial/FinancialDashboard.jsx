@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -63,12 +63,12 @@ export default function FinancialDashboard() {
   const [forecastDateApplied, setForecastDateApplied] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [showForecastDetails, setShowForecastDetails] = useState(false);
 
-  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
-  const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => base44.entities.ProjectPayable.list() });
-  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => base44.entities.Expense.list() });
-  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => base44.entities.FinancialAccount.list() });
-  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => base44.entities.TaxRate.list() });
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
+  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => api.entities.BillingEntry.list() });
+  const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => api.entities.ProjectPayable.list() });
+  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => api.entities.Expense.list() });
+  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => api.entities.FinancialAccount.list() });
+  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => api.entities.TaxRate.list() });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
 
   const periodTaxRate = taxRates.find(t => t.month === periodStr)?.rate_percent || 0;
   const totalBalance = accounts.reduce((s, a) => s + (a.current_balance || 0), 0);

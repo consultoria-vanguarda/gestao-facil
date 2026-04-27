@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,16 +14,16 @@ export default function TaxRatesTab() {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({ month: format(new Date(), 'yyyy-MM'), rate_percent: '', notes: '' });
 
-  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => base44.entities.TaxRate.list('-month') });
-  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
+  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => api.entities.TaxRate.list('-month') });
+  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => api.entities.BillingEntry.list() });
 
   const saveMutation = useMutation({
-    mutationFn: (data) => modal?.id ? base44.entities.TaxRate.update(modal.id, data) : base44.entities.TaxRate.create(data),
+    mutationFn: (data) => modal?.id ? api.entities.TaxRate.update(modal.id, data) : api.entities.TaxRate.create(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['taxRates'] }); setModal(null); },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.TaxRate.delete(id),
+    mutationFn: (id) => api.entities.TaxRate.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['taxRates'] }),
   });
 

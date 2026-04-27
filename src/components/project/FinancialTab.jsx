@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { format, parseISO } from 'date-fns';
 import { DollarSign, CheckCircle, Receipt, ChevronRight, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -143,7 +143,7 @@ export default function FinancialTab({ project, projectId, expenses }) {
   const [editingExpense, setEditingExpense] = useState(null);
 
   const updateExpenseMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Expense.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses', projectId] });
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
@@ -153,18 +153,18 @@ export default function FinancialTab({ project, projectId, expenses }) {
 
   const { data: schedules = [] } = useQuery({
     queryKey: ['schedules', projectId],
-    queryFn: () => base44.entities.ProjectSchedule.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ProjectSchedule.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: receivables = [] } = useQuery({
     queryKey: ['receivables', projectId],
-    queryFn: () => base44.entities.ProjectReceivable.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ProjectReceivable.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const createReceivableMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectReceivable.create(data),
+    mutationFn: (data) => api.entities.ProjectReceivable.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receivables', projectId] });
       setConfirmModal(false);

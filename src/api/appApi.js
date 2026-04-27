@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 import { requireCurrentOrganizationId } from '@/lib/organizationScope';
 import { clearStoredTenantSlug } from '@/lib/tenant';
+import { getPublicStorageBucket } from '@/lib/supabasePublicStorage';
 
 const generateId = () => {
   // IDs do schema são `VARCHAR(32)` sem hífen.
@@ -125,15 +126,16 @@ const createEntity = (tableName) => {
 const storageUploadFile = async ({ file }) => {
   if (!file) throw new Error('Arquivo não informado');
 
+  const bucket = getPublicStorageBucket();
   const objectPath = `public/${generateId()}_${encodeURIComponent(file.name)}`;
   const { error: uploadError } = await supabase
     .storage
-    .from('base44-prod')
+    .from(bucket)
     .upload(objectPath, file, { upsert: true });
 
   if (uploadError) throw uploadError;
 
-  const { data } = supabase.storage.from('base44-prod').getPublicUrl(objectPath);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
   // Mantemos o formato do front antigo: `{ file_url }`
   return { file_url: data.publicUrl };
 };
@@ -296,7 +298,7 @@ export async function invokeEdgeFunctionWithSession(functionName, body) {
   return json;
 }
 
-export const base44 = {
+export const api = {
   auth: {
     me: async () => {
       // Não usar requireCurrentOrganizationId() aqui: o escopo global pode ainda não estar
@@ -470,7 +472,7 @@ export const base44 = {
     },
   },
 
-  // SDK Base44 original enviava telemetria de navegação; aqui é no-op para não quebrar o app.
+  /** Telemetria de navegação (placeholder; não envia dados). */
   appLogs: {
     logUserInApp: async () => {},
   },

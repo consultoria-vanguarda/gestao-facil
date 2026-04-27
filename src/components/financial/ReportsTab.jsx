@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
+import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,7 +11,9 @@ import { Download, DollarSign, Clock, TrendingUp, TrendingDown, Users } from 'lu
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG";
+const LOGO_URL = publicStorageObjectUrl(
+  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
+);
 const fmt = (v) => (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // Mapa de situação do projeto → status da entidade Project
@@ -58,12 +61,12 @@ export default function ReportsTab() {
   const [filterBillingStatus, setFilterBillingStatus] = useState('all'); // só ativo quando completed
   const [detailModal, setDetailModal] = useState(null);
 
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
-  const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: () => base44.entities.Client.list() });
-  const { data: consultants = [] } = useQuery({ queryKey: ['consultants'], queryFn: () => base44.entities.Consultant.list() });
-  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
-  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => base44.entities.Expense.list() });
-  const { data: schedules = [] } = useQuery({ queryKey: ['allSchedules'], queryFn: () => base44.entities.ProjectSchedule.list() });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
+  const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: () => api.entities.Client.list() });
+  const { data: consultants = [] } = useQuery({ queryKey: ['consultants'], queryFn: () => api.entities.Consultant.list() });
+  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => api.entities.BillingEntry.list() });
+  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => api.entities.Expense.list() });
+  const { data: schedules = [] } = useQuery({ queryKey: ['allSchedules'], queryFn: () => api.entities.ProjectSchedule.list() });
 
   const areas = useMemo(() => [...new Set(projects.map(p => p.area).filter(Boolean))], [projects]);
 

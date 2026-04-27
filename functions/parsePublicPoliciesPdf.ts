@@ -2,8 +2,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const sdk = createClientFromRequest(req);
+    const user = await sdk.auth.me();
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     }
 
     // First call: extract header info + phases 1-50
-    const headerResult = await base44.integrations.Core.InvokeLLM({
+    const headerResult = await sdk.integrations.Core.InvokeLLM({
       prompt: `Você é um extrator de dados de documentos SEBRAE. Analise este documento PDF de "Informações da Demanda".
 
 Extraia as informações gerais do documento:
@@ -67,7 +67,7 @@ Para cada fase: phase_number (número inteiro), description (coluna Produto), ho
     while (start <= totalPhases) {
       const end = Math.min(start + batchSize - 1, totalPhases);
 
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await sdk.integrations.Core.InvokeLLM({
         prompt: `Você é um extrator de dados de documentos SEBRAE. Analise este documento PDF de "Informações da Demanda".
 
 Extraia APENAS as fases de número ${start} até ${end} (inclusive). IGNORE qualquer seção chamada "Histórico da Demanda".

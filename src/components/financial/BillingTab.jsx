@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePeriod } from './PeriodContext';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,13 +48,13 @@ export default function BillingTab() {
     setCollapsedMonths(prev => ({ ...prev, [monthKey]: !prev[monthKey] }));
   };
 
-  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list('-created_date') });
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
-  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => base44.entities.FinancialAccount.list() });
-  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => base44.entities.TaxRate.list() });
+  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => api.entities.BillingEntry.list('-created_date') });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
+  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => api.entities.FinancialAccount.list() });
+  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => api.entities.TaxRate.list() });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BillingEntry.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.BillingEntry.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['billings'] });
       setBillingModal(null);
@@ -64,7 +64,7 @@ export default function BillingTab() {
   const handleBill = async () => {
     if (!billingForm.due_date) return alert('Informe a data de vencimento');
     const billedDate = format(new Date(), 'yyyy-MM-dd');
-    await base44.entities.BillingEntry.update(billingModal.entry.id, {
+    await api.entities.BillingEntry.update(billingModal.entry.id, {
       status: 'billed',
       billed_date: billedDate,
       due_date: billingForm.due_date,
@@ -85,7 +85,7 @@ export default function BillingTab() {
     // Net amount credited to account = original - discount + extra
     const netAmount = Math.round((entry.amount - discount + extraRevenue) * 100) / 100;
 
-    await base44.entities.BillingEntry.update(entry.id, {
+    await api.entities.BillingEntry.update(entry.id, {
       status: 'received',
       received_date: today,
       account_id: billingForm.account_id,
@@ -93,10 +93,10 @@ export default function BillingTab() {
 
     // Update account balance with net amount
     const newBalance = Math.round(((account.current_balance || 0) + netAmount) * 100) / 100;
-    await base44.entities.FinancialAccount.update(billingForm.account_id, { current_balance: newBalance });
+    await api.entities.FinancialAccount.update(billingForm.account_id, { current_balance: newBalance });
 
     // Main transaction: net amount credited
-    await base44.entities.AccountTransaction.create({
+    await api.entities.AccountTransaction.create({
       account_id: billingForm.account_id,
       type: 'credit',
       amount: netAmount,
@@ -109,7 +109,7 @@ export default function BillingTab() {
 
     // If discount: lança como despesa na conta 2.6
     if (discount > 0) {
-      await base44.entities.Expense.create({
+      await api.entities.Expense.create({
         project_id: entry.project_id || '',
         chart_account_id: '69a46624d77081d6bf429fbb', // 2.6 Desconto
         category: 'other',
@@ -123,7 +123,7 @@ export default function BillingTab() {
 
     // If extra revenue: lança na conta 1.5 como BillingEntry extra
     if (extraRevenue > 0) {
-      await base44.entities.BillingEntry.create({
+      await api.entities.BillingEntry.create({
         project_id: entry.project_id || '',
         amount: extraRevenue,
         status: 'received',
@@ -147,7 +147,7 @@ export default function BillingTab() {
   const handleEditAmount = async () => {
     const newAmount = parseFloat(editAmountValue);
     if (!newAmount || newAmount <= 0) return alert('Informe um valor válido');
-    await base44.entities.BillingEntry.update(editAmountModal.entry.id, { amount: newAmount });
+    await api.entities.BillingEntry.update(editAmountModal.entry.id, { amount: newAmount });
     queryClient.invalidateQueries({ queryKey: ['billings'] });
     setEditAmountModal(null);
   };
@@ -157,7 +157,7 @@ export default function BillingTab() {
     setBatchLoading(true);
     const today = format(new Date(), 'yyyy-MM-dd');
     for (const id of selectedIds) {
-      await base44.entities.BillingEntry.update(id, {
+      await api.entities.BillingEntry.update(id, {
         status: 'billed',
         billed_date: today,
         due_date: batchForm.due_date,
@@ -174,7 +174,7 @@ export default function BillingTab() {
     setBatchLoading(true);
     const ids = selectedIds.filter(id => billings.find(b => b.id === id)?.status === 'billed');
     for (const id of ids) {
-      await base44.entities.BillingEntry.update(id, {
+      await api.entities.BillingEntry.update(id, {
         status: 'to_bill',
         billed_date: null,
         due_date: null,
@@ -197,7 +197,7 @@ export default function BillingTab() {
       const entry = billings.find(b => b.id === id);
       if (entry?.account_id) accountsToRecalc.add(entry.account_id);
 
-      await base44.entities.BillingEntry.update(id, {
+      await api.entities.BillingEntry.update(id, {
         status: 'billed',
         received_date: null,
         account_id: null,
@@ -208,11 +208,11 @@ export default function BillingTab() {
     for (const accountId of accountsToRecalc) {
       const account = accounts.find(a => a.id === accountId);
       if (!account) continue;
-      const allTx = await base44.entities.AccountTransaction.filter({ account_id: accountId });
+      const allTx = await api.entities.AccountTransaction.filter({ account_id: accountId });
       const calcBalance = allTx.reduce((sum, tx) => {
         return sum + (tx.type === 'credit' ? (tx.amount || 0) : -(tx.amount || 0));
       }, account.initial_balance || 0);
-      await base44.entities.FinancialAccount.update(accountId, { current_balance: Math.round(calcBalance * 100) / 100 });
+      await api.entities.FinancialAccount.update(accountId, { current_balance: Math.round(calcBalance * 100) / 100 });
     }
 
     queryClient.invalidateQueries({ queryKey: ['billings'] });
@@ -227,7 +227,7 @@ export default function BillingTab() {
     setBatchLoading(true);
     const ids = selectedIds.filter(id => billings.find(b => b.id === id)?.status === 'billed');
     for (const id of ids) {
-      await base44.entities.BillingEntry.update(id, { due_date: batchForm.due_date });
+      await api.entities.BillingEntry.update(id, { due_date: batchForm.due_date });
     }
     queryClient.invalidateQueries({ queryKey: ['billings'] });
     setBatchLoading(false);
@@ -247,12 +247,12 @@ export default function BillingTab() {
     const netTotal = Math.round((originalTotal - discount + extraRevenue) * 100) / 100;
 
     for (const entry of selectedEntries) {
-      await base44.entities.BillingEntry.update(entry.id, {
+      await api.entities.BillingEntry.update(entry.id, {
         status: 'received',
         received_date: batchToday,
         account_id: batchForm.account_id,
       });
-      await base44.entities.AccountTransaction.create({
+      await api.entities.AccountTransaction.create({
         account_id: batchForm.account_id,
         type: 'credit',
         amount: entry.amount,
@@ -266,11 +266,11 @@ export default function BillingTab() {
 
     // Update account balance with net total (original - discount + extra)
     const newBalance = Math.round(((account.current_balance || 0) + netTotal) * 100) / 100;
-    await base44.entities.FinancialAccount.update(batchForm.account_id, { current_balance: newBalance });
+    await api.entities.FinancialAccount.update(batchForm.account_id, { current_balance: newBalance });
 
     // If discount: lança como despesa na conta 2.6 (uma única vez pelo total)
     if (discount > 0) {
-      await base44.entities.Expense.create({
+      await api.entities.Expense.create({
         project_id: selectedEntries[0]?.project_id || '',
         chart_account_id: '69a46624d77081d6bf429fbb', // 2.6 Desconto
         category: 'other',
@@ -284,7 +284,7 @@ export default function BillingTab() {
 
     // If extra revenue: lança na conta 1.5 como BillingEntry extra
     if (extraRevenue > 0) {
-      await base44.entities.BillingEntry.create({
+      await api.entities.BillingEntry.create({
         project_id: selectedEntries[0]?.project_id || '',
         amount: extraRevenue,
         status: 'received',

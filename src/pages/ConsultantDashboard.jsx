@@ -1,5 +1,5 @@
 import React from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
@@ -22,14 +22,14 @@ import { format, isThisWeek, isToday } from 'date-fns';
 export default function ConsultantDashboard() {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: consultant } = useQuery({
     queryKey: ['myConsultant', user?.consultant_id],
     queryFn: async () => {
       if (!user?.consultant_id) return null;
-      const consultants = await base44.entities.Consultant.filter({ id: user.consultant_id });
+      const consultants = await api.entities.Consultant.filter({ id: user.consultant_id });
       return consultants[0];
     },
     enabled: !!user?.consultant_id,
@@ -37,25 +37,25 @@ export default function ConsultantDashboard() {
 
   const { data: projects = [] } = useQuery({
     queryKey: ['myProjects', user?.consultant_id],
-    queryFn: () => base44.entities.Project.filter({ consultant_id: user.consultant_id }),
+    queryFn: () => api.entities.Project.filter({ consultant_id: user.consultant_id }),
     enabled: !!user?.consultant_id,
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['myTasks', user?.consultant_id],
-    queryFn: () => base44.entities.Task.filter({ assigned_to: user.consultant_id }),
+    queryFn: () => api.entities.Task.filter({ assigned_to: user.consultant_id }),
     enabled: !!user?.consultant_id,
   });
 
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['myTimeEntries', user?.consultant_id],
-    queryFn: () => base44.entities.TimeEntry.filter({ consultant_id: user.consultant_id }, '-date'),
+    queryFn: () => api.entities.TimeEntry.filter({ consultant_id: user.consultant_id }, '-date'),
     enabled: !!user?.consultant_id,
   });
 
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
   });
 
   const activeProjects = projects.filter(p => p.status === 'in_progress');

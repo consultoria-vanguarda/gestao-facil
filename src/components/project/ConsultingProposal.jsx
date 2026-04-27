@@ -3,9 +3,11 @@ import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
+import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
 
-const SEBRAE_LOGO_URL =
-  'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/8efa5bac6_image.png';
+const SEBRAE_LOGO_URL = publicStorageObjectUrl(
+  'public/695ebd99a400611ea331a00a/8efa5bac6_image.png'
+);
 
 const LEGACY_AREA_LABELS = {
   finances: 'Finanças',

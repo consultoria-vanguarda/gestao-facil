@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Upload, FileCheck, X } from "lucide-react";
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import CpfCnpjInput from "@/components/ui/CpfCnpjInput";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { validateCPFOrCNPJ, validateEmail, validatePhone } from "@/lib/validators";
@@ -63,7 +63,7 @@ export default function ClientForm({ open, onClose, client, onSave, loading }) {
     if (!file) return;
     setUploading({ ...uploading, [field]: true });
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       setForm({ ...form, [field]: file_url });
     } catch (error) {
       console.error('Erro ao fazer upload:', error);

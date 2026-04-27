@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FileText, Upload, Download, Folder, Search, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,14 +29,14 @@ export default function ClientDocuments() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['clientProjects'],
     queryFn: async () => {
       if (!user?.client_id) return [];
-      return base44.entities.Project.filter({ client_id: user.client_id });
+      return api.entities.Project.filter({ client_id: user.client_id });
     },
     enabled: !!user?.client_id,
   });
@@ -46,7 +46,7 @@ export default function ClientDocuments() {
     queryFn: async () => {
       if (!user?.client_id || projects.length === 0) return [];
       const projectIds = projects.map(p => p.id);
-      const allDocs = await base44.entities.Document.list('-created_date');
+      const allDocs = await api.entities.Document.list('-created_date');
       return allDocs.filter(d => projectIds.includes(d.project_id) && d.visible_to_client);
     },
     enabled: projects.length > 0,
@@ -55,8 +55,8 @@ export default function ClientDocuments() {
   const uploadMutation = useMutation({
     mutationFn: async ({ file, projectId }) => {
       setUploading(true);
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      return base44.entities.Document.create({
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
+      return api.entities.Document.create({
         project_id: projectId,
         name: file.name,
         file_url,

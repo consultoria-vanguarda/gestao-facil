@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   FolderKanban, 
@@ -28,47 +28,47 @@ export default function ClientPortal() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['clientProjects'],
     queryFn: async () => {
       if (!user?.client_id) return [];
-      return base44.entities.Project.filter({ client_id: user.client_id });
+      return api.entities.Project.filter({ client_id: user.client_id });
     },
     enabled: !!user?.client_id,
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['clientTasks', selectedProject?.id],
-    queryFn: () => base44.entities.Task.filter({ project_id: selectedProject.id }),
+    queryFn: () => api.entities.Task.filter({ project_id: selectedProject.id }),
     enabled: !!selectedProject?.id,
   });
 
   const { data: documents = [] } = useQuery({
     queryKey: ['clientDocuments', selectedProject?.id],
-    queryFn: () => base44.entities.Document.filter({ project_id: selectedProject.id, visible_to_client: true }),
+    queryFn: () => api.entities.Document.filter({ project_id: selectedProject.id, visible_to_client: true }),
     enabled: !!selectedProject?.id,
   });
 
   const { data: messages = [] } = useQuery({
     queryKey: ['clientMessages', selectedProject?.id],
-    queryFn: () => base44.entities.Message.filter({ project_id: selectedProject.id }, 'created_date'),
+    queryFn: () => api.entities.Message.filter({ project_id: selectedProject.id }, 'created_date'),
     enabled: !!selectedProject?.id,
   });
 
   const { data: consultant } = useQuery({
     queryKey: ['consultant', selectedProject?.consultant_id],
     queryFn: async () => {
-      const consultants = await base44.entities.Consultant.filter({ id: selectedProject.consultant_id });
+      const consultants = await api.entities.Consultant.filter({ id: selectedProject.consultant_id });
       return consultants[0];
     },
     enabled: !!selectedProject?.consultant_id,
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: (content) => base44.entities.Message.create({
+    mutationFn: (content) => api.entities.Message.create({
       project_id: selectedProject.id,
       content,
       sender_name: user?.full_name,

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from 'date-fns';
@@ -13,10 +13,10 @@ export default function DRETab() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [projectId, setProjectId] = useState('');
 
-  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => base44.entities.BillingEntry.list() });
-  const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => base44.entities.ProjectPayable.list() });
-  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => base44.entities.TaxRate.list() });
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
+  const { data: billings = [] } = useQuery({ queryKey: ['billings'], queryFn: () => api.entities.BillingEntry.list() });
+  const { data: payables = [] } = useQuery({ queryKey: ['all_payables'], queryFn: () => api.entities.ProjectPayable.list() });
+  const { data: taxRates = [] } = useQuery({ queryKey: ['taxRates'], queryFn: () => api.entities.TaxRate.list() });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
 
   const dre = useMemo(() => {
     let filteredBillings = billings.filter(b => b.status === 'received');

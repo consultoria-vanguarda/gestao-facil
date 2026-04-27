@@ -1,5 +1,5 @@
 import React from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
@@ -17,7 +17,7 @@ export default function ProjectReports() {
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
-      const projects = await base44.entities.Project.filter({ id: projectId });
+      const projects = await api.entities.Project.filter({ id: projectId });
       return projects[0];
     },
     enabled: !!projectId,
@@ -25,25 +25,25 @@ export default function ProjectReports() {
 
   const { data: receivables = [] } = useQuery({
     queryKey: ['receivables', projectId],
-    queryFn: () => base44.entities.ProjectReceivable.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ProjectReceivable.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: payables = [] } = useQuery({
     queryKey: ['payables', projectId],
-    queryFn: () => base44.entities.ProjectPayable.filter({ project_id: projectId }),
+    queryFn: () => api.entities.ProjectPayable.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['timeEntries', projectId],
-    queryFn: () => base44.entities.TimeEntry.filter({ project_id: projectId }),
+    queryFn: () => api.entities.TimeEntry.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   if (!project) {

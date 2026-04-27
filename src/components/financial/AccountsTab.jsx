@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,10 @@ export default function AccountsTab() {
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
 
-  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => base44.entities.FinancialAccount.list() });
+  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => api.entities.FinancialAccount.list() });
   const { data: transactions = [] } = useQuery({
     queryKey: ['transactions', selectedAccount],
-    queryFn: () => base44.entities.AccountTransaction.filter({ account_id: selectedAccount }, '-date'),
+    queryFn: () => api.entities.AccountTransaction.filter({ account_id: selectedAccount }, '-date'),
     enabled: !!selectedAccount,
   });
 
@@ -49,13 +49,13 @@ export default function AccountsTab() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => accountModal?.id
-      ? base44.entities.FinancialAccount.update(accountModal.id, data)
-      : base44.entities.FinancialAccount.create({ ...data, current_balance: parseFloat(data.initial_balance) || 0 }),
+      ? api.entities.FinancialAccount.update(accountModal.id, data)
+      : api.entities.FinancialAccount.create({ ...data, current_balance: parseFloat(data.initial_balance) || 0 }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['accounts'] }); setAccountModal(null); },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.FinancialAccount.delete(id),
+    mutationFn: (id) => api.entities.FinancialAccount.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['accounts'] }),
   });
 
@@ -63,8 +63,8 @@ export default function AccountsTab() {
     mutationFn: async (data) => {
       const account = accounts.find(a => a.id === data.account_id);
       const delta = data.type === 'credit' ? parseFloat(data.amount) : -parseFloat(data.amount);
-      await base44.entities.AccountTransaction.create(data);
-      await base44.entities.FinancialAccount.update(data.account_id, { current_balance: (account.current_balance || 0) + delta });
+      await api.entities.AccountTransaction.create(data);
+      await api.entities.FinancialAccount.update(data.account_id, { current_balance: (account.current_balance || 0) + delta });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });

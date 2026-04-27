@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import PhoneInput from "@/components/ui/PhoneInput";
 import { Loader2, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { SERVICE_AREAS, getSubareasWithDetails } from '../utils/serviceAreas';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery } from '@tanstack/react-query';
 import { validateEmail, validatePhone } from "@/lib/validators";
 
@@ -68,7 +68,7 @@ export default function ConsultantForm({ open, onClose, consultant, onSave, load
   // Load active areas from DB config
   const { data: configs = [] } = useQuery({
     queryKey: ['serviceAreaConfigs'],
-    queryFn: () => base44.entities.ServiceAreaConfig.list(),
+    queryFn: () => api.entities.ServiceAreaConfig.list(),
   });
 
   // Build list of area options that have at least one active subarea in the company config

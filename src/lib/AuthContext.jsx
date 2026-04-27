@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { supabase } from '@/api/supabaseClient';
 import { useTenant } from '@/lib/TenantContext';
 import { storeTenantSlugForSession } from '@/lib/tenant';
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         if (showGlobalLoader && !cancelled) setIsLoadingAuth(true);
-        const currentUser = await base44.auth.me();
+        const currentUser = await api.auth.me();
         if (cancelled) return;
 
         if (
@@ -141,7 +141,7 @@ export const AuthProvider = ({ children }) => {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) return;
-      const currentUser = await base44.auth.me();
+      const currentUser = await api.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
       setAuthError(null);
@@ -156,16 +156,16 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
 
     if (shouldRedirect) {
-      void base44.auth.logout().finally(() => {
+      void api.auth.logout().finally(() => {
         window.location.assign('/login');
       });
     } else {
-      void base44.auth.logout();
+      void api.auth.logout();
     }
   };
 
   const navigateToLogin = () => {
-    base44.auth.redirectToLogin(window.location.href);
+    api.auth.redirectToLogin(window.location.href);
   };
 
   return (

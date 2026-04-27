@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,15 +31,15 @@ export default function ChartOfAccountsTab() {
   const [selectedParent, setSelectedParent] = useState('');
   const [newCategoryMode, setNewCategoryMode] = useState(false);
 
-  const { data: accounts = [] } = useQuery({ queryKey: ['chartOfAccounts'], queryFn: () => base44.entities.ChartOfAccounts.list() });
+  const { data: accounts = [] } = useQuery({ queryKey: ['chartOfAccounts'], queryFn: () => api.entities.ChartOfAccounts.list() });
 
   const saveMutation = useMutation({
-    mutationFn: (data) => modal?.id ? base44.entities.ChartOfAccounts.update(modal.id, data) : base44.entities.ChartOfAccounts.create(data),
+    mutationFn: (data) => modal?.id ? api.entities.ChartOfAccounts.update(modal.id, data) : api.entities.ChartOfAccounts.create(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['chartOfAccounts'] }); setModal(null); },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ChartOfAccounts.delete(id),
+    mutationFn: (id) => api.entities.ChartOfAccounts.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['chartOfAccounts'] }),
   });
 

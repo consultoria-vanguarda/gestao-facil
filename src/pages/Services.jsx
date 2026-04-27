@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Briefcase, Search, MoreHorizontal, Pencil, Trash2, Clock, DollarSign, FileText } from 'lucide-react';
 import PageHeader from '../components/ui/PageHeader';
@@ -27,11 +27,11 @@ export default function Services() {
 
   const { data: services = [], isLoading } = useQuery({
     queryKey: ['services'],
-    queryFn: () => base44.entities.ServiceModel.list('-created_date'),
+    queryFn: () => api.entities.ServiceModel.list('-created_date'),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ServiceModel.create(data),
+    mutationFn: (data) => api.entities.ServiceModel.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setFormOpen(false);
@@ -39,7 +39,7 @@ export default function Services() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ServiceModel.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.ServiceModel.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setFormOpen(false);
@@ -48,7 +48,7 @@ export default function Services() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ServiceModel.delete(id),
+    mutationFn: (id) => api.entities.ServiceModel.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       setDeleteConfirm(null);

@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { format, lastDayOfMonth } from 'date-fns';
 
 /**
@@ -31,7 +31,7 @@ export async function lancaImpostoDespesa(entry, receivedDate, taxRates) {
 
   // Busca conta do Plano de Contas pelo nome (type = expense)
   // Tenta encontrar conta com "Simples" no nome, ou "Imposto", ou "Tax"
-  const chartAccounts = await base44.entities.ChartOfAccounts.filter({ type: 'expense' });
+  const chartAccounts = await api.entities.ChartOfAccounts.filter({ type: 'expense' });
   const taxAccount = chartAccounts.find(a =>
     a.name?.toLowerCase().includes('simples') ||
     a.name?.toLowerCase().includes('imposto') ||
@@ -41,10 +41,10 @@ export async function lancaImpostoDespesa(entry, receivedDate, taxRates) {
   );
 
   // Verifica se já existe despesa de imposto para este billing_entry
-  const existing = await base44.entities.Expense.filter({ description: `Imposto (${ratePercent}%) — receb. ${receivedDate} — ${entry.id}` });
+  const existing = await api.entities.Expense.filter({ description: `Imposto (${ratePercent}%) — receb. ${receivedDate} — ${entry.id}` });
   if (existing.length > 0) return;
 
-  await base44.entities.Expense.create({
+  await api.entities.Expense.create({
     project_id: entry.project_id || '',
     chart_account_id: taxAccount?.id || '',
     category: 'administrative',
@@ -74,7 +74,7 @@ export async function lancaImpostoDespesaLote(totalAmount, receivedDate, taxRate
   const lastDay = lastDayOfMonth(new Date(parseInt(y), parseInt(m) - 1, 1));
   const dueDate = format(lastDay, 'yyyy-MM-dd');
 
-  const chartAccounts = await base44.entities.ChartOfAccounts.filter({ type: 'expense' });
+  const chartAccounts = await api.entities.ChartOfAccounts.filter({ type: 'expense' });
   const taxAccount = chartAccounts.find(a =>
     a.name?.toLowerCase().includes('simples') ||
     a.name?.toLowerCase().includes('imposto') ||
@@ -83,7 +83,7 @@ export async function lancaImpostoDespesaLote(totalAmount, receivedDate, taxRate
     a.name?.toLowerCase().includes('tax')
   );
 
-  await base44.entities.Expense.create({
+  await api.entities.Expense.create({
     project_id: projectId || '',
     chart_account_id: taxAccount?.id || '',
     category: 'administrative',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
@@ -25,7 +25,7 @@ export default function ProjectFinancial() {
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
-      const projects = await base44.entities.Project.filter({ id: projectId });
+      const projects = await api.entities.Project.filter({ id: projectId });
       return projects[0];
     },
     enabled: !!projectId,
@@ -33,23 +33,23 @@ export default function ProjectFinancial() {
 
   const { data: receivables = [] } = useQuery({
     queryKey: ['receivables', projectId],
-    queryFn: () => base44.entities.ProjectReceivable.filter({ project_id: projectId }, '-due_date'),
+    queryFn: () => api.entities.ProjectReceivable.filter({ project_id: projectId }, '-due_date'),
     enabled: !!projectId,
   });
 
   const { data: payables = [] } = useQuery({
     queryKey: ['payables', projectId],
-    queryFn: () => base44.entities.ProjectPayable.filter({ project_id: projectId }, '-due_date'),
+    queryFn: () => api.entities.ProjectPayable.filter({ project_id: projectId }, '-due_date'),
     enabled: !!projectId,
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   const createReceivableMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectReceivable.create({ ...data, project_id: projectId }),
+    mutationFn: (data) => api.entities.ProjectReceivable.create({ ...data, project_id: projectId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['receivables', projectId] });
       setReceivableForm({ description: '', due_date: '', amount: '', payment_method: 'pix' });
@@ -58,7 +58,7 @@ export default function ProjectFinancial() {
   });
 
   const createPayableMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectPayable.create({ ...data, project_id: projectId }),
+    mutationFn: (data) => api.entities.ProjectPayable.create({ ...data, project_id: projectId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payables', projectId] });
       setPayableForm({ description: '', due_date: '', amount: '', category: 'other' });
@@ -67,7 +67,7 @@ export default function ProjectFinancial() {
   });
 
   const updateReceivableStatusMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.ProjectReceivable.update(id, { 
+    mutationFn: ({ id, status }) => api.entities.ProjectReceivable.update(id, { 
       status, 
       received_at: status === 'received' ? new Date().toISOString().split('T')[0] : null 
     }),
@@ -75,7 +75,7 @@ export default function ProjectFinancial() {
   });
 
   const updatePayableStatusMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.ProjectPayable.update(id, { 
+    mutationFn: ({ id, status }) => api.entities.ProjectPayable.update(id, { 
       status, 
       paid_at: status === 'paid' ? new Date().toISOString().split('T')[0] : null 
     }),

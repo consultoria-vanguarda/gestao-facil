@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Clock, MoreHorizontal, Pencil, Trash2, Calendar } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,14 +42,14 @@ export default function ConsultantTimeEntries() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const { data: consultant } = useQuery({
     queryKey: ['myConsultant', user?.consultant_id],
     queryFn: async () => {
       if (!user?.consultant_id) return null;
-      const consultants = await base44.entities.Consultant.filter({ id: user.consultant_id });
+      const consultants = await api.entities.Consultant.filter({ id: user.consultant_id });
       return consultants[0];
     },
     enabled: !!user?.consultant_id,
@@ -57,33 +57,33 @@ export default function ConsultantTimeEntries() {
 
   const { data: timeEntries = [] } = useQuery({
     queryKey: ['myTimeEntries', user?.consultant_id],
-    queryFn: () => base44.entities.TimeEntry.filter({ consultant_id: user.consultant_id }, '-date'),
+    queryFn: () => api.entities.TimeEntry.filter({ consultant_id: user.consultant_id }, '-date'),
     enabled: !!user?.consultant_id,
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['myProjects', user?.consultant_id],
-    queryFn: () => base44.entities.Project.filter({ consultant_id: user.consultant_id }),
+    queryFn: () => api.entities.Project.filter({ consultant_id: user.consultant_id }),
     enabled: !!user?.consultant_id,
   });
 
   const { data: allProjects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => api.entities.Project.list(),
   });
 
   const { data: consultants = [] } = useQuery({
     queryKey: ['consultants'],
-    queryFn: () => base44.entities.Consultant.list(),
+    queryFn: () => api.entities.Consultant.list(),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
-    queryFn: () => base44.entities.Task.list(),
+    queryFn: () => api.entities.Task.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.TimeEntry.create({
+    mutationFn: (data) => api.entities.TimeEntry.create({
       ...data,
       consultant_id: user.consultant_id
     }),
@@ -94,7 +94,7 @@ export default function ConsultantTimeEntries() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.TimeEntry.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.TimeEntry.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myTimeEntries'] });
       setFormOpen(false);
@@ -103,7 +103,7 @@ export default function ConsultantTimeEntries() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.TimeEntry.delete(id),
+    mutationFn: (id) => api.entities.TimeEntry.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myTimeEntries'] });
       setDeleteConfirm(null);

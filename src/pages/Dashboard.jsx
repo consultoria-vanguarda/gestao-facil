@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { createPageUrl, createHourlyRatesViabilityUrl } from '../utils';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calculator, ChevronDown } from 'lucide-react';
+import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
 
-const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG";
+const LOGO_URL = publicStorageObjectUrl(
+  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
+);
 
 const menuLinks = [
   { label: 'Atendimentos', page: 'Projects' },

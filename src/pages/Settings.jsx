@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Settings as SettingsIcon, User, Bell, Shield, Loader2, Check } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function Settings() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => api.auth.me(),
   });
 
   const [profileForm, setProfileForm] = useState({
@@ -38,7 +38,7 @@ export default function Settings() {
   }, [user]);
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
+    mutationFn: (data) => api.auth.updateMe(data),
     onSuccess: async () => {
       await refreshUser();
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
@@ -223,7 +223,7 @@ export default function Settings() {
                   <Button 
                     variant="outline" 
                     className="text-rose-600 border-rose-200 hover:bg-rose-50"
-                    onClick={() => base44.auth.logout()}
+                    onClick={() => api.auth.logout()}
                   >
                     Sair da Conta
                   </Button>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Upload, Loader2, FileText, CheckCircle, AlertCircle } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { SERVICE_AREAS, getSubareas } from '../utils/serviceAreas';
 import { validateISODate } from "@/lib/validators";
 
@@ -37,12 +37,12 @@ export default function PublicPoliciesForm({ open, onClose, consultants, onSave,
     setParsedData(null);
 
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       setFileUrl(file_url);
       setUploading(false);
       setParsing(true);
 
-      const response = await base44.functions.invoke('parsePublicPoliciesPdf', {
+      const response = await api.functions.invoke('parsePublicPoliciesPdf', {
         file_url,
         num_phases: numPhases ? parseInt(numPhases) : undefined,
       });

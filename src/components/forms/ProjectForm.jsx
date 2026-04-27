@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, X, AlertTriangle, Plus, Trash2, Pencil, Check, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import { SERVICE_AREAS, getSubareas } from '../utils/serviceAreas';
 import { getConsultingHourlyRate, getDiagnosticRate } from '../utils/hourlyRateTables';
 import { format } from 'date-fns';
@@ -377,8 +377,8 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     if (!consultant_id || !start_date) { setConsultantConflicts([]); return; }
 
     Promise.all([
-      base44.entities.ProjectSchedule.filter({ consultant_id }),
-      base44.entities.Project.filter({ consultant_id })
+      api.entities.ProjectSchedule.filter({ consultant_id }),
+      api.entities.Project.filter({ consultant_id })
     ]).then(([schedules, projects]) => {
       const activeProjectIds = new Set(projects.map(p => p.id));
       const conflicts = schedules.filter(s =>
@@ -777,11 +777,11 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     setPpParseError('');
     setPpParsedData(null);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: ppFile });
+      const { file_url } = await api.integrations.Core.UploadFile({ file: ppFile });
       setPpFileUrl(file_url);
       setPpUploading(false);
       setPpParsing(true);
-      const response = await base44.functions.invoke('parsePublicPoliciesPdf', {
+      const response = await api.functions.invoke('parsePublicPoliciesPdf', {
         file_url,
         num_phases: ppNumPhases ? parseInt(ppNumPhases) : undefined,
       });

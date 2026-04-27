@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, X, Plus, Upload, FileText, Trash2 } from "lucide-react";
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/appApi';
 import MoneyInput from "@/components/ui/MoneyInput";
 import { parseMoneyBRToNumber, validateMoney } from "@/lib/validators";
 
@@ -90,7 +90,7 @@ export default function ServiceModelForm({ open, onClose, service, onSave, loadi
     
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       setForm({...form, document_url: file_url, document_name: file.name});
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
