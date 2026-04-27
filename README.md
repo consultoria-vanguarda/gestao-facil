@@ -14,6 +14,6 @@ Variáveis opcionais usadas pelo shell de parâmetros da app: `VITE_APP_ID`, `VI
 
 ## Scripts
 
-- `npm run build` — build de produção
+- `npm run build` — build de proodução
 - `npm run lint` — ESLint
 - `npm run typecheck` — verificação TypeScript
