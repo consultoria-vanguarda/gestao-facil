@@ -45,7 +45,7 @@ const AuthenticatedApp = () => {
     );
   }
 
-  if (tenantError?.type === 'tenant_not_found') {
+  if (tenantError?.type === 'organization_not_found') {
     return <TenantNotFoundError />;
   }
 

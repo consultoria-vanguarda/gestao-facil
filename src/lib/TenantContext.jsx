@@ -4,8 +4,8 @@ import { setCurrentOrganizationAccess, setCurrentOrganizationId } from '@/lib/or
 
 const TenantContext = createContext(null);
 
-const buildTenantNotFoundError = () => ({
-  type: 'tenant_not_found',
+const buildOrganizationNotFoundError = () => ({
+  type: 'organization_not_found',
   message: 'Organização não encontrada para este usuário.',
 });
 
@@ -51,7 +51,7 @@ export const TenantProvider = ({ children }) => {
             setSettings(null);
             setOrganizationId(null);
             setSubscription(null);
-            setTenantError(buildTenantNotFoundError());
+            setTenantError(buildOrganizationNotFoundError());
           }
           return;
         }
@@ -75,7 +75,7 @@ export const TenantProvider = ({ children }) => {
             setSettings(null);
             setOrganizationId(null);
             setSubscription(null);
-            setTenantError(buildTenantNotFoundError());
+            setTenantError(buildOrganizationNotFoundError());
           }
           return;
         }
@@ -107,8 +107,8 @@ export const TenantProvider = ({ children }) => {
         setOrganizationId(null);
         setSubscription(null);
         setTenantError({
-          type: 'tenant_load_failed',
-          message: error?.message || 'Falha ao carregar tenant.',
+          type: 'organization_load_failed',
+          message: error?.message || 'Falha ao carregar organização.',
         });
       } finally {
         if (!cancelled) {

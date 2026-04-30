@@ -11,10 +11,6 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-function slugOk(slug: string): boolean {
-  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
-}
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -45,12 +41,11 @@ Deno.serve(async (req) => {
     const email = String(body?.email ?? '').trim().toLowerCase();
     const password = String(body?.password ?? '');
     const organization_id = String(body?.organization_id ?? '').trim();
-    const organization_slug = String(body?.organization_slug ?? '').trim().toLowerCase();
     const full_name = String(body?.full_name ?? '').trim() || email;
 
-    if (!email || !password || (!organization_id && !organization_slug)) {
+    if (!email || !password || !organization_id) {
       return Response.json(
-        { error: 'Informe email, senha e organization_id (ou organization_slug legado).' },
+        { error: 'Informe email, senha e organization_id.' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -58,13 +53,6 @@ Deno.serve(async (req) => {
     if (password.length < 6) {
       return Response.json(
         { error: 'A senha deve ter pelo menos 6 caracteres.' },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    if (organization_slug && !slugOk(organization_slug)) {
-      return Response.json(
-        { error: 'Slug inválido (apenas minúsculas, números e hífens).' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -110,13 +98,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    let orgQuery = admin.from('organizations').select('id, slug, name');
-    if (organization_id) {
-      orgQuery = orgQuery.eq('id', organization_id);
-    } else {
-      orgQuery = orgQuery.eq('slug', organization_slug);
-    }
-    const { data: org, error: orgErr } = await orgQuery.maybeSingle();
+    const { data: org, error: orgErr } = await admin
+      .from('organizations')
+      .select('id, name')
+      .eq('id', organization_id)
+      .maybeSingle();
 
     if (orgErr || !org) {
       return Response.json(

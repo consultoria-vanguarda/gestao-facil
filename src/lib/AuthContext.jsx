@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    if (tenantError?.type === 'tenant_not_found') {
+    if (tenantError?.type === 'organization_not_found') {
       setUser(null);
       setIsAuthenticated(false);
       setAuthError(null);
