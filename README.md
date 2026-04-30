@@ -10,6 +10,22 @@ Aplicação web (Vite + React) com Supabase: multi-tenant, autenticação e mód
 
 Variáveis opcionais usadas pelo shell de parâmetros da app: `VITE_APP_ID`, `VITE_APP_BASE_URL`, `VITE_FUNCTIONS_VERSION`.
 
+### Stripe (billing por conta)
+
+No Supabase Functions, configure os secrets:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_BASIC`
+- `STRIPE_PRICE_PRO`
+- `STRIPE_PRICE_ENTERPRISE`
+
+Deploy das funções:
+
+- `supabase functions deploy billing-create-checkout-session`
+- `supabase functions deploy billing-create-portal-session`
+- `supabase functions deploy stripe-webhook`
+
 4. Execute: `npm run dev`
 
 ## Scripts

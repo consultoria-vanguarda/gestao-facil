@@ -1,6 +1,5 @@
 import { supabase } from './supabaseClient';
-import { requireCurrentOrganizationId } from '@/lib/organizationScope';
-import { clearStoredTenantSlug } from '@/lib/tenant';
+import { requireCurrentOrganizationId, requireCurrentOrganizationWritable } from '@/lib/organizationScope';
 import { getPublicStorageBucket } from '@/lib/supabasePublicStorage';
 
 const generateId = () => {
@@ -61,6 +60,7 @@ const createEntity = (tableName) => {
 
   const create = async (data) => {
     const orgId = requireCurrentOrganizationId();
+    requireCurrentOrganizationWritable();
     const row = { ...data };
     if (!row.id) row.id = generateId();
     row.organization_id = orgId;
@@ -75,6 +75,7 @@ const createEntity = (tableName) => {
 
   const update = async (id, data) => {
     const orgId = requireCurrentOrganizationId();
+    requireCurrentOrganizationWritable();
     const { data: updated, error } = await supabase
       .from(tableName)
       .update({
@@ -92,6 +93,7 @@ const createEntity = (tableName) => {
 
   const remove = async (id) => {
     const orgId = requireCurrentOrganizationId();
+    requireCurrentOrganizationWritable();
     const { error } = await supabase
       .from(tableName)
       .delete()
@@ -103,6 +105,7 @@ const createEntity = (tableName) => {
 
   const bulkCreate = async (records) => {
     const orgId = requireCurrentOrganizationId();
+    requireCurrentOrganizationWritable();
     const rows = (records || []).map((r) => ({ ...r }));
     for (const row of rows) {
       if (!row.id) row.id = generateId();
@@ -319,7 +322,7 @@ export const api = {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*, organization:organizations(id, name, slug, custom_domain)')
+        .select('*, organization:organizations(id, name, subscription_status, subscription_plan, subscription_current_period_end, read_only_reason)')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -341,8 +344,10 @@ export const api = {
           client_id: null,
           organization_id: null,
           organization_name: null,
-          organization_slug: null,
-          organization_custom_domain: null,
+          organization_subscription_status: null,
+          organization_subscription_plan: null,
+          organization_subscription_current_period_end: null,
+          organization_read_only_reason: null,
         };
       }
 
@@ -355,13 +360,14 @@ export const api = {
         client_id: profile.client_id,
         organization_id: profile.organization_id ?? null,
         organization_name: profile.organization?.name ?? null,
-        organization_slug: profile.organization?.slug ?? null,
-        organization_custom_domain: profile.organization?.custom_domain ?? null,
+        organization_subscription_status: profile.organization?.subscription_status ?? null,
+        organization_subscription_plan: profile.organization?.subscription_plan ?? null,
+        organization_subscription_current_period_end: profile.organization?.subscription_current_period_end ?? null,
+        organization_read_only_reason: profile.organization?.read_only_reason ?? null,
       };
     },
 
     logout: async (redirectUrl) => {
-      clearStoredTenantSlug();
       await supabase.auth.signOut();
       if (redirectUrl) window.location.href = redirectUrl;
     },
@@ -475,5 +481,42 @@ export const api = {
   /** Telemetria de navegação (placeholder; não envia dados). */
   appLogs: {
     logUserInApp: async () => {},
+  },
+
+  billing: {
+    getMySubscription: async () => {
+      const orgId = requireCurrentOrganizationId();
+      const { data, error } = await supabase
+        .from('organizations')
+        .select(`
+          id,
+          name,
+          billing_email,
+          stripe_customer_id,
+          stripe_subscription_id,
+          subscription_status,
+          subscription_plan,
+          subscription_current_period_end,
+          read_only_reason
+        `)
+        .eq('id', orgId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+
+    createCheckoutSession: async ({ planKey, successUrl, cancelUrl }) => {
+      return invokeEdgeFunctionWithSession('billing-create-checkout-session', {
+        plan_key: planKey,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+    },
+
+    createPortalSession: async ({ returnUrl }) => {
+      return invokeEdgeFunctionWithSession('billing-create-portal-session', {
+        return_url: returnUrl,
+      });
+    },
   },
 };

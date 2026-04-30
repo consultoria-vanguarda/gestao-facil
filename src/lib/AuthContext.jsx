@@ -8,7 +8,6 @@ import React, {
 import { api } from '@/api/appApi';
 import { supabase } from '@/api/supabaseClient';
 import { useTenant } from '@/lib/TenantContext';
-import { storeTenantSlugForSession } from '@/lib/tenant';
 
 const AuthContext = createContext();
 
@@ -50,42 +49,6 @@ export const AuthProvider = ({ children }) => {
         if (showGlobalLoader && !cancelled) setIsLoadingAuth(true);
         const currentUser = await api.auth.me();
         if (cancelled) return;
-
-        if (
-          organizationId &&
-          currentUser?.organization_id &&
-          currentUser.organization_id !== organizationId &&
-          currentUser?.user_type !== 'saas_admin'
-        ) {
-          // Sem ?slug= o tenant pode ser o default (ex. app); redireciona para o slug da org do utilizador.
-          let slug = currentUser.organization_slug;
-          if (!slug && currentUser.organization_id) {
-            const { data: orgRow } = await supabase
-              .from('organizations')
-              .select('slug')
-              .eq('id', currentUser.organization_id)
-              .maybeSingle();
-            slug = orgRow?.slug ? String(orgRow.slug).trim().toLowerCase() : '';
-          }
-          if (slug && typeof window !== 'undefined') {
-            storeTenantSlugForSession(slug);
-            const url = new URL(window.location.href);
-            ['slug', 'tenant', 'organization', 'org'].forEach((k) =>
-              url.searchParams.delete(k)
-            );
-            url.searchParams.set('slug', slug);
-            window.location.replace(`${url.pathname}${url.search}${url.hash}`);
-            return;
-          }
-          setUser(null);
-          setIsAuthenticated(false);
-          setAuthError({
-            type: 'tenant_mismatch',
-            message: 'Usuário autenticado em tenant diferente do domínio atual.',
-          });
-          await supabase.auth.signOut();
-          return;
-        }
 
         setUser(currentUser);
         setIsAuthenticated(true);

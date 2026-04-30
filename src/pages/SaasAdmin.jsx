@@ -33,16 +33,6 @@ import {
 } from '@/components/ui/table';
 import { useToast } from '@/components/ui/use-toast';
 
-const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-function normalizeSlug(raw) {
-  return String(raw || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
-
 export default function SaasAdmin() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -51,7 +41,6 @@ export default function SaasAdmin() {
   const [tenantDialogOpen, setTenantDialogOpen] = useState(false);
   const [adminDialogOpen, setAdminDialogOpen] = useState(false);
   const [newTenantName, setNewTenantName] = useState('');
-  const [newTenantSlug, setNewTenantSlug] = useState('');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [newAdminName, setNewAdminName] = useState('');
@@ -63,7 +52,7 @@ export default function SaasAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('id, name, slug, custom_domain, created_at')
+        .select('id, name, subscription_status, created_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
@@ -99,10 +88,14 @@ export default function SaasAdmin() {
   });
 
   const createTenantMutation = useMutation({
-    mutationFn: async ({ name, slug }) => {
+    mutationFn: async ({ name }) => {
       const { data: org, error: orgErr } = await supabase
         .from('organizations')
-        .insert({ name: name.trim(), slug })
+        .insert({
+          name: name.trim(),
+          subscription_status: 'inactive',
+          read_only_reason: 'subscription_inactive',
+        })
         .select('id')
         .single();
       if (orgErr) throw orgErr;
@@ -118,7 +111,6 @@ export default function SaasAdmin() {
       toast({ title: 'Tenant criado', description: 'Organização e configurações iniciais foram criadas.' });
       setTenantDialogOpen(false);
       setNewTenantName('');
-      setNewTenantSlug('');
     },
     onError: (e) => {
       toast({
@@ -130,12 +122,12 @@ export default function SaasAdmin() {
   });
 
   const inviteAdminMutation = useMutation({
-    mutationFn: async ({ email, password, full_name, organization_slug }) => {
+    mutationFn: async ({ email, password, full_name, organization_id }) => {
       return invokeEdgeFunctionWithSession('saas-invite-tenant-admin', {
         email,
         password,
         full_name,
-        organization_slug,
+        organization_id,
       });
     },
     onSuccess: () => {
@@ -173,26 +165,25 @@ export default function SaasAdmin() {
 
   const handleSubmitTenant = (e) => {
     e.preventDefault();
-    const slug = normalizeSlug(newTenantSlug);
-    if (!newTenantName.trim() || !slug || !SLUG_RE.test(slug)) {
+    if (!newTenantName.trim()) {
       toast({
         variant: 'destructive',
         title: 'Dados inválidos',
-        description: 'Informe nome e um slug válido (minúsculas, números e hífens).',
+        description: 'Informe o nome da empresa.',
       });
       return;
     }
-    createTenantMutation.mutate({ name: newTenantName, slug });
+    createTenantMutation.mutate({ name: newTenantName });
   };
 
   const handleSubmitAdmin = (e) => {
     e.preventDefault();
-    if (!selectedOrg?.slug) return;
+    if (!selectedOrg?.id) return;
     inviteAdminMutation.mutate({
       email: newAdminEmail.trim(),
       password: newAdminPassword,
       full_name: newAdminName.trim() || newAdminEmail.trim(),
-      organization_slug: selectedOrg.slug,
+      organization_id: selectedOrg.id,
     });
   };
 
@@ -230,8 +221,7 @@ export default function SaasAdmin() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Domínio customizado</TableHead>
+                  <TableHead>Status assinatura</TableHead>
                   <TableHead className="whitespace-nowrap">Criado em</TableHead>
                 </TableRow>
               </TableHeader>
@@ -239,10 +229,7 @@ export default function SaasAdmin() {
                 {organizations.map((o) => (
                   <TableRow key={o.id}>
                     <TableCell className="font-medium">{o.name}</TableCell>
-                    <TableCell>
-                      <code className="text-sm bg-slate-100 px-1.5 py-0.5 rounded">{o.slug}</code>
-                    </TableCell>
-                    <TableCell className="text-slate-600">{o.custom_domain || '—'}</TableCell>
+                    <TableCell className="text-slate-600">{o.subscription_status || 'inactive'}</TableCell>
                     <TableCell className="text-slate-600 text-sm">
                       {o.created_at ? new Date(o.created_at).toLocaleString('pt-BR') : '—'}
                     </TableCell>
@@ -279,7 +266,7 @@ export default function SaasAdmin() {
                 <SelectContent>
                   {organizations.map((o) => (
                     <SelectItem key={o.id} value={o.id}>
-                      {o.name} ({o.slug})
+                      {o.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -353,14 +340,7 @@ export default function SaasAdmin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tenant-slug">Slug</Label>
-                <Input
-                  id="tenant-slug"
-                  value={newTenantSlug}
-                  onChange={(e) => setNewTenantSlug(normalizeSlug(e.target.value))}
-                  placeholder="ex.: empresa-xyz"
-                />
-                <p className="text-xs text-slate-500">Usado em subdomínio e metadados de novos usuários.</p>
+                <p className="text-xs text-slate-500">A organização será identificada por conta (sem slug/domínio).</p>
               </div>
             </div>
             <DialogFooter>
@@ -383,7 +363,7 @@ export default function SaasAdmin() {
               <DialogTitle>Administrador do tenant</DialogTitle>
               <DialogDescription>
                 Cria usuário no Auth com perfil <strong>admin</strong> neste tenant:{' '}
-                <code className="text-xs bg-slate-100 px-1 rounded">{selectedOrg?.slug}</code>
+                <code className="text-xs bg-slate-100 px-1 rounded">{selectedOrg?.name}</code>
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">

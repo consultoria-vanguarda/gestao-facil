@@ -44,12 +44,13 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email ?? '').trim().toLowerCase();
     const password = String(body?.password ?? '');
+    const organization_id = String(body?.organization_id ?? '').trim();
     const organization_slug = String(body?.organization_slug ?? '').trim().toLowerCase();
     const full_name = String(body?.full_name ?? '').trim() || email;
 
-    if (!email || !password || !organization_slug) {
+    if (!email || !password || (!organization_id && !organization_slug)) {
       return Response.json(
-        { error: 'Informe email, senha e organization_slug.' },
+        { error: 'Informe email, senha e organization_id (ou organization_slug legado).' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!slugOk(organization_slug)) {
+    if (organization_slug && !slugOk(organization_slug)) {
       return Response.json(
         { error: 'Slug inválido (apenas minúsculas, números e hífens).' },
         { status: 400, headers: corsHeaders }
@@ -109,15 +110,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { data: org, error: orgErr } = await admin
-      .from('organizations')
-      .select('id, slug')
-      .eq('slug', organization_slug)
-      .maybeSingle();
+    let orgQuery = admin.from('organizations').select('id, slug, name');
+    if (organization_id) {
+      orgQuery = orgQuery.eq('id', organization_id);
+    } else {
+      orgQuery = orgQuery.eq('slug', organization_slug);
+    }
+    const { data: org, error: orgErr } = await orgQuery.maybeSingle();
 
     if (orgErr || !org) {
       return Response.json(
-        { error: `Organização "${organization_slug}" não encontrada.` },
+        { error: 'Organização não encontrada.' },
         { status: 404, headers: corsHeaders }
       );
     }
@@ -127,7 +130,8 @@ Deno.serve(async (req) => {
       password,
       email_confirm: true,
       user_metadata: {
-        organization_slug: org.slug,
+        organization_id: org.id,
+        organization_name: org.name,
         full_name,
         user_type: 'admin',
       },

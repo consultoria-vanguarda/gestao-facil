@@ -1,84 +1,111 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { supabase } from '@/api/supabaseClient';
-import { getMainLandingUrl, getTenantContext } from '@/lib/tenant';
-import { setCurrentOrganizationId } from '@/lib/organizationScope';
+import { setCurrentOrganizationAccess, setCurrentOrganizationId } from '@/lib/organizationScope';
 
 const TenantContext = createContext(null);
 
 const buildTenantNotFoundError = () => ({
   type: 'tenant_not_found',
-  message: 'Tenant não encontrado para este domínio.',
+  message: 'Organização não encontrada para este usuário.',
 });
 
 export const TenantProvider = ({ children }) => {
-  const location = useLocation();
   const [tenant, setTenant] = useState(null);
   const [settings, setSettings] = useState(null);
   const [organizationId, setOrganizationId] = useState(null);
+  const [subscription, setSubscription] = useState(null);
   const [isLoadingTenant, setIsLoadingTenant] = useState(true);
   const [tenantError, setTenantError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const loadTenant = async () => {
+    const loadTenantForSession = async (session) => {
       setIsLoadingTenant(true);
       setTenantError(null);
 
-      const { hostname, defaultTenantSlug } = getTenantContext(location);
-
       try {
-        let row = null;
-
-        // 1) Slug explícito (query ou env): não depende do hostname (*.vercel.app etc.).
-        if (defaultTenantSlug) {
-          const bySlug = await supabase.rpc('resolve_tenant_by_slug', {
-            p_slug: defaultTenantSlug,
-          });
-          if (bySlug.error) throw bySlug.error;
-          row = bySlug.data?.[0] ?? null;
-        }
-
-        // 2) Resolução por domínio/subdomínio + fallback (comportamento anterior).
-        if (!row) {
-          const byHost = await supabase.rpc('resolve_tenant_by_host', {
-            input_host: hostname,
-            fallback_slug: defaultTenantSlug ?? null,
-          });
-          if (byHost.error) throw byHost.error;
-          row = byHost.data?.[0] ?? null;
-        }
-
-        if (!row) {
+        const userId = session?.user?.id;
+        if (!userId) {
           if (!cancelled) {
             setTenant(null);
             setSettings(null);
             setOrganizationId(null);
+            setSubscription(null);
+            setTenantError(null);
+          }
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', userId)
+          .maybeSingle();
+        if (profileError) throw profileError;
+
+        const orgId = profile?.organization_id;
+        if (!orgId) {
+          if (!cancelled) {
+            setTenant(null);
+            setSettings(null);
+            setOrganizationId(null);
+            setSubscription(null);
             setTenantError(buildTenantNotFoundError());
           }
           return;
         }
 
-        if (cancelled) return;
+        const { data: org, error: orgError } = await supabase
+          .from('organizations')
+          .select(`
+            id,
+            name,
+            subscription_status,
+            subscription_plan,
+            subscription_current_period_end,
+            read_only_reason
+          `)
+          .eq('id', orgId)
+          .maybeSingle();
+        if (orgError) throw orgError;
+        if (!org) {
+          if (!cancelled) {
+            setTenant(null);
+            setSettings(null);
+            setOrganizationId(null);
+            setSubscription(null);
+            setTenantError(buildTenantNotFoundError());
+          }
+          return;
+        }
+
+        const { data: orgSettings, error: settingsError } = await supabase
+          .from('organization_settings')
+          .select('primary_color, secondary_color, logo_url')
+          .eq('organization_id', orgId)
+          .maybeSingle();
+        if (settingsError) throw settingsError;
 
         setTenant({
-          id: row.organization_id,
-          name: row.organization_name,
-          slug: row.organization_slug,
-          custom_domain: row.organization_custom_domain,
+          id: org.id,
+          name: org.name,
         });
-        setSettings({
-          primary_color: row.primary_color ?? null,
-          secondary_color: row.secondary_color ?? null,
-          logo_url: row.logo_url ?? null,
+        setSettings(orgSettings || null);
+        setOrganizationId(org.id);
+        setSubscription({
+          status: org.subscription_status || 'inactive',
+          plan: org.subscription_plan || null,
+          currentPeriodEnd: org.subscription_current_period_end || null,
+          readOnlyReason: org.read_only_reason || null,
+          isActive: ['trialing', 'active'].includes(String(org.subscription_status || '').toLowerCase()),
         });
-        setOrganizationId(row.organization_id);
       } catch (error) {
         if (cancelled) return;
         setTenant(null);
         setSettings(null);
         setOrganizationId(null);
+        setSubscription(null);
         setTenantError({
           type: 'tenant_load_failed',
           message: error?.message || 'Falha ao carregar tenant.',
@@ -90,23 +117,32 @@ export const TenantProvider = ({ children }) => {
       }
     };
 
-    void loadTenant();
+    supabase.auth.getSession().then(({ data }) => {
+      void loadTenantForSession(data?.session ?? null);
+    });
+
+    const {
+      data: { subscription: authSubscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void loadTenantForSession(session);
+    });
 
     return () => {
       cancelled = true;
+      authSubscription.unsubscribe();
     };
-  }, [location.pathname, location.search, location.hash]);
-
-  useEffect(() => {
-    if (tenantError?.type !== 'tenant_not_found') return;
-    const landingUrl = getMainLandingUrl();
-    if (!landingUrl) return;
-    window.location.replace(landingUrl);
-  }, [tenantError]);
+  }, []);
 
   useEffect(() => {
     setCurrentOrganizationId(organizationId);
   }, [organizationId]);
+
+  useEffect(() => {
+    setCurrentOrganizationAccess({
+      writable: !subscription || subscription.isActive,
+      reason: subscription?.readOnlyReason || null,
+    });
+  }, [subscription]);
 
   const withTenantFilter = (filters = {}) => {
     if (!organizationId) return { ...filters };
@@ -118,11 +154,12 @@ export const TenantProvider = ({ children }) => {
       tenant,
       settings,
       organizationId,
+      subscription,
       isLoadingTenant,
       tenantError,
       withTenantFilter,
     }),
-    [tenant, settings, organizationId, isLoadingTenant, tenantError]
+    [tenant, settings, organizationId, subscription, isLoadingTenant, tenantError]
   );
 
   return (

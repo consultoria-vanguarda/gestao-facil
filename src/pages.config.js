@@ -59,6 +59,7 @@ import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import Financial from './pages/Financial';
 import HourlyRates from './pages/HourlyRates';
+import MySubscription from './pages/MySubscription';
 import ProjectDetail from './pages/ProjectDetail';
 import ProjectFinancial from './pages/ProjectFinancial';
 import ProjectReports from './pages/ProjectReports';
@@ -85,6 +86,7 @@ export const PAGES = {
     "Expenses": Expenses,
     "Financial": Financial,
     "HourlyRates": HourlyRates,
+    "MySubscription": MySubscription,
     "ProjectDetail": ProjectDetail,
     "ProjectFinancial": ProjectFinancial,
     "ProjectReports": ProjectReports,

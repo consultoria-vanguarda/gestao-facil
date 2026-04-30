@@ -8,6 +8,7 @@ const HEADER_LOGO_URL = publicStorageObjectUrl(
   'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
 );
 import { useAuth } from '@/lib/AuthContext';
+import { useTenant } from '@/lib/TenantContext';
 import { 
   LayoutDashboard, 
   Users, 
@@ -24,6 +25,7 @@ import {
   FileText,
   Shield,
   Calculator,
+  CreditCard,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -48,6 +50,7 @@ const adminMenuItems = [
 ];
 
 const saasAdminExtraItem = { name: 'Admin SaaS', icon: Shield, page: 'SaasAdmin' };
+const subscriptionItem = { name: 'Minha Assinatura', icon: CreditCard, page: 'MySubscription' };
 
 const consultantMenuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'ConsultantDashboard' },
@@ -65,6 +68,7 @@ const clientMenuItems = [
 export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const { subscription } = useTenant();
   const location = useLocation();
   const viabilityTabActive =
     new URLSearchParams(location.search || '').get('tab') === 'viability';
@@ -75,12 +79,13 @@ export default function Layout({ children, currentPageName }) {
 
   const menuItems =
     userType === 'saas_admin'
-      ? [...adminMenuItems, saasAdminExtraItem]
+      ? [...adminMenuItems, subscriptionItem, saasAdminExtraItem]
       : userType === 'admin'
-        ? adminMenuItems
+        ? [...adminMenuItems, subscriptionItem]
         : userType === 'consultant'
           ? consultantMenuItems
           : clientMenuItems;
+  const readOnlyMode = Boolean(subscription && !subscription.isActive);
 
   const handleLogout = async () => {
     await api.auth.logout();
@@ -233,6 +238,11 @@ export default function Layout({ children, currentPageName }) {
       {/* Main Content */}
       <main className="pt-16 min-h-screen">
         <div className="p-6 lg:p-8">
+          {readOnlyMode && (
+            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              Sua organização está em modo somente leitura porque a assinatura não está ativa.
+            </div>
+          )}
           {children}
         </div>
       </main>
