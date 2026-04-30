@@ -3,11 +3,9 @@ import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+import { APP_LOGO_URL } from '@/lib/branding';
 
-const SEBRAE_LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/8efa5bac6_image.png'
-);
+const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 const LEGACY_AREA_LABELS = {
   finances: 'Finanças',

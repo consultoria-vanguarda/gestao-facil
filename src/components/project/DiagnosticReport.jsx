@@ -1,10 +1,8 @@
 import { jsPDF } from 'jspdf';
 import { format, parseISO } from 'date-fns';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+import { APP_LOGO_URL } from '@/lib/branding';
 
-const SEBRAE_LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/289c11ce8_image.png'
-);
+const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 /**
  * Loads an image URL and returns a base64 data URL (PNG).

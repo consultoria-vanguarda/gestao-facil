@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl, createHourlyRatesViabilityUrl } from './utils';
 import { api } from '@/api/appApi';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
-
-const HEADER_LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
-);
+import { APP_LOGO_URL } from '@/lib/branding';
 import { useAuth } from '@/lib/AuthContext';
 import { useTenant } from '@/lib/TenantContext';
+import { READ_ONLY_BLOCKED_EVENT } from '@/lib/organizationScope';
 import { 
   LayoutDashboard, 
   Users, 
@@ -36,6 +33,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const adminMenuItems = [
   { name: 'Áreas de Atuação', icon: Briefcase, page: 'ServiceAreas' },
@@ -67,6 +73,7 @@ const clientMenuItems = [
 
 export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [readOnlyDialogOpen, setReadOnlyDialogOpen] = useState(false);
   const { user } = useAuth();
   const { subscription } = useTenant();
   const location = useLocation();
@@ -87,6 +94,14 @@ export default function Layout({ children, currentPageName }) {
           : clientMenuItems;
   const readOnlyMode = Boolean(subscription && !subscription.isActive);
 
+  React.useEffect(() => {
+    const onReadOnlyBlocked = () => setReadOnlyDialogOpen(true);
+    window.addEventListener(READ_ONLY_BLOCKED_EVENT, onReadOnlyBlocked);
+    return () => {
+      window.removeEventListener(READ_ONLY_BLOCKED_EVENT, onReadOnlyBlocked);
+    };
+  }, []);
+
   const handleLogout = async () => {
     await api.auth.logout();
     window.location.assign('/login');
@@ -100,7 +115,7 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo + menu desktop (scroll horizontal se couber no ecrã) */}
           <div className="flex items-center gap-3 lg:gap-4 min-w-0 flex-1">
             <Link to={createPageUrl('Dashboard')} className="shrink-0">
-              <img src={HEADER_LOGO_URL} alt="Vanguarda Consultoria" className="h-8 w-auto object-contain" />
+              <img src={APP_LOGO_URL} alt="GestãoUP" className="h-8 w-auto object-contain" />
             </Link>
             
             {/* Desktop Menu */}
@@ -246,6 +261,23 @@ export default function Layout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+
+      <Dialog open={readOnlyDialogOpen} onOpenChange={setReadOnlyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cadastro bloqueado em modo leitura</DialogTitle>
+            <DialogDescription>
+              Sua organização está com a assinatura inativa e, por isso, não é possível cadastrar ou alterar dados.
+              Ative a assinatura em <strong>Minha Assinatura</strong> para liberar o sistema.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" onClick={() => setReadOnlyDialogOpen(false)}>
+              Entendi
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

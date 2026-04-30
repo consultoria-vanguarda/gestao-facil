@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/appApi';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+import { APP_LOGO_URL } from '@/lib/branding';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,9 +11,7 @@ import { Download, DollarSign, Clock, TrendingUp, TrendingDown, Users } from 'lu
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-const LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
-);
+const LOGO_URL = APP_LOGO_URL;
 const fmt = (v) => (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // Mapa de situação do projeto → status da entidade Project

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/api/supabaseClient';
 import { invokeEdgeFunctionWithSession } from '@/api/appApi';
 import { useAuth } from '@/lib/AuthContext';
-import { Building2, Loader2, Plus, ShieldAlert, Users } from 'lucide-react';
+import { Building2, Check, Loader2, Plus, ShieldAlert, Users, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,7 @@ export default function SaasAdmin() {
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [newAdminName, setNewAdminName] = useState('');
+  const [freemiumTarget, setFreemiumTarget] = useState(null);
 
   const isSaas = user?.user_type === 'saas_admin';
 
@@ -52,7 +53,7 @@ export default function SaasAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('id, name, subscription_status, created_at')
+        .select('id, name, subscription_status, subscription_plan, created_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
@@ -98,7 +99,7 @@ export default function SaasAdmin() {
           full_name,
           user_type,
           created_date,
-          organization:organizations(name, subscription_status)
+          organization:organizations(id, name, subscription_status, subscription_plan)
         `)
         .order('created_date', { ascending: false });
       if (error) throw error;
@@ -167,6 +168,49 @@ export default function SaasAdmin() {
     },
   });
 
+  const toggleFreemiumMutation = useMutation({
+    mutationFn: async ({ organizationId, enable }) => {
+      const payload = enable
+        ? {
+            subscription_status: 'active',
+            subscription_plan: 'freemium',
+            subscription_current_period_end: null,
+            read_only_reason: null,
+          }
+        : {
+            subscription_status: 'inactive',
+            subscription_plan: null,
+            subscription_current_period_end: null,
+            read_only_reason: 'subscription_inactive',
+          };
+
+      const { error } = await supabase
+        .from('organizations')
+        .update(payload)
+        .eq('id', organizationId);
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['saas-admin', 'organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['saas-admin', 'profiles-all'] });
+      queryClient.invalidateQueries({ queryKey: ['saas-admin', 'profiles', selectedOrgId] });
+      toast({
+        title: vars.enable ? 'Freemium ativado' : 'Freemium removido',
+        description: vars.enable
+          ? 'A organização agora possui acesso total por tempo indefinido.'
+          : 'A organização voltou para assinatura inativa.',
+      });
+    },
+    onError: (e) => {
+      toast({
+        variant: 'destructive',
+        title: 'Falha ao atualizar freemium',
+        description: e?.message || 'Tente novamente.',
+      });
+    },
+  });
+
   if (!isSaas) {
     return (
       <div className="max-w-lg space-y-4">
@@ -205,6 +249,24 @@ export default function SaasAdmin() {
       full_name: newAdminName.trim() || newAdminEmail.trim(),
       organization_id: selectedOrg.id,
     });
+  };
+
+  const requestToggleFreemium = (profile) => {
+    if (!profile?.organization?.id) return;
+    setFreemiumTarget({
+      organizationId: profile.organization.id,
+      organizationName: profile.organization.name || 'Tenant',
+      enable: profile.organization.subscription_plan !== 'freemium',
+    });
+  };
+
+  const confirmToggleFreemium = () => {
+    if (!freemiumTarget?.organizationId) return;
+    toggleFreemiumMutation.mutate({
+      organizationId: freemiumTarget.organizationId,
+      enable: freemiumTarget.enable,
+    });
+    setFreemiumTarget(null);
   };
 
   return (
@@ -249,7 +311,9 @@ export default function SaasAdmin() {
                 {organizations.map((o) => (
                   <TableRow key={o.id}>
                     <TableCell className="font-medium">{o.name}</TableCell>
-                    <TableCell className="text-slate-600">{o.subscription_status || 'inactive'}</TableCell>
+                    <TableCell className="text-slate-600">
+                      {o.subscription_plan === 'freemium' ? 'freemium' : o.subscription_status || 'inactive'}
+                    </TableCell>
                     <TableCell className="text-slate-600 text-sm">
                       {o.created_at ? new Date(o.created_at).toLocaleString('pt-BR') : '—'}
                     </TableCell>
@@ -363,6 +427,7 @@ export default function SaasAdmin() {
                   <TableHead>Tipo</TableHead>
                   <TableHead>Tenant</TableHead>
                   <TableHead>Assinatura do tenant</TableHead>
+                  <TableHead className="text-right">Freemium</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -375,7 +440,29 @@ export default function SaasAdmin() {
                     </TableCell>
                     <TableCell>{p.organization?.name || '—'}</TableCell>
                     <TableCell className="capitalize">
-                      {p.organization?.subscription_status || 'inactive'}
+                      {p.organization?.subscription_plan === 'freemium'
+                        ? 'freemium'
+                        : p.organization?.subscription_status || 'inactive'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={p.organization?.subscription_plan === 'freemium' ? 'destructive' : 'default'}
+                        disabled={!p.organization || toggleFreemiumMutation.isPending}
+                        onClick={() => requestToggleFreemium(p)}
+                      >
+                        {toggleFreemiumMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                        ) : p.organization?.subscription_plan === 'freemium' ? (
+                          <X className="w-4 h-4 mr-1" />
+                        ) : (
+                          <Check className="w-4 h-4 mr-1" />
+                        )}
+                        {p.organization?.subscription_plan === 'freemium'
+                          ? 'Desmarcar freemium'
+                          : 'Definir freemium'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -477,6 +564,35 @@ export default function SaasAdmin() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(freemiumTarget)}
+        onOpenChange={(open) => {
+          if (!open) setFreemiumTarget(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {freemiumTarget?.enable ? 'Ativar freemium' : 'Desmarcar freemium'}
+            </DialogTitle>
+            <DialogDescription>
+              {freemiumTarget?.enable
+                ? `Confirma ativar freemium para o tenant "${freemiumTarget?.organizationName}"? Essa organização terá acesso total por tempo indefinido, sem validação no Stripe.`
+                : `Confirma remover freemium do tenant "${freemiumTarget?.organizationName}"? A organização voltará para assinatura inativa e modo somente leitura.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setFreemiumTarget(null)}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={confirmToggleFreemium} disabled={toggleFreemiumMutation.isPending}>
+              {toggleFreemiumMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Confirmar
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

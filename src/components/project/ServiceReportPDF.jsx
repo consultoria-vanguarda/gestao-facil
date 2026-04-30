@@ -1,11 +1,9 @@
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+import { APP_LOGO_URL } from '@/lib/branding';
 
-const SEBRAE_LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/8efa5bac6_image.png'
-);
+const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 const REPORT_TYPE_LABELS = {
   presencial: 'Consultoria Presencial',

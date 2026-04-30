@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl, createHourlyRatesViabilityUrl } from '../utils';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calculator, ChevronDown } from 'lucide-react';
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
-
-const LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
-);
+import { APP_LOGO_URL } from '@/lib/branding';
 
 const menuLinks = [
   { label: 'Atendimentos', page: 'Projects' },
@@ -67,8 +63,8 @@ export default function Dashboard() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#7b5ea7]/40 to-[#38bcd4]/30 blur-2xl scale-110" />
               <div className="relative bg-white rounded-2xl px-10 py-6 shadow-2xl shadow-[#7b5ea7]/30">
                 <img
-                  src={LOGO_URL}
-                  alt="Vanguarda Consultoria"
+                  src={APP_LOGO_URL}
+                  alt="GestãoUP"
                   className="h-20 md:h-28 w-auto object-contain"
                 />
               </div>
@@ -106,7 +102,7 @@ export default function Dashboard() {
             className="text-white/50 text-base md:text-lg max-w-xl mb-12"
           >
             Projetos, clientes, financeiro e relatórios — tudo em um só lugar,
-            com a eficiência que a Vanguarda representa.
+            com a eficiência que a GestãoUP representa.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -244,7 +240,7 @@ export default function Dashboard() {
 
       {/* Footer strip */}
       <div className="border-t border-white/5 py-6 text-center">
-        <img src={LOGO_URL} alt="Vanguarda" className="h-8 w-auto mx-auto opacity-30 object-contain" />
+        <img src={APP_LOGO_URL} alt="GestãoUP" className="h-8 w-auto mx-auto opacity-30 object-contain" />
       </div>
     </div>
   );

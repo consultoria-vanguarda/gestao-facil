@@ -1,6 +1,7 @@
 let currentOrganizationId = null;
 let currentOrganizationWritable = true;
 let currentReadOnlyReason = null;
+export const READ_ONLY_BLOCKED_EVENT = 'organization:read-only-blocked';
 
 export const setCurrentOrganizationId = (organizationId) => {
   currentOrganizationId = organizationId || null;
@@ -24,6 +25,13 @@ export const requireCurrentOrganizationId = () => {
 
 export const requireCurrentOrganizationWritable = () => {
   if (!currentOrganizationWritable) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent(READ_ONLY_BLOCKED_EVENT, {
+          detail: { reason: currentReadOnlyReason || null },
+        })
+      );
+    }
     const suffix = currentReadOnlyReason ? ` (${currentReadOnlyReason})` : '';
     throw new Error(`Organização em modo somente leitura${suffix}.`);
   }

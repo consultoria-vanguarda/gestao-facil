@@ -24,6 +24,7 @@ function statusLabel(status) {
     incomplete: 'Incompleta',
     incomplete_expired: 'Expirada',
     paused: 'Pausada',
+    freemium: 'Freemium',
   };
   return map[String(status || '').toLowerCase()] || status || 'Desconhecido';
 }
@@ -85,6 +86,8 @@ export default function MySubscription() {
   }, [queryClient, toast]);
 
   const isActive = ['active', 'trialing'].includes(String(data?.subscription_status || '').toLowerCase());
+  const isFreemium = String(data?.subscription_plan || '').toLowerCase() === 'freemium';
+  const isWritable = isActive || isFreemium;
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -110,8 +113,10 @@ export default function MySubscription() {
           ) : (
             <>
               <div className="flex items-center gap-2">
-                <Badge variant={isActive ? 'default' : 'secondary'}>{statusLabel(data?.subscription_status)}</Badge>
-                {isActive ? (
+                <Badge variant={isActive || isFreemium ? 'default' : 'secondary'}>
+                  {isFreemium ? 'Freemium' : statusLabel(data?.subscription_status)}
+                </Badge>
+                {isWritable ? (
                   <span className="text-emerald-700 inline-flex items-center gap-1 text-sm">
                     <CircleCheck className="w-4 h-4" />
                     Escrita liberada
@@ -124,6 +129,11 @@ export default function MySubscription() {
                 )}
               </div>
               <p className="text-sm text-slate-700">Plano: <strong>{data?.subscription_plan || 'Não contratado'}</strong></p>
+              {isFreemium ? (
+                <p className="text-sm text-emerald-700">
+                  Plano freemium concedido pelo administrador SaaS com acesso total por tempo indefinido.
+                </p>
+              ) : null}
               <p className="text-sm text-slate-700">
                 Próxima renovação:{' '}
                 <strong>
@@ -148,7 +158,7 @@ export default function MySubscription() {
               key={plan.key}
               variant="outline"
               className="justify-center"
-              disabled={checkoutMutation.isPending}
+              disabled={checkoutMutation.isPending || isFreemium}
               onClick={() => checkoutMutation.mutate(plan.key)}
             >
               {checkoutMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
@@ -159,7 +169,7 @@ export default function MySubscription() {
       </Card>
 
       <div>
-        <Button onClick={() => portalMutation.mutate()} disabled={portalMutation.isPending}>
+        <Button onClick={() => portalMutation.mutate()} disabled={portalMutation.isPending || isFreemium}>
           {portalMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
           Gerenciar no Stripe
         </Button>

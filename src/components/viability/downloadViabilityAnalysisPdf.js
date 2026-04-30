@@ -1,12 +1,9 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-
-import { publicStorageObjectUrl } from '@/lib/supabasePublicStorage';
+import { APP_LOGO_URL } from '@/lib/branding';
 
 /** Mesma logomarca dos relatórios gerenciais (ReportsTab). */
-const LOGO_URL = publicStorageObjectUrl(
-  'public/695ebd99a400611ea331a00a/dd42951c1_Logomarca.JPG'
-);
+const LOGO_URL = APP_LOGO_URL;
 
 const BRAND = [30, 58, 95];
 
