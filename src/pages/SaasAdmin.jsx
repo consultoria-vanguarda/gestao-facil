@@ -87,6 +87,26 @@ export default function SaasAdmin() {
     enabled: isSaas && Boolean(selectedOrgId),
   });
 
+  const { data: allProfiles = [], isLoading: loadingAllProfiles } = useQuery({
+    queryKey: ['saas-admin', 'profiles-all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          email,
+          full_name,
+          user_type,
+          created_date,
+          organization:organizations(name, subscription_status)
+        `)
+        .order('created_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isSaas,
+  });
+
   const createTenantMutation = useMutation({
     mutationFn: async ({ name }) => {
       const { data: org, error: orgErr } = await supabase
@@ -309,6 +329,53 @@ export default function SaasAdmin() {
                     </TableCell>
                     <TableCell className="text-sm text-slate-600">
                       {p.created_date ? new Date(p.created_date).toLocaleString('pt-BR') : '—'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Usuários da plataforma
+          </CardTitle>
+          <CardDescription>
+            Lista global de usuários com tenant vinculado e status da assinatura do tenant.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingAllProfiles ? (
+            <div className="flex items-center gap-2 text-slate-500 py-6 justify-center">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Carregando usuários da plataforma…
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>E-mail</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Tenant</TableHead>
+                  <TableHead>Assinatura do tenant</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allProfiles.map((p) => (
+                  <TableRow key={`all-${p.id}`}>
+                    <TableCell>{p.email}</TableCell>
+                    <TableCell>{p.full_name}</TableCell>
+                    <TableCell>
+                      <span className="text-sm capitalize">{p.user_type}</span>
+                    </TableCell>
+                    <TableCell>{p.organization?.name || '—'}</TableCell>
+                    <TableCell className="capitalize">
+                      {p.organization?.subscription_status || 'inactive'}
                     </TableCell>
                   </TableRow>
                 ))}
