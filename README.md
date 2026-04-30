@@ -4,7 +4,7 @@ Aplicação web (Vite + React) com Supabase: multi-tenant, autenticação e mód
 
 ## Desenvolvimento
 
-1. Clone o repositório e entre na pasta do projeto.
+1. Clone o repoositório e entre na pasta do projeto.
 2. Instale dependências: `npm install`
 3. Crie `.env.local` com as variáveis do Supabase (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, etc.). Opcional: `VITE_SUPABASE_STORAGE_BUCKET` se o bucket público de arquivos tiver outro nome no painel.
 
