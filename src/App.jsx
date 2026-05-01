@@ -10,6 +10,7 @@ import { TenantProvider, useTenant } from '@/lib/TenantContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import LoginPage from '@/pages/Login';
 import TenantNotFoundError from '@/components/TenantNotFoundError';
+import LandingPage from '@/pages/LandingPage';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -21,14 +22,14 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
 
 /** Evita open redirect: só caminhos relativos na mesma origem. */
 function safePostLoginRedirect(raw) {
-  if (!raw || typeof raw !== 'string') return '/';
+  if (!raw || typeof raw !== 'string') return `/${mainPageKey}`;
   try {
     const decoded = decodeURIComponent(raw);
     if (decoded.startsWith('/') && !decoded.startsWith('//')) return decoded;
   } catch {
     /* ignore */
   }
-  return '/';
+  return `/${mainPageKey}`;
 }
 
 const AuthenticatedApp = () => {
@@ -36,6 +37,11 @@ const AuthenticatedApp = () => {
   const { isLoadingTenant, tenantError } = useTenant();
   const location = useLocation();
   const isLoginPath = location.pathname === '/login';
+  const isPublicLandingPath = location.pathname === '/';
+
+  if (isPublicLandingPath) {
+    return <LandingPage />;
+  }
 
   if (isLoadingTenant) {
     return (

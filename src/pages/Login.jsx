@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { pagesConfig } from '@/pages.config';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,8 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : '/';
+  const defaultRedirect = `/${pagesConfig.mainPage || 'Dashboard'}`;
+  const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : defaultRedirect;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
