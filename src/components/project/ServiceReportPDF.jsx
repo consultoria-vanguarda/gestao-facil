@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { APP_LOGO_URL } from '@/lib/branding';
+import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
@@ -11,17 +12,6 @@ const REPORT_TYPE_LABELS = {
   parcial: 'Consultoria Parcial',
   final: 'Consultoria Final',
 };
-
-async function loadImageAsBase64(url) {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 export async function downloadServiceReport(report, project, client, consultant) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -37,12 +27,12 @@ export async function downloadServiceReport(report, project, client, consultant)
 
   // Load logo
   let logoDataUrl = null;
-  try { logoDataUrl = await loadImageAsBase64(SEBRAE_LOGO_URL); } catch (e) {}
+  try { logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL); } catch (e) {}
 
   // Preload result images
   const imageDataUrls = [];
   for (const url of (report.results_images || [])) {
-    try { imageDataUrls.push(await loadImageAsBase64(url)); } catch (e) { imageDataUrls.push(null); }
+    try { imageDataUrls.push(await loadImageAsDataUrl(url)); } catch (e) { imageDataUrls.push(null); }
   }
 
   // ─── Header ────────────────────────────────────────────────────────────────

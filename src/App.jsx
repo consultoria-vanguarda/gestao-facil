@@ -37,11 +37,6 @@ const AuthenticatedApp = () => {
   const { isLoadingTenant, tenantError } = useTenant();
   const location = useLocation();
   const isLoginPath = location.pathname === '/login';
-  const isPublicLandingPath = location.pathname === '/';
-
-  if (isPublicLandingPath) {
-    return <LandingPage />;
-  }
 
   if (isLoadingTenant) {
     return (
@@ -112,16 +107,23 @@ const AuthenticatedApp = () => {
 
 
 function App() {
-
   return (
     <QueryClientProvider client={queryClientInstance}>
       <Router>
-        <TenantProvider>
-          <AuthProvider>
-            <NavigationTracker />
-            <AuthenticatedApp />
-          </AuthProvider>
-        </TenantProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/*"
+            element={(
+              <TenantProvider>
+                <AuthProvider>
+                  <NavigationTracker />
+                  <AuthenticatedApp />
+                </AuthProvider>
+              </TenantProvider>
+            )}
+          />
+        </Routes>
       </Router>
       <Toaster />
     </QueryClientProvider>

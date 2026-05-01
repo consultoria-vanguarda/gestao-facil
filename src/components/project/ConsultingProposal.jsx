@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
 import { APP_LOGO_URL } from '@/lib/branding';
+import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
@@ -235,17 +236,6 @@ function drawJustifiedBox(doc, x, y, w, text, fontSize, black, padding = 3) {
   return h;
 }
 
-async function loadImageAsBase64(url) {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
 // Build schedule rows from project - uses schedule_config if available, otherwise auto-generates
 function buildScheduleRows(project) {
   const savedConfig = project.schedule_config;
@@ -348,7 +338,7 @@ export async function downloadConsultingProposal(project, client) {
 
   // Load logo
   let logoDataUrl = null;
-  try { logoDataUrl = await loadImageAsBase64(SEBRAE_LOGO_URL); } catch(e) {}
+  try { logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL); } catch(e) {}
 
   // ─── Header ───────────────────────────────────────────────────────────────
   const headerY = 12;

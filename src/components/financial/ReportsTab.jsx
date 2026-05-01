@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/appApi';
 import { APP_LOGO_URL } from '@/lib/branding';
+import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -180,8 +181,8 @@ export default function ReportsTab() {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
     try {
-      const img = await loadImageAsBase64(LOGO_URL);
-      doc.addImage(img, 'JPEG', 10, 8, 40, 14);
+      const img = await loadImageAsDataUrl(LOGO_URL);
+      doc.addImage(img, 'PNG', 10, 8, 40, 14);
     } catch (_) {}
 
     doc.setFontSize(16); doc.setTextColor(30, 58, 95);
@@ -562,15 +563,4 @@ function DetailModal({ open, onClose, title, columns, rows, total }) {
       </DialogContent>
     </Dialog>
   );
-}
-
-async function loadImageAsBase64(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
 }

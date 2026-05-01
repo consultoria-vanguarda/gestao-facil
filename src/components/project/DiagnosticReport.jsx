@@ -1,22 +1,9 @@
 import { jsPDF } from 'jspdf';
 import { format, parseISO } from 'date-fns';
 import { APP_LOGO_URL } from '@/lib/branding';
+import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 const SEBRAE_LOGO_URL = APP_LOGO_URL;
-
-/**
- * Loads an image URL and returns a base64 data URL (PNG).
- */
-async function loadImageAsBase64(url) {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 /**
  * Generates and downloads the "Relatório de Diagnóstico" PDF.
@@ -34,7 +21,7 @@ export async function downloadDiagnosticReport(project, client) {
   // Pre-load logo
   let logoDataUrl = null;
   try {
-    logoDataUrl = await loadImageAsBase64(SEBRAE_LOGO_URL);
+    logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL);
   } catch (e) {
     console.warn('Could not load SEBRAE logo:', e);
   }

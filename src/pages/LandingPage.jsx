@@ -1,10 +1,5 @@
 import HeroSection from '@/components/landing/HeroSection';
 import ProblemSolutionSection from '@/components/landing/ProblemSolutionSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import ModulesSection from '@/components/landing/ModulesSection';
-import BenefitsSection from '@/components/landing/BenefitsSection';
-import SocialProofSection from '@/components/landing/SocialProofSection';
-import FaqSection from '@/components/landing/FaqSection';
 import ContactSection from '@/components/landing/ContactSection';
 
 const navLinks = [
@@ -35,11 +30,6 @@ export default function LandingPage() {
       <main>
         <HeroSection />
         <ProblemSolutionSection />
-        <HowItWorksSection />
-        <ModulesSection />
-        <BenefitsSection />
-        <SocialProofSection />
-        <FaqSection />
         <ContactSection />
       </main>
 

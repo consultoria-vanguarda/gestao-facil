@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { APP_LOGO_URL } from '@/lib/branding';
+import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 /** Mesma logomarca dos relatórios gerenciais (ReportsTab). */
 const LOGO_URL = APP_LOGO_URL;
@@ -10,17 +11,6 @@ const BRAND = [30, 58, 95];
 function fmtMoney(v) {
   if (v === null || v === undefined || Number.isNaN(Number(v))) return '—';
   return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-async function loadImageAsBase64(url) {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
 }
 
 function formatCidadeUf(cidade, uf) {
@@ -67,8 +57,8 @@ export async function downloadViabilityAnalysisPdf({
   const pageW = doc.internal.pageSize.getWidth();
 
   try {
-    const img = await loadImageAsBase64(LOGO_URL);
-    doc.addImage(img, 'JPEG', 10, 8, 40, 14);
+    const img = await loadImageAsDataUrl(LOGO_URL);
+    doc.addImage(img, 'PNG', 10, 8, 40, 14);
   } catch (_) {
     /* logo opcional */
   }
