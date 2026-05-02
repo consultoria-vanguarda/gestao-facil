@@ -84,15 +84,21 @@ export default function Layout({ children, currentPageName }) {
   // Evita um segundo fetch + ecrã "Carregando..." (que parecia refresh ao voltar o foco).
   const userType = String(user?.user_type || 'admin').toLowerCase();
 
+  const isPlatformAdminOnly =
+    userType === 'saas_admin' && String(user?.organization_slug || '').toLowerCase() === 'admin';
+
   const menuItems =
-    userType === 'saas_admin'
-      ? [...adminMenuItems, subscriptionItem, saasAdminExtraItem]
+    isPlatformAdminOnly
+      ? [saasAdminExtraItem]
+      : userType === 'saas_admin'
+        ? [...adminMenuItems, subscriptionItem, saasAdminExtraItem]
       : userType === 'admin'
         ? [...adminMenuItems, subscriptionItem]
         : userType === 'consultant'
           ? consultantMenuItems
           : clientMenuItems;
-  const readOnlyMode = Boolean(subscription && !subscription.isActive);
+  const readOnlyMode =
+    !isPlatformAdminOnly && Boolean(subscription && !subscription.isActive);
 
   React.useEffect(() => {
     const onReadOnlyBlocked = () => setReadOnlyDialogOpen(true);
@@ -179,7 +185,7 @@ export default function Layout({ children, currentPageName }) {
                   </div>
                 </DropdownMenuLabel>
                 {(userType === 'admin' ||
-                  userType === 'saas_admin' ||
+                  (userType === 'saas_admin' && !isPlatformAdminOnly) ||
                   userType === 'consultant') && (
                   <>
                     <DropdownMenuSeparator />

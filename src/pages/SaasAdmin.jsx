@@ -53,7 +53,7 @@ export default function SaasAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('id, name, subscription_status, subscription_plan, created_at')
+        .select('id, name, slug, subscription_status, subscription_plan, created_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
@@ -63,15 +63,20 @@ export default function SaasAdmin() {
 
   const [selectedOrgId, setSelectedOrgId] = useState(null);
 
+  const tenantOrgPickerList = useMemo(
+    () => (organizations || []).filter((o) => String(o.slug || '').toLowerCase() !== 'admin'),
+    [organizations]
+  );
+
   React.useEffect(() => {
-    if (!selectedOrgId && organizations.length > 0) {
-      setSelectedOrgId(organizations[0].id);
+    if (!selectedOrgId && tenantOrgPickerList.length > 0) {
+      setSelectedOrgId(tenantOrgPickerList[0].id);
     }
-  }, [organizations, selectedOrgId]);
+  }, [tenantOrgPickerList, selectedOrgId]);
 
   const selectedOrg = useMemo(
-    () => organizations.find((o) => o.id === selectedOrgId) ?? null,
-    [organizations, selectedOrgId]
+    () => tenantOrgPickerList.find((o) => o.id === selectedOrgId) ?? organizations.find((o) => o.id === selectedOrgId) ?? null,
+    [organizations, selectedOrgId, tenantOrgPickerList]
   );
 
   const { data: tenantProfiles = [], isLoading: loadingProfiles } = useQuery({
@@ -303,6 +308,7 @@ export default function SaasAdmin() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
+                  <TableHead>Plano</TableHead>
                   <TableHead>Status assinatura</TableHead>
                   <TableHead className="whitespace-nowrap">Criado em</TableHead>
                 </TableRow>
@@ -312,6 +318,9 @@ export default function SaasAdmin() {
                   <TableRow key={o.id}>
                     <TableCell className="font-medium">{o.name}</TableCell>
                     <TableCell className="text-slate-600">
+                      {o.subscription_plan || '—'}
+                    </TableCell>
+                    <TableCell className="text-slate-600 capitalize">
                       {o.subscription_plan === 'freemium' ? 'freemium' : o.subscription_status || 'inactive'}
                     </TableCell>
                     <TableCell className="text-slate-600 text-sm">
@@ -342,13 +351,13 @@ export default function SaasAdmin() {
               <Select
                 value={selectedOrgId ?? ''}
                 onValueChange={(v) => setSelectedOrgId(v)}
-                disabled={organizations.length === 0}
+                disabled={tenantOrgPickerList.length === 0}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione…" />
                 </SelectTrigger>
                 <SelectContent>
-                  {organizations.map((o) => (
+                  {tenantOrgPickerList.map((o) => (
                     <SelectItem key={o.id} value={o.id}>
                       {o.name}
                     </SelectItem>

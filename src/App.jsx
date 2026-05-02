@@ -33,7 +33,7 @@ function safePostLoginRedirect(raw) {
 }
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, authError, isAuthenticated } = useAuth();
+  const { isLoadingAuth, authError, isAuthenticated, user } = useAuth();
   const { isLoadingTenant, tenantError } = useTenant();
   const location = useLocation();
   const isLoginPath = location.pathname === '/login';
@@ -79,6 +79,13 @@ const AuthenticatedApp = () => {
     const params = new URLSearchParams(location.search);
     const to = safePostLoginRedirect(params.get('redirect'));
     return <Navigate to={to} replace />;
+  }
+
+  const platformAdminOnly =
+    String(user?.user_type || '').toLowerCase() === 'saas_admin' &&
+    String(user?.organization_slug || '').toLowerCase() === 'admin';
+  if (platformAdminOnly && location.pathname !== '/SaasAdmin') {
+    return <Navigate to="/SaasAdmin" replace />;
   }
 
   return (

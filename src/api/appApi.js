@@ -322,7 +322,7 @@ export const api = {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*, organization:organizations(id, name, subscription_status, subscription_plan, subscription_current_period_end, read_only_reason)')
+        .select('*, organization:organizations(id, name, slug, subscription_status, subscription_plan, subscription_current_period_end, read_only_reason)')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -344,6 +344,7 @@ export const api = {
           client_id: null,
           organization_id: null,
           organization_name: null,
+          organization_slug: null,
           organization_subscription_status: null,
           organization_subscription_plan: null,
           organization_subscription_current_period_end: null,
@@ -360,6 +361,7 @@ export const api = {
         client_id: profile.client_id,
         organization_id: profile.organization_id ?? null,
         organization_name: profile.organization?.name ?? null,
+        organization_slug: profile.organization?.slug ?? null,
         organization_subscription_status: profile.organization?.subscription_status ?? null,
         organization_subscription_plan: profile.organization?.subscription_plan ?? null,
         organization_subscription_current_period_end: profile.organization?.subscription_current_period_end ?? null,
