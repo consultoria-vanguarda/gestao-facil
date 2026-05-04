@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestãoUP — Brand System v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Ink scale — off-whites com calor violáceo, evitando branco puro */
+  --ink-50:  #F5F2FF;
+  --ink-100: #ECEAFF;
+  --ink-200: #B5B0C9;
+  --ink-300: #8B85A0;
+  --ink-400: #6E6884;
+  --ink-500: #524C66;
+  --ink-600: #2A2538;
+  --ink-700: #1A1626;
+  --ink-800: #14101F;
+  --ink-900: #0A0612;
+
+  /* Violet — assinatura cromática */
+  --violet-100: #E9E1FF;
+  --violet-300: #C0AFFF;
+  --violet-400: #9F84FF;
+  --violet-500: #7C5CFF;  /* Signature */
+  --violet-600: #5E3DEE;
+  --violet-700: #4A2EE0;
+  --violet-900: #2A1F5C;
+
+  /* Sinal de borda/divisor */
+  --hairline: rgba(236, 234, 255, 0.08);
+  --hairline-bright: rgba(236, 234, 255, 0.16);
+
+  /* Tipografia */
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+  --font-serif: 'Fraunces', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink-900);
+  color: var(--ink-100);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "ss02", "cv11";
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Ambient violet glow no fundo */
+body::before {
+  content: '';
+  position: fixed;
+  top: -30vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 60vh;
+  background: radial-gradient(ellipse at center, var(--violet-700) 0%, transparent 60%);
+  opacity: 0.25;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grain overlay sutil */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.7 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+main { position: relative; z-index: 2; }
+
+/* ============= NAV / TOP META ============= */
+.top-meta {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 48px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+  background: rgba(10, 6, 18, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.top-meta .left { display: flex; gap: 24px; align-items: center; }
+.top-meta .dot {
+  width: 6px; height: 6px;
+  background: var(--violet-500);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--violet-500);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============= HERO ============= */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  position: relative;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 64px;
+  margin-bottom: 64px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+}
+.hero-meta span strong {
+  display: block;
+  color: var(--ink-100);
+  font-weight: 500;
+  margin-top: 4px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.wordmark-hero {
+  font-family: var(--font-sans);
+  font-size: clamp(80px, 16vw, 240px);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+  color: var(--ink-100);
+  position: relative;
+  display: inline-block;
+}
+.wordmark-hero .accent {
+  color: var(--violet-500);
+}
+.wordmark-hero .tilde-mark {
+  display: inline-block;
+  color: var(--violet-500);
+  position: relative;
+  top: -0.05em;
+}
+
+.hero-essence {
+  margin-top: 80px;
+  max-width: 720px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(20px, 2.4vw, 32px);
+  line-height: 1.35;
+  color: var(--ink-200);
+  font-weight: 300;
+}
+.hero-essence em {
+  color: var(--violet-400);
+  font-style: italic;
+}
+
+/* ============= SECTION SHELL ============= */
+section.block {
+  padding: 120px 48px;
+  border-top: 1px solid var(--hairline);
+  position: relative;
+}
+
+.block-header {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 32px;
+  margin-bottom: 80px;
+  align-items: baseline;
+}
+.block-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--violet-400);
+}
+.block-title {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--ink-100);
+}
+.block-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+  margin-bottom: 12px;
+}
+.block-lede {
+  margin-top: 16px;
+  max-width: 640px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-200);
+  font-weight: 300;
+}
+
+/* ============= 01 — PLATAFORMA ============= */
+.platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px 80px;
+  max-width: 1280px;
+  margin-left: 112px;
+}
+@media (max-width: 900px) {
+  .platform-grid { grid-template-columns: 1fr; margin-left: 0; }
+}
+.attr {
+  border-top: 1px solid var(--hairline);
+  padding-top: 32px;
+}
+.attr .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--violet-400);
+  margin-bottom: 16px;
+}
+.attr h4 {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  color: var(--ink-100);
+}
+.attr p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-200);
+  font-weight: 300;
+}
+
+/* ============= 02 — LOGO ============= */
+.logo-stage {
+  background: var(--ink-800);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 96px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.logo-stage.light {
+  background: var(--ink-50);
+}
+.logo-stage.light .wm { color: var(--ink-900); }
+.logo-stage.light .wm .accent { color: var(--violet-600); }
+.logo-stage.light .wm .tilde-mark { color: var(--violet-600); }
+
+.logo-label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+.logo-stage.light .logo-label { color: var(--ink-300); }
+
+.wm {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  color: var(--ink-100);
+  display: inline-flex;
+  align-items: baseline;
+}
+.wm .accent { color: var(--violet-500); }
+.wm .tilde-mark { color: var(--violet-500); display: inline-block; }
+
+.wm-xl { font-size: 96px; }
+.wm-l  { font-size: 56px; }
+.wm-m  { font-size: 32px; }
+.wm-s  { font-size: 18px; }
+
+.logo-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+.logo-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+@media (max-width: 800px) {
+  .logo-grid-2, .logo-grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Símbolo isolado — o til como marca */
+.symbol-stage {
+  background: var(--ink-800);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.symbol-tilde {
+  font-family: var(--font-sans);
+  font-size: 180px;
+  font-weight: 600;
+  color: var(--violet-500);
+  line-height: 0.5;
+}
+.symbol-stage.alt { background: var(--violet-500); }
+.symbol-stage.alt .symbol-tilde { color: var(--ink-900); }
+.symbol-stage.solid { background: var(--ink-100); }
+.symbol-stage.solid .symbol-tilde { color: var(--violet-600); }
+
+/* Clear space spec */
+.clearspace {
+  background: var(--ink-800);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 80px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.clearspace::before, .clearspace::after,
+.clearspace > .guide-h, .clearspace > .guide-v {
+  content: '';
+  position: absolute;
+  background: var(--violet-500);
+  opacity: 0.4;
+}
+.clearspace::before {
+  left: 0; right: 0; top: 40px;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--violet-500) 50%, transparent 50%);
+  background-size: 6px 1px;
+  background-color: transparent;
+}
+.clearspace::after {
+  left: 0; right: 0; bottom: 40px;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--violet-500) 50%, transparent 50%);
+  background-size: 6px 1px;
+  background-color: transparent;
+}
+.clearspace .guide-v.left {
+  top: 0; bottom: 0; left: 40px; width: 1px;
+  background-image: linear-gradient(to bottom, var(--violet-500) 50%, transparent 50%);
+  background-size: 1px 6px;
+  background-color: transparent;
+}
+.clearspace .guide-v.right {
+  top: 0; bottom: 0; right: 40px; width: 1px;
+  background-image: linear-gradient(to bottom, var(--violet-500) 50%, transparent 50%);
+  background-size: 1px 6px;
+  background-color: transparent;
+}
+.clearspace-note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--violet-400);
+  position: absolute;
+  top: 14px;
+  left: 16px;
+}
+.x-marker {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--violet-400);
+  background: var(--ink-800);
+  padding: 0 6px;
+}
+.x-marker.top { top: 32px; right: 80px; }
+.x-marker.bottom { bottom: 32px; left: 80px; }
+
+/* Don'ts */
+.dont-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+}
+@media (max-width: 800px) { .dont-grid { grid-template-columns: 1fr 1fr; } }
+
+.dont {
+  background: var(--ink-800);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  aspect-ratio: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.dont::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid #FF4D4D;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.dont-x {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: #FF4D4D;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+.dont-caption {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+}
+.dont .wm { font-size: 28px; }
+.dont.stretch .wm { transform: scaleX(1.6); }
+.dont.rotate .wm { transform: rotate(-12deg); }
+.dont.shadow .wm { text-shadow: 4px 4px 0 var(--violet-500); }
+.dont.recolor .wm .accent { color: #00FF88; }
+.dont.recolor .wm .tilde-mark { color: #00FF88; }
+
+/* ============= 03 — COR ============= */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  margin-bottom: 64px;
+}
+@media (max-width: 800px) { .swatches { grid-template-columns: repeat(3, 1fr); } }
+
+.swatch {
+  aspect-ratio: 1 / 1.3;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.swatch:hover { transform: translateY(-4px); }
+
+.swatch .name {
+  font-size: 13px;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+.swatch .role {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+.swatch .hex { font-size: 11px; }
+
+.swatch.dark { color: var(--ink-100); }
+.swatch.light { color: var(--ink-900); }
+
+/* Combinações */
+.combo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 800px) { .combo-grid { grid-template-columns: 1fr; } }
+.combo {
+  border-radius: 4px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 200px;
+}
+.combo h5 {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.combo p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.combo .accent-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-top: auto;
+}
+
+/* ============= 04 — TIPOGRAFIA ============= */
+.type-spec {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: baseline;
+}
+.type-spec:last-child { border-bottom: 1px solid var(--hairline); }
+.type-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-300);
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+.type-meta strong {
+  display: block;
+  color: var(--violet-400);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  text-transform: none;
+}
+
+.type-sample-display {
+  font-family: var(--font-sans);
+  font-size: 88px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--ink-100);
+}
+.type-sample-body {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--ink-100);
+  max-width: 640px;
+}
+.type-sample-mono {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-100);
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+.type-sample-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 32px;
+  line-height: 1.3;
+  font-weight: 300;
+  color: var(--violet-300);
+  max-width: 640px;
+}
+
+.weight-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.weight-row span {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.w-300 { font-weight: 300; color: var(--ink-300); }
+.w-400 { font-weight: 400; color: var(--ink-200); }
+.w-500 { font-weight: 500; color: var(--ink-100); }
+.w-600 { font-weight: 600; color: var(--ink-100); }
+.w-700 { font-weight: 700; color: var(--violet-400); }
+
+/* ============= 05 — APLICAÇÕES ============= */
+.app-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) { .app-grid { grid-template-columns: 1fr; } }
+
+.mock {
+  background: var(--ink-800);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.3s ease;
+}
+.mock:hover { border-color: var(--hairline-bright); }
+
+.mock-label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  z-index: 5;
+}
+
+/* Browser mockup — site header */
+.browser-mock {
+  aspect-ratio: 16/10;
+  display: flex;
+  flex-direction: column;
+}
+.browser-bar {
+  height: 32px;
+  background: var(--ink-700);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+  border-bottom: 1px solid var(--hairline);
+}
+.browser-bar .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ink-500);
+}
+.browser-bar .url {
+  margin-left: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-300);
+  background: var(--ink-800);
+  padding: 4px 10px;
+  border-radius: 100px;
+  flex: 1;
+  max-width: 280px;
+}
+.site-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink-900);
+  padding: 24px 32px;
+}
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--hairline);
+}
+.site-nav .nav-links {
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  color: var(--ink-200);
+  font-weight: 400;
+}
+.site-nav .nav-links span:hover { color: var(--ink-100); }
+.site-nav .cta {
+  background: var(--violet-500);
+  color: var(--ink-900);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 100px;
+  letter-spacing: -0.01em;
+}
+.site-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 0;
+}
+.site-hero .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--violet-400);
+  margin-bottom: 16px;
+}
+.site-hero h2 {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink-100);
+  max-width: 80%;
+  margin-bottom: 16px;
+}
+.site-hero h2 em {
+  font-style: italic;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  color: var(--violet-300);
+}
+.site-hero p {
+  font-size: 13px;
+  color: var(--ink-300);
+  max-width: 60%;
+  line-height: 1.5;
+}
+
+/* App icon */
+.app-icon-mock {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--violet-700) 0%, var(--violet-500) 50%, var(--violet-400) 100%);
+  position: relative;
+}
+.app-icon-mock .symbol-tilde { font-size: 140px; color: var(--ink-50); }
+.app-icon-mock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.2), transparent 60%);
+}
+
+/* Favicon row */
+.favicon-strip {
+  display: flex;
+  gap: 16px;
+  padding: 32px;
+  align-items: center;
+}
+.favicon {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink-50);
+}
+.favicon .symbol-tilde { line-height: 0.5; }
+.fav-64 { width: 64px; height: 64px; background: var(--violet-500); }
+.fav-64 .symbol-tilde { font-size: 56px; }
+.fav-32 { width: 32px; height: 32px; background: var(--violet-500); }
+.fav-32 .symbol-tilde { font-size: 28px; }
+.fav-16 { width: 16px; height: 16px; background: var(--violet-500); border-radius: 3px; }
+.fav-16 .symbol-tilde { font-size: 14px; }
+
+/* Social card */
+.social-card {
+  aspect-ratio: 1.91/1;
+  background: var(--ink-900);
+  position: relative;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--hairline);
+}
+.social-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, var(--violet-700) 0%, transparent 60%);
+  opacity: 0.5;
+  filter: blur(40px);
+}
+.social-card-content { position: relative; z-index: 2; }
+.social-card .badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--violet-400);
+  margin-bottom: 16px;
+}
+.social-card .headline {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink-100);
+  max-width: 80%;
+}
+.social-card .headline em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--violet-300);
+  font-weight: 300;
+}
+.social-card .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  z-index: 2;
+}
+.social-card .footer .wm { font-size: 22px; }
+.social-card .footer .url {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+}
+
+/* Email signature */
+.email-sig {
+  padding: 40px;
+  background: var(--ink-50);
+  color: var(--ink-900);
+}
+.email-sig .sig-name {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  margin-bottom: 2px;
+}
+.email-sig .sig-role {
+  font-size: 13px;
+  color: var(--ink-500);
+  margin-bottom: 16px;
+}
+.email-sig .sig-divider {
+  width: 32px;
+  height: 2px;
+  background: var(--violet-600);
+  margin-bottom: 16px;
+}
+.email-sig .sig-wm {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  color: var(--ink-900);
+}
+.email-sig .sig-wm .accent { color: var(--violet-600); }
+.email-sig .sig-wm .tilde-mark { color: var(--violet-600); }
+.email-sig .sig-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-500);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ============= 06 — VOZ ============= */
+.voice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1280px;
+  margin-left: 112px;
+}
+@media (max-width: 900px) { .voice-grid { grid-template-columns: 1fr; margin-left: 0; } }
+.voice-card {
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 40px;
+}
+.voice-card h4 {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+  color: var(--ink-100);
+}
+.voice-card.do h4::before {
+  content: '+ ';
+  color: var(--violet-400);
+}
+.voice-card.dont h4::before {
+  content: '− ';
+  color: var(--ink-400);
+}
+.voice-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.voice-card li {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-200);
+  padding-left: 20px;
+  position: relative;
+  font-weight: 300;
+}
+.voice-card.do li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px; height: 1px;
+  background: var(--violet-400);
+}
+.voice-card.dont li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px; height: 1px;
+  background: var(--ink-500);
+}
+
+.taglines {
+  margin-top: 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+}
+.tagline {
+  background: var(--ink-900);
+  padding: 40px 48px;
+  display: grid;
+  grid-template-columns: 80px 1fr 200px;
+  gap: 32px;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .tagline { grid-template-columns: 1fr; gap: 12px; }
+}
+.tagline .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--violet-400);
+  letter-spacing: 0.08em;
+}
+.tagline .line {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink-100);
+  line-height: 1.2;
+}
+.tagline .line em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--violet-300);
+  font-weight: 300;
+}
+.tagline .context {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+  text-align: right;
+}
+@media (max-width: 800px) {
+  .tagline .context { text-align: left; }
+}
+
+/* ============= FOOTER ============= */
+footer {
+  padding: 80px 48px 48px;
+  border-top: 1px solid var(--hairline);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 48px;
+}
+@media (max-width: 800px) { footer { grid-template-columns: 1fr; } }
+footer .col h6 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+footer .col p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-200);
+  font-weight: 300;
+}
+footer .col .wm-footer {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+footer .col .wm-footer .accent { color: var(--violet-500); }
+footer .col .wm-footer .tilde-mark { color: var(--violet-500); }
+
+footer .meta-row {
+  grid-column: 1 / -1;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-400);
+  text-transform: uppercase;
+}
+
+/* Stagger reveals */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.hero-meta { animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: 0.1s; }
+.wordmark-hero { animation: rise 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: 0.3s; }
+.hero-essence { animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: 0.6s; }
+
+/* ============= MOBILE ============= */
+@media (max-width: 700px) {
+  .top-meta { padding: 16px 24px; }
+  .top-meta .left { gap: 12px; }
+  .top-meta .right { display: none; }
+  .hero { padding: 80px 24px 60px; }
+  .hero-meta { gap: 24px; flex-wrap: wrap; }
+  section.block { padding: 80px 24px; }
+  .block-header { grid-template-columns: 1fr; gap: 8px; }
+  .logo-stage { padding: 48px 24px; min-height: 200px; }
+  .wm-xl { font-size: 56px; }
+  .wm-l { font-size: 36px; }
+  .type-spec { grid-template-columns: 1fr; gap: 16px; }
+  .type-sample-display { font-size: 48px; }
+  .tagline { padding: 32px 24px; }
+  footer { padding: 60px 24px 32px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="top-meta">
+  <div class="left">
+    <span class="dot"></span>
+    <span>GestãoUP</span>
+    <span style="opacity:0.5">/</span>
+    <span style="opacity:0.7">Brand System</span>
+  </div>
+  <div class="right">
+    <span>v1.0 — Mai 2026</span>
+  </div>
+</div>
+
+<main>
+
+<!-- ============= HERO ============= -->
+<section class="hero">
+  <div class="hero-meta">
+    <span>Documento<strong>Brand Identity v1.0</strong></span>
+    <span>Categoria<strong>SaaS B2B — Consultoria</strong></span>
+    <span>Mercado<strong>Brasil → Global</strong></span>
+    <span>Status<strong>Foundation Release</strong></span>
+  </div>
+
+  <div class="wordmark-hero">
+    Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span>
+  </div>
+
+  <p class="hero-essence">
+    Sistema operacional para consultorias modernas. <em>Gestão</em> é o que herdamos do mercado tradicional. <em>UP</em> é como o transformamos: leve, conectado, mensurável, global.
+  </p>
+</section>
+
+<!-- ============= 01 PLATAFORMA ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[01]</span>
+    <div>
+      <div class="block-kicker">Plataforma de Marca</div>
+      <h2 class="block-title">A consultoria, redesenhada como software.</h2>
+      <p class="block-lede">GestãoUP existe para tirar firmas de consultoria do Excel e do pipeline mental do sócio. Centraliza projetos, horas, entregáveis e finanças num único sistema — e mira o consultor brasileiro com ambição global.</p>
+    </div>
+  </div>
+
+  <div class="platform-grid">
+    <div class="attr">
+      <div class="num">[ 01 / Propósito ]</div>
+      <h4>Liberar consultor de planilha.</h4>
+      <p>Toda firma de consultoria reinventa a mesma roda em Excel. Nós entregamos a roda pronta: gestão processual, gerencial e financeira de projetos num produto unificado e mensurável.</p>
+    </div>
+    <div class="attr">
+      <div class="num">[ 02 / Posicionamento ]</div>
+      <h4>O OS das consultorias.</h4>
+      <p>Não somos CRM, não somos timesheet, não somos ERP. Somos a camada operacional que conecta projeto, time e P&L — com a opinião forte do mercado de consultoria embutida.</p>
+    </div>
+    <div class="attr">
+      <div class="num">[ 03 / Atributos ]</div>
+      <h4>Preciso. Leve. Mensurável.</h4>
+      <p>Decisões em segundos, não relatórios. Cada interação devolve dado acionável. Pensado para times que entregam por hora, não por mês.</p>
+    </div>
+    <div class="attr">
+      <div class="num">[ 04 / Arquétipo ]</div>
+      <h4>Magician — quem destrava.</h4>
+      <p>Marca que transforma realidade visível em sistema operável. Não vende esforço, vende alavancagem. Confiável como ferramenta, ambiciosa como visão.</p>
+    </div>
+    <div class="attr">
+      <div class="num">[ 05 / Audiência ]</div>
+      <h4>Sócios e gestores de firmas.</h4>
+      <p>Beachhead: ~5 mil consultores credenciados Sebrae no Brasil. Expansão: small/mid consulting firms LatAm e mercados de língua portuguesa. Visão: produto bilíngue com posicionamento global.</p>
+    </div>
+    <div class="attr">
+      <div class="num">[ 06 / Essência ]</div>
+      <h4>Para cima.</h4>
+      <p>"UP" não é só sufixo de produto. É direção. Consultorias que adotam GestãoUP movem para cima — em margem, em escala, em sofisticação operacional.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============= 02 LOGO ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[02]</span>
+    <div>
+      <div class="block-kicker">Sistema de Logo</div>
+      <h2 class="block-title">Wordmark com til-marca.</h2>
+      <p class="block-lede">Wordmark monoweight com diferenciação cromática entre "Gestão" (português, herança) e "UP" (inglês, visão global). O til do "ã" foi promovido a marca-mãe — opera como símbolo isolado em favicons, app icons e mídias sociais.</p>
+    </div>
+  </div>
+
+  <!-- Logo principal -->
+  <div class="logo-stage">
+    <span class="logo-label">Logo Principal — Dark</span>
+    <span class="wm wm-xl">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+  </div>
+
+  <div class="logo-grid-2">
+    <div class="logo-stage light">
+      <span class="logo-label">Logo Principal — Light</span>
+      <span class="wm wm-l">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+    </div>
+    <div class="logo-stage" style="background: var(--violet-600);">
+      <span class="logo-label" style="color: var(--violet-100);">Logo — Reverso Violeta</span>
+      <span class="wm wm-l" style="color: var(--ink-50);">
+        Gest<span class="tilde-mark" style="color:var(--ink-50);">ã</span>o<span class="accent" style="color:var(--ink-900);">UP</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Símbolo isolado -->
+  <h3 style="font-size:24px; font-weight:500; letter-spacing:-0.02em; margin: 64px 0 24px; color:var(--ink-100);">Símbolo isolado — o til</h3>
+  <p style="font-size:15px; color:var(--ink-200); max-width:640px; margin-bottom:32px; font-weight:300;">
+    Quando o wordmark inteiro não cabe ou seria visualmente fraco — favicon, app icon, avatar social, watermark, monograma de assinatura — usamos apenas o til. É a abreviação semântica da marca: o detalhe português que carrega a identidade inteira.
+  </p>
+
+  <div class="logo-grid-3">
+    <div class="symbol-stage">
+      <span class="logo-label">Padrão</span>
+      <span class="symbol-tilde">˜</span>
+    </div>
+    <div class="symbol-stage solid">
+      <span class="logo-label" style="color:var(--ink-400);">Inverso</span>
+      <span class="symbol-tilde">˜</span>
+    </div>
+    <div class="symbol-stage alt">
+      <span class="logo-label" style="color:var(--violet-900);">Solid Violet</span>
+      <span class="symbol-tilde">˜</span>
+    </div>
+  </div>
+
+  <!-- Clear space -->
+  <h3 style="font-size:24px; font-weight:500; letter-spacing:-0.02em; margin: 64px 0 24px; color:var(--ink-100);">Área de proteção</h3>
+  <p style="font-size:15px; color:var(--ink-200); max-width:640px; margin-bottom:32px; font-weight:300;">
+    A área mínima ao redor do wordmark equivale à altura do "U" de "UP". Nada — texto, ícone, borda — invade essa zona.
+  </p>
+
+  <div class="clearspace">
+    <span class="clearspace-note">Clear-space = X</span>
+    <span class="x-marker top">X</span>
+    <span class="x-marker bottom">X</span>
+    <div class="guide-v left"></div>
+    <div class="guide-v right"></div>
+    <span class="wm wm-l">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+  </div>
+
+  <!-- Reduções mínimas -->
+  <h3 style="font-size:24px; font-weight:500; letter-spacing:-0.02em; margin: 64px 0 24px; color:var(--ink-100);">Reduções mínimas</h3>
+  <div class="logo-grid-3">
+    <div class="logo-stage" style="padding:48px;">
+      <span class="logo-label">Digital — 24px alt.</span>
+      <span class="wm" style="font-size:24px;">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+    </div>
+    <div class="logo-stage" style="padding:48px;">
+      <span class="logo-label">App / favicon — 16px</span>
+      <span class="wm" style="font-size:14px;">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+    </div>
+    <div class="logo-stage" style="padding:48px;">
+      <span class="logo-label">Print — 8mm alt.</span>
+      <span class="wm" style="font-size:18px;">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+    </div>
+  </div>
+
+  <!-- Don'ts -->
+  <h3 style="font-size:24px; font-weight:500; letter-spacing:-0.02em; margin: 64px 0 24px; color:var(--ink-100);">Não faça</h3>
+  <div class="dont-grid">
+    <div class="dont stretch">
+      <span class="dont-x">×</span>
+      <span class="wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+      <span class="dont-caption">Não distorça</span>
+    </div>
+    <div class="dont rotate">
+      <span class="dont-x">×</span>
+      <span class="wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+      <span class="dont-caption">Não rotacione</span>
+    </div>
+    <div class="dont shadow">
+      <span class="dont-x">×</span>
+      <span class="wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+      <span class="dont-caption">Sem sombras</span>
+    </div>
+    <div class="dont recolor">
+      <span class="dont-x">×</span>
+      <span class="wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+      <span class="dont-caption">Sem recolorir</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============= 03 COR ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[03]</span>
+    <div>
+      <div class="block-kicker">Sistema Cromático</div>
+      <h2 class="block-title">Violeta elétrico sobre tinta profunda.</h2>
+      <p class="block-lede">Paleta dominantemente escura com violeta como assinatura. Evitamos branco puro e violetas saturados de varejo — a marca habita o território de SaaS premium: rico, contido, com brilho intencional.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-300); margin-bottom:16px; font-family:var(--font-mono);">Tinta — Ink Scale</h3>
+  <div class="swatches">
+    <div class="swatch dark" style="background:#0A0612;">
+      <span class="role">Base</span>
+      <div><div class="name">Ink 900</div><div class="hex">#0A0612</div></div>
+    </div>
+    <div class="swatch dark" style="background:#14101F;">
+      <span class="role">Elevated</span>
+      <div><div class="name">Ink 800</div><div class="hex">#14101F</div></div>
+    </div>
+    <div class="swatch dark" style="background:#2A2538;">
+      <span class="role">Surface</span>
+      <div><div class="name">Ink 600</div><div class="hex">#2A2538</div></div>
+    </div>
+    <div class="swatch dark" style="background:#6E6884;">
+      <span class="role">Mid</span>
+      <div><div class="name">Ink 400</div><div class="hex">#6E6884</div></div>
+    </div>
+    <div class="swatch light" style="background:#B5B0C9;">
+      <span class="role">Soft</span>
+      <div><div class="name">Ink 200</div><div class="hex">#B5B0C9</div></div>
+    </div>
+    <div class="swatch light" style="background:#ECEAFF;">
+      <span class="role">Foreground</span>
+      <div><div class="name">Ink 100</div><div class="hex">#ECEAFF</div></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-300); margin-bottom:16px; font-family:var(--font-mono);">Violeta — Brand Signature</h3>
+  <div class="swatches">
+    <div class="swatch dark" style="background:#2A1F5C;">
+      <span class="role">Deep</span>
+      <div><div class="name">Violet 900</div><div class="hex">#2A1F5C</div></div>
+    </div>
+    <div class="swatch dark" style="background:#4A2EE0;">
+      <span class="role">Pressure</span>
+      <div><div class="name">Violet 700</div><div class="hex">#4A2EE0</div></div>
+    </div>
+    <div class="swatch dark" style="background:#5E3DEE;">
+      <span class="role">Strong</span>
+      <div><div class="name">Violet 600</div><div class="hex">#5E3DEE</div></div>
+    </div>
+    <div class="swatch light" style="background:#7C5CFF;">
+      <span class="role">Signature</span>
+      <div><div class="name">Violet 500 ★</div><div class="hex">#7C5CFF</div></div>
+    </div>
+    <div class="swatch light" style="background:#C0AFFF;">
+      <span class="role">Soft</span>
+      <div><div class="name">Violet 300</div><div class="hex">#C0AFFF</div></div>
+    </div>
+    <div class="swatch light" style="background:#E9E1FF;">
+      <span class="role">Tint</span>
+      <div><div class="name">Violet 100</div><div class="hex">#E9E1FF</div></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-300); margin: 48px 0 16px; font-family:var(--font-mono);">Combinações canônicas</h3>
+  <div class="combo-grid">
+    <div class="combo" style="background:#0A0612;">
+      <p style="color:var(--violet-400);">Primary — UI</p>
+      <h5 style="color:var(--ink-100);">Ink 900 + Violet 500</h5>
+      <p style="color:var(--ink-300);">Produto, dashboards, escuro nativo</p>
+      <span class="accent-dot" style="background:#7C5CFF;"></span>
+    </div>
+    <div class="combo" style="background:#ECEAFF;">
+      <p style="color:var(--violet-700);">Marketing — Light</p>
+      <h5 style="color:var(--ink-900);">Ink 100 + Violet 600</h5>
+      <p style="color:var(--ink-500);">Site institucional, blog, docs</p>
+      <span class="accent-dot" style="background:#5E3DEE;"></span>
+    </div>
+    <div class="combo" style="background:#7C5CFF;">
+      <p style="color:#2A1F5C;">Statement — High Contrast</p>
+      <h5 style="color:var(--ink-50);">Violet 500 + Ink 50</h5>
+      <p style="color:#2A1F5C;">Capas, lançamentos, mídia paga</p>
+      <span class="accent-dot" style="background:#0A0612;"></span>
+    </div>
+  </div>
+
+  <p style="margin-top:48px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; color:var(--ink-400); text-transform:uppercase;">
+    Proporção de uso: 70% Ink · 25% Neutros · 5% Violet (sinal, nunca enchimento)
+  </p>
+</section>
+
+<!-- ============= 04 TIPOGRAFIA ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[04]</span>
+    <div>
+      <div class="block-kicker">Sistema Tipográfico</div>
+      <h2 class="block-title">Geist como espinha. Fraunces como respiro.</h2>
+      <p class="block-lede">Família única para UI e display, com mono para metadados técnicos e serif itálica para acentos editoriais. Decisão alinhada com o vocabulário visual do ecossistema (Vercel, Linear) — mas reservamos a serif para diferenciação.</p>
+    </div>
+  </div>
+
+  <div class="type-spec">
+    <div class="type-meta">
+      <strong>Geist</strong>
+      Display + UI<br>
+      Sans-serif geométrico<br>
+      Variable 100–900<br>
+      Por Vercel
+    </div>
+    <div>
+      <div class="type-sample-display">Ag &amp; <span class="tilde-mark" style="color:var(--violet-500);">ã</span></div>
+      <div class="weight-row">
+        <span class="w-300">Light · Aa Bb Cc</span>
+        <span class="w-400">Regular · Aa Bb Cc</span>
+        <span class="w-500">Medium · Aa Bb Cc</span>
+        <span class="w-600">Semibold · Aa Bb Cc</span>
+        <span class="w-700">Bold · Aa Bb Cc</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="type-spec">
+    <div class="type-meta">
+      <strong>Geist — Body</strong>
+      16–18px<br>
+      Line height 1.55<br>
+      Tracking neutro
+    </div>
+    <div>
+      <p class="type-sample-body">
+        GestãoUP centraliza projetos, horas e finanças num único sistema operacional, desenhado para firmas de consultoria que entregam por hora. Cada decisão de produto é guiada por um princípio: devolver ao consultor o tempo que a planilha rouba.
+      </p>
+    </div>
+  </div>
+
+  <div class="type-spec">
+    <div class="type-meta">
+      <strong>Geist Mono</strong>
+      Metadados, código,<br>
+      labels técnicos<br>
+      11–14px
+    </div>
+    <div>
+      <p class="type-sample-mono">
+        [01] METADATA — DOC v1.0<br>
+        $ npm install @gestaoup/sdk<br>
+        STATUS — PRODUCTION READY<br>
+        +55 (61) — gestaoup.com.br
+      </p>
+    </div>
+  </div>
+
+  <div class="type-spec">
+    <div class="type-meta">
+      <strong>Fraunces Italic</strong>
+      Acentos editoriais<br>
+      Light 300<br>
+      Use cirurgicamente
+    </div>
+    <div>
+      <p class="type-sample-serif">
+        "Para cima" não é direção — <em>é compromisso</em>.
+      </p>
+      <p style="font-family:var(--font-mono); font-size:11px; color:var(--ink-400); margin-top:16px; letter-spacing:0.06em;">
+        USO RESTRITO: 1 ITÁLICO POR PEÇA. NUNCA EM UI DE PRODUTO.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============= 05 APLICAÇÕES ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[05]</span>
+    <div>
+      <div class="block-kicker">Aplicações</div>
+      <h2 class="block-title">A marca em uso.</h2>
+      <p class="block-lede">Mockups das aplicações canônicas — site, app icon, favicon, social card e assinatura de e-mail. Tudo derivado dos mesmos elementos: wordmark + til.</p>
+    </div>
+  </div>
+
+  <!-- Site mockup -->
+  <div class="mock browser-mock" style="margin-bottom:24px;">
+    <span class="mock-label">A. Web — gestaoup.com.br</span>
+    <div class="browser-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="url">gestaoup.com.br</span>
+    </div>
+    <div class="site-content">
+      <div class="site-nav">
+        <span class="wm" style="font-size:18px;">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+        <div class="nav-links">
+          <span>Produto</span>
+          <span>Para consultorias</span>
+          <span>Preços</span>
+          <span>Docs</span>
+        </div>
+        <span class="cta">Começar grátis</span>
+      </div>
+      <div class="site-hero">
+        <div class="eyebrow">[ Operating system for consultancies ]</div>
+        <h2>O sistema que tira sua firma <em>do Excel.</em></h2>
+        <p>Projetos, horas, finanças e entregáveis — operados num lugar só. Construído com a opinião do mercado de consultoria embutida.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <!-- Social card -->
+    <div class="mock">
+      <span class="mock-label">B. Open Graph — 1200×630</span>
+      <div class="social-card">
+        <div class="social-card-content">
+          <div class="badge">[ Lançamento — v2.0 ]</div>
+          <div class="headline">A planilha era o problema. <em>Não a solução.</em></div>
+        </div>
+        <div class="footer">
+          <span class="wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></span>
+          <span class="url">gestaoup.com.br</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- App icon -->
+    <div class="mock">
+      <span class="mock-label">C. App Icon — iOS/Android</span>
+      <div class="app-icon-mock">
+        <span class="symbol-tilde">˜</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <!-- E-mail signature -->
+    <div class="mock">
+      <span class="mock-label">D. Assinatura de e-mail</span>
+      <div class="email-sig">
+        <div class="sig-name">Juàrez Vieira</div>
+        <div class="sig-role">Conselheiro · Founding Partner</div>
+        <div class="sig-divider"></div>
+        <div class="sig-wm">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></div>
+        <div class="sig-meta">gestaoup.com.br · +55 (61) ••••-••••</div>
+      </div>
+    </div>
+
+    <!-- Favicon strip -->
+    <div class="mock">
+      <span class="mock-label">E. Favicon — 64 / 32 / 16px</span>
+      <div class="favicon-strip" style="background:var(--ink-50); height:100%; align-items:center; justify-content:center;">
+        <div class="favicon fav-64"><span class="symbol-tilde">˜</span></div>
+        <div class="favicon fav-32"><span class="symbol-tilde">˜</span></div>
+        <div class="favicon fav-16"><span class="symbol-tilde">˜</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= 06 VOZ ============= -->
+<section class="block">
+  <div class="block-header">
+    <span class="block-num">[06]</span>
+    <div>
+      <div class="block-kicker">Voz da Marca</div>
+      <h2 class="block-title">Direta como produto. Editorial quando precisa.</h2>
+      <p class="block-lede">A voz acompanha a tipografia: 95% Geist (clara, técnica, opinativa), 5% Fraunces (editorial, italianizada, momento de respiro). Nunca corporativista, nunca ufanista.</p>
+    </div>
+  </div>
+
+  <div class="voice-grid">
+    <div class="voice-card do">
+      <h4>Faça</h4>
+      <ul>
+        <li>Frases curtas e opinativas. "A planilha era o problema." em vez de "Eliminamos as ineficiências de planilhas".</li>
+        <li>Verbos de ação no presente. "Centraliza", "destrava", "mensura" — não "irá centralizar".</li>
+        <li>Métricas concretas. "Reduz em 70% o tempo de fechamento mensal", não "otimiza significativamente".</li>
+        <li>Vocabulário do mercado de consultoria. "Sócio", "billable", "burn", "entregável" — falamos a língua de quem usa.</li>
+        <li>Bilíngue quando faz sentido. "Operating system for consultancies" no eyebrow, "Sistema operacional para consultorias" no body.</li>
+      </ul>
+    </div>
+    <div class="voice-card dont">
+      <h4>Não Faça</h4>
+      <ul>
+        <li>Jargão corporativo vazio. "Soluções inovadoras", "sinergia", "transformação digital" — mortos na entrega.</li>
+        <li>Tom de palestrante motivacional. Não somos guru, somos ferramenta.</li>
+        <li>Bullets infinitos. Texto institucional vira parede; preferimos um parágrafo afiado.</li>
+        <li>Promessas de mágica. Nunca dizemos "automatize tudo". Somos honestos: tiramos o atrito que importa.</li>
+        <li>Tom de varejo. Sem "imperdível", "exclusivo", "limitado". Não vendemos urgência fabricada.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="taglines">
+    <div class="tagline">
+      <span class="num">[ T1 ]</span>
+      <span class="line">O sistema operacional das consultorias.</span>
+      <span class="context">Posicionamento principal</span>
+    </div>
+    <div class="tagline">
+      <span class="num">[ T2 ]</span>
+      <span class="line">Tire sua firma <em>do Excel</em>.</span>
+      <span class="context">Hero / Performance</span>
+    </div>
+    <div class="tagline">
+      <span class="num">[ T3 ]</span>
+      <span class="line">Para cima — <em>e mensurável</em>.</span>
+      <span class="context">Brand statement</span>
+    </div>
+    <div class="tagline">
+      <span class="num">[ T4 ]</span>
+      <span class="line">Operating system <em>for consultancies</em>.</span>
+      <span class="context">Mercado global / EN</span>
+    </div>
+    <div class="tagline">
+      <span class="num">[ T5 ]</span>
+      <span class="line">Projeto, hora, P&amp;L. <em>Num lugar só</em>.</span>
+      <span class="context">Funcional / Site</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer>
+  <div class="col">
+    <div class="wm-footer">Gest<span class="tilde-mark">ã</span>o<span class="accent">UP</span></div>
+    <p style="margin-top:12px;">Brand System v1.0 — Foundation Release. Documento vivo, sujeito a iteração antes do lançamento público da plataforma.</p>
+  </div>
+  <div class="col">
+    <h6>Próximos passos</h6>
+    <p>
+      → Vetorizar wordmark em paths (SVG/PDF)<br>
+      → Gerar pacote de assets (favicons, app icons, OG images)<br>
+      → Aplicar na landing page real<br>
+      → Treinar equipe e CTO no manual<br>
+      → Validar em 3 firmas-piloto antes do GA
+    </p>
+  </div>
+  <div class="col">
+    <h6>Contato editorial</h6>
+    <p>Juàrez Vieira<br>Founding partner / Conselho<br>gestaoup.com.br</p>
+  </div>
+
+  <div class="meta-row">
+    <span>© 2026 GestãoUP</span>
+    <span>Brand System / Mai 2026 / v1.0</span>
+  </div>
+</footer>
+
+</main>
+
+</body>
+</html>

@@ -4,7 +4,8 @@
       "Bash(xargs grep *)",
       "Read(//c/Users/SERPRO/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/**)",
       "Bash(python scripts/search.py \"saas b2b consultoria gestao profissional moderno navy\" --design-system -p \"Gestão Ágil\" -f markdown)",
-      "Bash(python3 scripts/search.py \"saas b2b consultoria gestao profissional moderno navy\" --design-system -p \"Gestão Ágil\" -f markdown)"
+      "Bash(python3 scripts/search.py \"saas b2b consultoria gestao profissional moderno navy\" --design-system -p \"Gestão Ágil\" -f markdown)",
+      "Bash(npm run *)"
     ]
   }
 }

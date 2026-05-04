@@ -4,6 +4,11 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['Geist', 'system-ui', 'sans-serif'],
+  			mono: ['"Geist Mono"', '"JetBrains Mono"', 'monospace'],
+  			serif: ['Fraunces', 'Georgia', 'serif'],
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

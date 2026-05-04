@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { MessageSquare, Settings, DollarSign, BarChart3, ArrowRight, ChevronDown } from 'lucide-react';
 
 const flowSteps = [
@@ -39,112 +38,108 @@ const stepItem = {
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[90vh] items-center overflow-hidden px-6 pb-16 pt-14 md:pb-20 md:pt-16">
-      {/* Animated background orbs */}
+    <section className="relative flex min-h-[92vh] items-center overflow-hidden px-6 pb-20 pt-16 md:px-12 md:pb-24 md:pt-20">
+      {/* Ambient violet glow */}
       <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          className="absolute -right-64 -top-64 h-[700px] w-[700px] rounded-full bg-blue-100/50 blur-3xl"
-          animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.65, 0.4] }}
-          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+        <div
+          className="absolute left-1/2 top-[-20vh] h-[55vh] w-[75vw] -translate-x-1/2 opacity-30 blur-[80px]"
+          style={{ background: 'radial-gradient(ellipse at center, #4A2EE0 0%, transparent 60%)' }}
         />
         <motion.div
-          className="absolute -bottom-48 -left-48 h-[600px] w-[600px] rounded-full bg-indigo-100/40 blur-3xl"
-          animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0.55, 0.3] }}
-          transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          className="absolute right-[-20%] top-[10%] h-[40vh] w-[40vw] opacity-10 blur-[60px]"
+          style={{ background: 'radial-gradient(ellipse at center, #7C5CFF 0%, transparent 70%)' }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.18, 0.1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(30,58,95,0.07),transparent)]" />
       </div>
 
       <div className="relative mx-auto w-full max-w-6xl">
         <motion.div
-          className="flex flex-col items-center gap-8 text-center"
+          className="flex flex-col items-center gap-10 text-center"
           variants={container}
           initial="hidden"
           animate="visible"
         >
           {/* Badge */}
           <motion.div variants={item}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-blue-700 shadow-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
+            <span className="inline-flex items-center gap-2 border border-[rgba(124,92,255,0.3)] bg-[rgba(124,92,255,0.08)] px-4 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-[#9F84FF]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C5CFF] opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" />
               </span>
-              Sistema para Consultorias
+              Operating system for consultancies
             </span>
           </motion.div>
 
           {/* Heading */}
           <motion.h1
             variants={item}
-            className="max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-6xl lg:text-[68px]"
+            className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-[#ECEAFF] md:text-6xl lg:text-[68px]"
           >
-            Pare de gerenciar sua consultoria{' '}
-            <span className="bg-gradient-to-r from-[#1e3a5f] via-blue-700 to-blue-500 bg-clip-text text-transparent">
-              em planilhas soltas.
-            </span>
+            O sistema que tira sua firma{' '}
+            <em className="font-serif font-light italic text-[#C0AFFF]">do Excel.</em>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p
             variants={item}
-            className="max-w-2xl text-lg leading-relaxed text-slate-500 md:text-xl"
+            className="max-w-2xl text-lg leading-relaxed text-[#8B85A0] md:text-xl"
           >
-            O Gestão Ágil centraliza atendimento, execução, documentos e financeiro em um fluxo único para
-            você ganhar{' '}
-            <strong className="font-semibold text-slate-700">
-              previsibilidade operacional e margem.
-            </strong>
+            Projetos, horas, finanças e entregáveis — operados num lugar só. Construído com a{' '}
+            <span className="font-medium text-[#B5B0C9]">
+              opinião do mercado de consultoria embutida.
+            </span>
           </motion.p>
 
           {/* CTAs */}
           <motion.div variants={item} className="flex flex-wrap justify-center gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="group bg-[#1e3a5f] text-white shadow-lg shadow-[#1e3a5f]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#152d4a] hover:shadow-xl hover:shadow-[#1e3a5f]/30"
+            <a
+              href="#contato"
+              className="group inline-flex items-center gap-2 bg-[#7C5CFF] px-6 py-3 text-sm font-medium text-[#0A0612] shadow-lg shadow-[#7C5CFF]/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#9F84FF] hover:shadow-xl hover:shadow-[#7C5CFF]/30"
             >
-              <a href="#contato" className="flex items-center gap-2">
-                Quero falar com o time comercial
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                />
-              </a>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-slate-300 text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+              Falar com o time comercial
+              <ArrowRight
+                size={15}
+                className="transition-transform duration-200 group-hover:translate-x-1"
+              />
+            </a>
+            <a
+              href="/login"
+              className="inline-flex items-center gap-2 border border-[rgba(236,234,255,0.16)] px-6 py-3 text-sm font-medium text-[#B5B0C9] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(236,234,255,0.3)] hover:text-[#ECEAFF]"
             >
-              <a href="/login">Acessar o sistema</a>
-            </Button>
+              Acessar o sistema
+            </a>
           </motion.div>
 
           {/* Trust indicators */}
-          <motion.p variants={item} className="text-sm text-slate-400">
+          <motion.p variants={item} className="font-mono text-[11px] uppercase tracking-[0.1em] text-[#524C66]">
             Implantação guiada · Perfis por tipo de usuário · Operação pronta para crescer
           </motion.p>
 
           {/* Flow steps card */}
           <motion.div
             variants={item}
-            className="w-full max-w-5xl rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-xl shadow-slate-200/60 backdrop-blur-sm md:p-8"
+            className="w-full max-w-5xl border border-[rgba(236,234,255,0.08)] bg-[#14101F] p-6 md:p-8"
           >
+            <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#7C5CFF]">
+              Fluxo operacional
+            </p>
             <motion.div className="grid gap-4 md:grid-cols-4" variants={stepsContainer}>
               {flowSteps.map(({ number, label, Icon }) => (
                 <motion.div
                   key={number}
                   variants={stepItem}
-                  className="group rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-md hover:shadow-blue-100/50"
+                  className="group border border-[rgba(236,234,255,0.06)] bg-[#1A1626] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(124,92,255,0.25)] hover:bg-[#2A2538]"
                 >
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{number}</p>
-                    <div className="rounded-lg bg-[#1e3a5f]/10 p-1.5 text-[#1e3a5f] transition-colors duration-200 group-hover:bg-blue-100 group-hover:text-blue-600">
+                    <p className="font-mono text-[11px] font-medium tracking-[0.1em] text-[#7C5CFF]">
+                      {number}
+                    </p>
+                    <div className="text-[#524C66] transition-colors duration-200 group-hover:text-[#7C5CFF]">
                       <Icon size={15} />
                     </div>
                   </div>
-                  <p className="text-sm font-semibold text-slate-800">{label}</p>
+                  <p className="text-sm font-medium text-[#ECEAFF]">{label}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -156,7 +151,7 @@ export default function HeroSection() {
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <ChevronDown size={22} className="text-slate-300" />
+              <ChevronDown size={20} className="text-[#524C66]" />
             </motion.div>
           </motion.div>
         </motion.div>
