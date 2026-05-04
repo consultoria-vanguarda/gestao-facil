@@ -1,0 +1,137 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "GestãoUP — página inicial" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: GestãoUP
+      - navigation [ref=e8]:
+        - link "Produto" [ref=e9] [cursor=pointer]:
+          - /url: "#sobre"
+        - link "Como funciona" [ref=e10] [cursor=pointer]:
+          - /url: "#como-funciona"
+        - link "Módulos" [ref=e11] [cursor=pointer]:
+          - /url: "#modulos"
+        - link "Preços" [ref=e12] [cursor=pointer]:
+          - /url: "#precos"
+        - link "Contato" [ref=e13] [cursor=pointer]:
+          - /url: "#contato"
+      - generic [ref=e14]:
+        - link "Entrar" [ref=e15] [cursor=pointer]:
+          - /url: /login
+        - link "Começar grátis" [ref=e16] [cursor=pointer]:
+          - /url: "#contato"
+  - main [ref=e17]:
+    - generic [ref=e20]:
+      - generic [ref=e22]: Operating system for consultancies
+      - heading "O sistema que tira sua empresa do Excel." [level=1] [ref=e26]:
+        - text: O sistema que tira sua empresa
+        - emphasis [ref=e27]: do Excel.
+      - paragraph [ref=e28]: Projetos, horas, finanças e entregáveis — operados num lugar só. Construído com a opinião do mercado de consultoria embutida.
+      - generic [ref=e29]:
+        - link "Falar com o time comercial" [ref=e30] [cursor=pointer]:
+          - /url: "#contato"
+          - text: Falar com o time comercial
+          - img [ref=e31]
+        - link "Acessar o sistema" [ref=e33] [cursor=pointer]:
+          - /url: /login
+      - paragraph [ref=e34]: Implantação guiada · Perfis por tipo de usuário · Operação pronta para crescer
+      - generic [ref=e35]:
+        - paragraph [ref=e36]: Fluxo operacional
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: "01"
+              - img [ref=e42]
+            - paragraph [ref=e44]: Atendimento estruturado
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: "02"
+              - img [ref=e49]
+            - paragraph [ref=e52]: Execução padronizada
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - paragraph [ref=e55]: "03"
+              - img [ref=e57]
+            - paragraph [ref=e59]: Financeiro integrado
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: "04"
+              - img [ref=e64]
+            - paragraph [ref=e66]: Decisão com dados
+      - img [ref=e69]
+    - generic [ref=e72]:
+      - generic [ref=e73]:
+        - paragraph [ref=e74]: A solução
+        - heading "Da gestão reativa para uma operação previsível" [level=2] [ref=e75]:
+          - text: Da gestão reativa para uma
+          - emphasis [ref=e76]: operação previsível
+        - paragraph [ref=e77]: Você mantém o atendimento consultivo e ganha estrutura para executar com método, visibilidade e controle.
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - img [ref=e81]
+            - generic [ref=e85]:
+              - generic [ref=e86]: Antes
+              - text: Como a maioria das consultorias opera
+          - list [ref=e87]:
+            - listitem [ref=e88]:
+              - img [ref=e89]
+              - text: Atendimentos espalhados entre WhatsApp, planilha e e-mail.
+            - listitem [ref=e93]:
+              - img [ref=e94]
+              - text: Dificuldade para acompanhar escopo, horas e entregas por projeto.
+            - listitem [ref=e98]:
+              - img [ref=e99]
+              - text: Financeiro desconectado da execução e sem previsibilidade de resultado.
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - img [ref=e105]
+            - generic [ref=e108]:
+              - generic [ref=e109]: Depois
+              - text: Com o GestãoUP
+          - list [ref=e110]:
+            - listitem [ref=e111]:
+              - img [ref=e112]
+              - text: Operação centralizada com projetos, clientes, consultores e tarefas.
+            - listitem [ref=e115]:
+              - img [ref=e116]
+              - text: Acompanhamento claro de progresso, agenda, documentos e comunicação.
+            - listitem [ref=e119]:
+              - img [ref=e120]
+              - text: Financeiro integrado com DRE, despesas, faturamento e relatórios.
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - paragraph [ref=e125]: "[ 01 ]"
+          - heading "Preciso" [level=4] [ref=e126]
+          - paragraph [ref=e127]: Decisões em segundos, não relatórios. Cada interação devolve dado acionável.
+        - generic [ref=e128]:
+          - paragraph [ref=e129]: "[ 02 ]"
+          - heading "Leve" [level=4] [ref=e130]
+          - paragraph [ref=e131]: Pensado para times que entregam por hora. Sem fricção operacional.
+        - generic [ref=e132]:
+          - paragraph [ref=e133]: "[ 03 ]"
+          - heading "Mensurável" [level=4] [ref=e134]
+          - paragraph [ref=e135]: Projeto, hora e P&L num lugar só. Margem visível a qualquer momento.
+    - generic [ref=e138]:
+      - paragraph [ref=e139]: Contato comercial
+      - heading "Quer ver o GestãoUP aplicado à sua consultoria?" [level=2] [ref=e140]:
+        - text: Quer ver o GestãoUP aplicado
+        - emphasis [ref=e141]: à sua consultoria?
+      - paragraph [ref=e142]: Fale com nosso time para avaliar seu cenário, mapear ganhos rápidos e entender o melhor formato de implantação.
+      - generic [ref=e143]:
+        - link "Falar com comercial" [ref=e144] [cursor=pointer]:
+          - /url: mailto:comercial@gestaoup.com.br
+          - img [ref=e145]
+          - text: Falar com comercial
+        - link "Entrar na plataforma" [ref=e148] [cursor=pointer]:
+          - /url: /login
+          - text: Entrar na plataforma
+          - img [ref=e149]
+      - paragraph [ref=e151]: Resposta em horário comercial · Atendimento consultivo · Sem compromisso
+  - contentinfo [ref=e152]:
+    - generic [ref=e153]:
+      - generic [ref=e154]:
+        - generic [ref=e155]: GestãoUP
+        - paragraph [ref=e156]: © 2026 GestãoUP · Sistema para Consultorias
+      - link "Área interna →" [ref=e157] [cursor=pointer]:
+        - /url: /login

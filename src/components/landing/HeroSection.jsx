@@ -76,7 +76,7 @@ export default function HeroSection() {
             variants={item}
             className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-[#ECEAFF] md:text-6xl lg:text-[68px]"
           >
-            O sistema que tira sua firma{' '}
+            O sistema que tira sua empresa{' '}
             <em className="font-serif font-light italic text-[#C0AFFF]">do Excel.</em>
           </motion.h1>
 
