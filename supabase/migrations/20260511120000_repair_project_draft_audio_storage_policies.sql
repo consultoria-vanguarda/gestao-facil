@@ -1,11 +1,6 @@
--- Bucket privado: áudios de reunião para rascunho de projeto (path = {organization_id}/...)
---
--- NOTA: mensagens NOTICE ao dropar políticas inexistentes são esperadas na primeira execução e não indicam falha.
--- Políticas usam EXISTS em public.profiles em vez de helpers públicos — mais compatível com RLS do Storage.
-
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('project-draft-audio', 'project-draft-audio', false)
-ON CONFLICT (id) DO NOTHING;
+-- Reparo idempotente: recria políticas do bucket project-draft-audio com EXISTS em profiles.
+-- Use este arquivo se uma versão anterior das políticas falhou ou se você viu apenas NOTICE no DROP.
+-- Os NOTICE em "DROP POLICY IF EXISTS ... does not exist" são normais na primeira vez.
 
 DROP POLICY IF EXISTS project_draft_audio_select ON storage.objects;
 DROP POLICY IF EXISTS project_draft_audio_insert ON storage.objects;
