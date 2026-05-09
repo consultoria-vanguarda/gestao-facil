@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, X, AlertTriangle, Plus, Trash2, Pencil, Check, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
-import { api } from '@/api/appApi';
+import { Loader2, X, AlertTriangle, Plus, Trash2, Pencil, Check, Upload, FileText, CheckCircle, AlertCircle, Mic } from "lucide-react";
+import { api, invokeEdgeFunctionWithSession } from '@/api/appApi';
+import { supabase } from '@/api/supabaseClient';
+import { useTenant } from '@/lib/TenantContext';
+import {
+  PROJECT_DRAFT_AUDIO_BUCKET,
+  PROJECT_DRAFT_MAX_FILE_BYTES,
+  isAllowedProjectDraftMime,
+  buildProjectDraftAudioPath,
+} from '@/lib/projectDraftAudio';
+import { useToast } from '@/components/ui/use-toast';
 import { SERVICE_AREAS, getSubareas } from '../utils/serviceAreas';
 import { getConsultingHourlyRate, getDiagnosticRate } from '../utils/hourlyRateTables';
 import { format } from 'date-fns';
@@ -185,6 +194,14 @@ function generateScheduleRows(formData, activities, skipDates = new Set()) {
 }
 
 export default function ProjectForm({ open, onClose, project, onSave, loading, clients, consultants, serviceModels }) {
+  const { organizationId } = useTenant();
+  const { toast } = useToast();
+  const [aiDraftLoading, setAiDraftLoading] = useState(false);
+  const [aiPasteText, setAiPasteText] = useState('');
+  const [aiTranscript, setAiTranscript] = useState('');
+  const [aiLastResponse, setAiLastResponse] = useState(null);
+  const aiFileRef = React.useRef(null);
+
   const [formData, setFormData] = useState(emptyForm);
   const [consultantConflicts, setConsultantConflicts] = useState([]);
   const [newActivity, setNewActivity] = useState({ description: '', days: '', hours: '', modality: '', delivery: '' });
@@ -932,6 +949,129 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   const subsidyValue = contractedValue * (subsidyPct / 100);
   const clientValue = contractedValue - subsidyValue;
 
+  const VALID_PROJECT_TYPES = new Set([
+    'diagnostic',
+    'consulting',
+    'instructional',
+    'lecture',
+    'public_policies',
+    'other',
+  ]);
+
+  const handleAiGenerateDraft = async () => {
+    if (!organizationId) {
+      toast({
+        variant: 'destructive',
+        title: 'Rascunho IA',
+        description: 'Organização não carregada. Aguarde ou faça login novamente.',
+      });
+      return;
+    }
+    setAiDraftLoading(true);
+    try {
+      let storage_path;
+      const file = aiFileRef.current?.files?.[0];
+      if (file) {
+        if (file.size > PROJECT_DRAFT_MAX_FILE_BYTES) {
+          throw new Error(`Arquivo acima do limite (${Math.round(PROJECT_DRAFT_MAX_FILE_BYTES / 1024 / 1024)} MB).`);
+        }
+        if (!isAllowedProjectDraftMime(file.type)) {
+          throw new Error('Formato de áudio não suportado. Use webm, mp3, wav, m4a ou ogg.');
+        }
+        const path = buildProjectDraftAudioPath(organizationId, file);
+        const { error: upErr } = await supabase.storage
+          .from(PROJECT_DRAFT_AUDIO_BUCKET)
+          .upload(path, file, {
+            upsert: false,
+            contentType: file.type || undefined,
+          });
+        if (upErr) throw upErr;
+        storage_path = path;
+        aiFileRef.current.value = '';
+      }
+
+      const body = {};
+      if (storage_path) body.storage_path = storage_path;
+      const note = aiPasteText.trim();
+      if (note) body.text_note = note;
+
+      if (!body.storage_path && !body.text_note) {
+        throw new Error('Envie um arquivo de áudio ou cole o texto da reunião.');
+      }
+
+      const json = await invokeEdgeFunctionWithSession('ai-project-draft', body);
+      setAiLastResponse(json);
+      setAiTranscript(json.transcript || '');
+      toast({
+        title: 'Rascunho gerado',
+        description: 'Revise a transcrição e clique em Aplicar ao formulário.',
+      });
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Rascunho IA',
+        description: e?.message || 'Falha ao gerar rascunho.',
+      });
+    } finally {
+      setAiDraftLoading(false);
+    }
+  };
+
+  const handleAiApplyDraft = () => {
+    const json = aiLastResponse;
+    if (!json?.draft) {
+      toast({
+        variant: 'destructive',
+        title: 'Rascunho IA',
+        description: 'Gere um rascunho antes de aplicar.',
+      });
+      return;
+    }
+    const d = json.draft;
+    setFormData((prev) => {
+      const next = { ...prev };
+      if (d.project_type && VALID_PROJECT_TYPES.has(d.project_type)) {
+        next.project_type = d.project_type;
+      }
+      const copyTrim = (key) => {
+        const v = d[key];
+        if (v != null && String(v).trim() !== '') next[key] = String(v).trim();
+      };
+      copyTrim('area');
+      copyTrim('subarea');
+      copyTrim('custom_area');
+      copyTrim('custom_subarea');
+      copyTrim('objective');
+      copyTrim('client_needs');
+      copyTrim('service_detail');
+      copyTrim('produto_final');
+      if (d.notes != null && String(d.notes).trim() !== '') {
+        const add = String(d.notes).trim();
+        next.notes = prev.notes ? `${prev.notes}\n\n--- IA ---\n${add}` : add;
+      }
+      if (Array.isArray(d.activities) && d.activities.length > 0) {
+        next.activities = d.activities.map((a) => ({
+          description: a.description || '',
+          days: a.days != null && String(a.days).trim() !== '' ? String(a.days) : '',
+          hours: a.hours != null && String(a.hours).trim() !== '' ? String(a.hours) : '',
+          modality: a.modality || '',
+          delivery: a.delivery || '',
+        }));
+      }
+      return next;
+    });
+    if (d.suggested_client_company && String(d.suggested_client_company).trim()) {
+      toast({
+        title: 'Cliente mencionado na reunião',
+        description: String(d.suggested_client_company).trim(),
+      });
+    }
+    toast({
+      title: 'Formulário atualizado',
+      description: 'Revise cliente, consultor e valores financeiros antes de salvar.',
+    });
+  };
+
   const inputStyle = {
     width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1',
     borderRadius: '6px', fontSize: '14px', backgroundColor: 'white'
@@ -955,6 +1095,84 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         </div>
 
         <form onSubmit={handleSubmit} style={{ padding: '32px', maxWidth: '900px', margin: '0 auto' }}>
+
+          {/* Rascunho por IA (áudio / texto) */}
+          <div style={{ ...sectionStyle, marginBottom: '24px', backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }}>
+            <div style={{ ...sectionTitleStyle, borderBottomColor: '#15803d', color: '#14532d' }}>
+              <Mic style={{ width: '18px', height: '18px', display: 'inline', verticalAlign: 'middle', marginRight: '8px' }} />
+              Rascunho a partir de reunião (IA)
+            </div>
+            <p style={{ fontSize: '13px', color: '#334155', marginBottom: '12px' }}>
+              Envie áudio (até ~15 MB) e/ou cole texto da reunião. O modelo da organização em{' '}
+              <strong>Configurações → IA / Projetos</strong> orienta o formato. A IA não escolhe cliente/consultor automaticamente.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input
+                ref={aiFileRef}
+                type="file"
+                accept="audio/webm,audio/mpeg,audio/mp3,audio/mp4,audio/wav,audio/x-m4a,audio/m4a,audio/ogg"
+                style={{ fontSize: '13px' }}
+              />
+              <textarea
+                value={aiPasteText}
+                onChange={(e) => setAiPasteText(e.target.value)}
+                rows={4}
+                placeholder="Opcional: cole aqui a ata ou transcrição se não for usar áudio."
+                style={{ ...inputStyle, resize: 'vertical' }}
+              />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => void handleAiGenerateDraft()}
+                  disabled={aiDraftLoading}
+                  style={{
+                    padding: '10px 18px',
+                    backgroundColor: '#15803d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: aiDraftLoading ? 'wait' : 'pointer',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  {aiDraftLoading ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : null}
+                  Gerar rascunho
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAiApplyDraft}
+                  disabled={!aiLastResponse?.draft}
+                  style={{
+                    padding: '10px 18px',
+                    backgroundColor: aiLastResponse?.draft ? '#1e3a5f' : '#94a3b8',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: aiLastResponse?.draft ? 'pointer' : 'not-allowed',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                  }}
+                >
+                  Aplicar ao formulário
+                </button>
+              </div>
+              {Array.isArray(aiLastResponse?.warnings) && aiLastResponse.warnings.length > 0 && (
+                <div style={{ fontSize: '13px', color: '#92400e', backgroundColor: '#fffbeb', padding: '10px', borderRadius: '8px' }}>
+                  <strong>Avisos:</strong> {aiLastResponse.warnings.join(' · ')}
+                </div>
+              )}
+              {aiTranscript ? (
+                <div>
+                  <label style={labelStyle}>Transcrição / síntese</label>
+                  <textarea value={aiTranscript} readOnly rows={6} style={{ ...inputStyle, backgroundColor: '#f8fafc' }} />
+                </div>
+              ) : null}
+            </div>
+          </div>
 
           {/* TIPO */}
           <div style={{ marginBottom: '24px' }}>

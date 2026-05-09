@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { api } from '@/api/appApi';
+import { supabase } from '@/api/supabaseClient';
 import { useAuth } from '@/lib/AuthContext';
+import { useTenant } from '@/lib/TenantContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings as SettingsIcon, User, Bell, Shield, Loader2, Check } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Shield, Loader2, Check, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,9 +17,16 @@ import { motion } from 'framer-motion';
 
 export default function Settings() {
   const [saveStatus, setSaveStatus] = useState(null);
+  const [draftSaveStatus, setDraftSaveStatus] = useState(null);
+  const [draftTemplate, setDraftTemplate] = useState('');
   const { refreshUser } = useAuth();
+  const { organizationId, settings: tenantSettings } = useTenant();
 
   const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    setDraftTemplate(tenantSettings?.project_draft_template ?? '');
+  }, [organizationId, tenantSettings?.project_draft_template]);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -51,6 +61,24 @@ export default function Settings() {
     updateProfileMutation.mutate({ full_name: profileForm.full_name });
   };
 
+  const saveDraftTemplateMutation = useMutation({
+    mutationFn: async () => {
+      if (!organizationId) throw new Error('Organização não disponível.');
+      const { error } = await supabase
+        .from('organization_settings')
+        .update({
+          project_draft_template: draftTemplate.trim() ? draftTemplate.trim() : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('organization_id', organizationId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setDraftSaveStatus('success');
+      setTimeout(() => setDraftSaveStatus(null), 2000);
+    },
+  });
+
   const userType = user?.user_type || 'admin';
   const userTypeLabels = {
     admin: 'Administrador',
@@ -80,6 +108,12 @@ export default function Settings() {
             <Shield className="w-4 h-4 mr-2" />
             Segurança
           </TabsTrigger>
+          {userType === 'admin' && (
+            <TabsTrigger value="project-ai">
+              <Sparkles className="w-4 h-4 mr-2" />
+              IA / Projetos
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="profile">
@@ -188,6 +222,56 @@ export default function Settings() {
             </Card>
           </motion.div>
         </TabsContent>
+
+        {userType === 'admin' && (
+          <TabsContent value="project-ai">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle>Modelo de rascunho de projeto (IA)</CardTitle>
+                  <CardDescription>
+                    Defina seções e tom que a IA deve seguir ao gerar rascunhos a partir de áudio ou texto
+                    de reunião (Configurações da organização).
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="project-draft-template">Modelo em Markdown ou texto livre</Label>
+                    <Textarea
+                      id="project-draft-template"
+                      value={draftTemplate}
+                      onChange={(e) => setDraftTemplate(e.target.value)}
+                      rows={14}
+                      className="mt-2 font-mono text-sm"
+                      placeholder={'Ex.: Seções obrigatórias:\n- Contexto do cliente\n- Objetivos mensuráveis\n- Entregáveis\n- Cronograma em fases'}
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => saveDraftTemplateMutation.mutate()}
+                      disabled={saveDraftTemplateMutation.isPending || !organizationId}
+                      className="bg-[#1e3a5f] hover:bg-[#2d4a6f]"
+                    >
+                      {saveDraftTemplateMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : draftSaveStatus === 'success' ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : null}
+                      {draftSaveStatus === 'success' ? 'Salvo!' : 'Salvar modelo'}
+                    </Button>
+                    {!organizationId && (
+                      <p className="text-sm text-amber-600">Carregando organização…</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        )}
 
         <TabsContent value="security">
           <motion.div

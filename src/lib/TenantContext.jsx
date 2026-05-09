@@ -82,7 +82,7 @@ export const TenantProvider = ({ children }) => {
 
         const { data: orgSettings, error: settingsError } = await supabase
           .from('organization_settings')
-          .select('primary_color, secondary_color, logo_url')
+          .select('primary_color, secondary_color, logo_url, project_draft_template')
           .eq('organization_id', orgId)
           .maybeSingle();
         if (settingsError) throw settingsError;
