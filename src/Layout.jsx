@@ -42,6 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import AiAssistant from '@/components/ai/AiAssistant';
 
 const adminMenuItems = [
   { name: 'Áreas de Atuação', icon: Briefcase, page: 'ServiceAreas' },
@@ -267,6 +268,8 @@ export default function Layout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+
+      {user && <AiAssistant />}
 
       <Dialog open={readOnlyDialogOpen} onOpenChange={setReadOnlyDialogOpen}>
         <DialogContent>

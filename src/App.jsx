@@ -11,6 +11,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import LoginPage from '@/pages/Login';
 import TenantNotFoundError from '@/components/TenantNotFoundError';
 import LandingPage from '@/pages/LandingPage';
+import { getPostLoginRedirect } from '@/lib/postLoginRedirect';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -20,17 +21,36 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
-/** Evita open redirect: só caminhos relativos na mesma origem. */
-function safePostLoginRedirect(raw) {
-  if (!raw || typeof raw !== 'string') return `/${mainPageKey}`;
-  try {
-    const decoded = decodeURIComponent(raw);
-    if (decoded.startsWith('/') && !decoded.startsWith('//')) return decoded;
-  } catch {
-    /* ignore */
+const HomeRoute = () => {
+  const { isLoadingAuth, isAuthenticated } = useAuth();
+  const { isLoadingTenant, tenantError } = useTenant();
+
+  if (isLoadingTenant) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
   }
-  return `/${mainPageKey}`;
-}
+
+  if (tenantError?.type === 'organization_not_found') {
+    return <TenantNotFoundError />;
+  }
+
+  if (isLoadingAuth) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={`/${mainPageKey}`} replace />;
+  }
+
+  return <LandingPage />;
+};
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, authError, isAuthenticated, user } = useAuth();
@@ -77,7 +97,7 @@ const AuthenticatedApp = () => {
 
   if (isLoginPath) {
     const params = new URLSearchParams(location.search);
-    const to = safePostLoginRedirect(params.get('redirect'));
+    const to = getPostLoginRedirect(params.get('redirect'));
     return <Navigate to={to} replace />;
   }
 
@@ -117,20 +137,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClientInstance}>
       <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/*"
-            element={(
-              <TenantProvider>
-                <AuthProvider>
-                  <NavigationTracker />
-                  <AuthenticatedApp />
-                </AuthProvider>
-              </TenantProvider>
-            )}
-          />
-        </Routes>
+        <TenantProvider>
+          <AuthProvider>
+            <NavigationTracker />
+            <Routes>
+              <Route path="/" element={<HomeRoute />} />
+              <Route path="/*" element={<AuthenticatedApp />} />
+            </Routes>
+          </AuthProvider>
+        </TenantProvider>
       </Router>
       <Toaster />
     </QueryClientProvider>

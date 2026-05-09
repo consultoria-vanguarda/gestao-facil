@@ -34,6 +34,22 @@ const emptyForm = {
   status: 'planning', notes: ''
 };
 
+/** Mesmo texto do placeholder; se estiver salvo igual ao padrão, persistimos vazio para usar o fallback na proposta. */
+const DEFAULT_PRODUTO_FINAL_PLACEHOLDER = `PRODUTO FINAL A SER DISPONIBILIZADO PARA O CLIENTE:
+01 (um) PLANO DE NEGÓCIO.
+Obs: Os custos de aquisição, implantação e treinamento não fazem parte da presente proposta.`;
+
+function normalizeMultiline(s) {
+  return String(s ?? '').replace(/\r\n/g, '\n').trim();
+}
+
+function produtoFinalForPersistence(raw) {
+  const v = normalizeMultiline(raw);
+  if (!v) return '';
+  if (v === normalizeMultiline(DEFAULT_PRODUTO_FINAL_PLACEHOLDER)) return '';
+  return String(raw).replace(/\r\n/g, '\n').trim();
+}
+
 function RichTextArea({ name, value, onChange, rows = 4, style, placeholder, inputRef }) {
   const applyFormat = (marker) => {
     const el = inputRef?.current;
@@ -736,7 +752,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       objective: formData.objective || '',
       client_needs: formData.client_needs || '',
       service_detail: formData.service_detail || '',
-      produto_final: formData.produto_final || '',
+      produto_final: produtoFinalForPersistence(formData.produto_final),
       activities: formData.activities,
       activity_groups: formData.activity_groups || {},
       km_rodado: parseFloat(formData.km_rodado) || 0,
@@ -1351,7 +1367,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                   onChange={handleChange}
                   rows={3}
                   style={{ ...inputStyle, fontFamily: 'inherit', resize: 'vertical' }}
-                  placeholder={'PRODUTO FINAL A SER DISPONIBILIZADO PARA O CLIENTE:\n01 (um) PLANO DE NEGÓCIO.\nObs: Os custos de aquisição, implantação e treinamento não fazem parte da presente proposta.'}
+                  placeholder={DEFAULT_PRODUTO_FINAL_PLACEHOLDER}
                   inputRef={produtoFinalRef}
                 />
                 <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Se não preenchido, será usado o texto padrão acima.</p>

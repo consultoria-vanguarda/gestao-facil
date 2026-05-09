@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { pagesConfig } from '@/pages.config';
+import { getPostLoginRedirect } from '@/lib/postLoginRedirect';
+import { useToast } from '@/components/ui/use-toast';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const defaultRedirect = `/${pagesConfig.mainPage || 'Dashboard'}`;
-  const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : defaultRedirect;
+  const redirect = getPostLoginRedirect(searchParams.get('redirect'));
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,7 +83,7 @@ export default function LoginPage() {
       });
       if (signInError) throw signInError;
 
-      if (signInData?.user?.id) navigate(redirect);
+      if (signInData?.user?.id) navigate(redirect, { replace: true });
     } catch (err) {
       setError(loginErrorMessage(err));
     } finally {
@@ -126,12 +127,16 @@ export default function LoginPage() {
       if (signUpError) throw signUpError;
 
       if (data.session?.user?.id) {
-        navigate(redirect);
+        toast({
+          title: 'Cadastro realizado com sucesso',
+          description: 'Redirecionando para o sistema.',
+        });
+        navigate(redirect, { replace: true });
         return;
       }
 
       setSignupSuccessMessage(
-        'Conta criada. Enviamos um link de confirmação para o seu e-mail — após confirmar, você poderá entrar com trial de 7 dias no novo espaço.'
+        'Cadastro realizado com sucesso. Enviamos um link de confirmação para o seu e-mail — após confirmar, você poderá acessar o sistema (trial de 7 dias no novo espaço).'
       );
       setPassword('');
       setConfirmPassword('');
