@@ -16,14 +16,16 @@
  * O system prompt restringe o escopo a perguntas pertinentes ao sistema,
  * gestão de projetos/consultoria e dados da organização. Perguntas off-topic
  * são recusadas com mensagem padronizada.
+ *
+ * Os tools usam jsonSchema() do AI SDK em vez de Zod para evitar problemas de
+ * versionamento de Zod no runtime Deno (esm.sh + npm:).
  */
 
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
-import { convertToModelMessages, stepCountIs, streamText, tool } from 'npm:ai@6.0.177';
+import { convertToModelMessages, jsonSchema, stepCountIs, streamText, tool } from 'npm:ai@6.0.177';
 import { createAnthropic } from 'npm:@ai-sdk/anthropic@3.0.76';
 import { createGoogleGenerativeAI } from 'npm:@ai-sdk/google@3.0.71';
 import { createOpenAI } from 'npm:@ai-sdk/openai@3.0.63';
-import { z } from 'npm:zod@3.23.8';
 
 const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
@@ -62,20 +64,15 @@ ESTILO:
 - Não invente dados, IDs, datas ou valores. Se faltar informação, diga e sugira onde buscar.`;
 
 const MAX_LIST_LIMIT = 25;
+const DEFAULT_LIST_LIMIT = 10;
 const PROJECT_STATUS = ['planning', 'in_progress', 'completed'] as const;
 const TASK_STATUS = ['todo', 'in_progress', 'review', 'completed'] as const;
+const TASK_PRIORITY = ['low', 'medium', 'high', 'urgent'] as const;
+const CLIENT_STATUS = ['active', 'inactive', 'prospect'] as const;
+const CONSULTANT_STATUS = ['active', 'inactive'] as const;
 
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/u, 'Use o formato YYYY-MM-DD.');
-const id32 = z
-  .string()
-  .regex(/^[a-zA-Z0-9]{1,32}$/u, 'ID inválido.');
-const searchTerm = z
-  .string()
-  .min(1)
-  .max(120)
-  .transform((s) => s.trim());
+const ID_REGEX = /^[a-zA-Z0-9]{1,32}$/u;
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/u;
 
 function escapeIlike(value: string): string {
   return value.replace(/[\\%_]/gu, (m) => `\\${m}`);
@@ -90,6 +87,41 @@ function startOfMonthIso(): string {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
     .toISOString()
     .slice(0, 10);
+}
+
+function clampLimit(value: unknown): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return DEFAULT_LIST_LIMIT;
+  return Math.min(Math.max(Math.trunc(n), 1), MAX_LIST_LIMIT);
+}
+
+function normalizeString(value: unknown, max = 120): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, max);
+  return trimmed.length ? trimmed : null;
+}
+
+function assertId(value: unknown, name: string): string {
+  if (typeof value !== 'string' || !ID_REGEX.test(value)) {
+    throw new Error(`Parâmetro "${name}" inválido.`);
+  }
+  return value;
+}
+
+function assertIsoDate(value: unknown, name: string): string {
+  if (typeof value !== 'string' || !ISO_DATE_REGEX.test(value)) {
+    throw new Error(`Parâmetro "${name}" deve estar no formato YYYY-MM-DD.`);
+  }
+  return value;
+}
+
+function pickEnum<T extends readonly string[]>(
+  value: unknown,
+  values: T,
+): T[number] | null {
+  return typeof value === 'string' && (values as readonly string[]).includes(value)
+    ? (value as T[number])
+    : null;
 }
 
 function resolveLanguageModel() {
@@ -127,15 +159,21 @@ function resolveLanguageModel() {
 function buildTools(opts: { client: SupabaseClient; orgId: string }) {
   const { client, orgId } = opts;
 
-  const orgFilter = <T extends { eq: (col: string, val: unknown) => T }>(q: T) =>
-    q.eq('organization_id', orgId);
+  const sumAmount = (
+    rows: Array<{ amount?: number | string | null }> | null | undefined,
+  ): number => (rows ?? []).reduce((acc, r) => acc + Number(r.amount ?? 0), 0);
 
   return {
     getOrganizationOverview: tool({
       description:
         'Retorna um panorama geral da organização do usuário: nome, contagens de projetos por status, total de clientes/consultores ativos, e resumo financeiro do mês corrente (a receber, a pagar, despesas). Use quando o usuário pedir um resumo geral ou quiser saber como a empresa está.',
-      inputSchema: z.object({}),
+      inputSchema: jsonSchema<Record<string, never>>({
+        type: 'object',
+        properties: {},
+        additionalProperties: false,
+      }),
       execute: async () => {
+        const monthStart = startOfMonthIso();
         const [
           orgRes,
           projAgg,
@@ -146,27 +184,35 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
           expMonth,
         ] = await Promise.all([
           client.from('organizations').select('id, name, slug').eq('id', orgId).maybeSingle(),
-          orgFilter(client.from('project').select('status', { count: 'exact', head: false })),
-          orgFilter(client.from('client').select('id', { count: 'exact', head: true }).eq('status', 'active')),
-          orgFilter(client.from('consultant').select('id', { count: 'exact', head: true }).eq('status', 'active')),
-          orgFilter(
-            client
-              .from('project_receivable')
-              .select('amount, status, due_date')
-              .gte('due_date', startOfMonthIso()),
-          ),
-          orgFilter(
-            client
-              .from('project_payable')
-              .select('amount, status, due_date')
-              .gte('due_date', startOfMonthIso()),
-          ),
-          orgFilter(
-            client
-              .from('expense')
-              .select('amount, status, date')
-              .gte('date', startOfMonthIso()),
-          ),
+          client
+            .from('project')
+            .select('status', { count: 'exact', head: false })
+            .eq('organization_id', orgId),
+          client
+            .from('client')
+            .select('id', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
+            .eq('status', 'active'),
+          client
+            .from('consultant')
+            .select('id', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
+            .eq('status', 'active'),
+          client
+            .from('project_receivable')
+            .select('amount, status, due_date')
+            .eq('organization_id', orgId)
+            .gte('due_date', monthStart),
+          client
+            .from('project_payable')
+            .select('amount, status, due_date')
+            .eq('organization_id', orgId)
+            .gte('due_date', monthStart),
+          client
+            .from('expense')
+            .select('amount, status, date')
+            .eq('organization_id', orgId)
+            .gte('date', monthStart),
         ]);
 
         const projectsByStatus: Record<string, number> = {};
@@ -175,11 +221,6 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
           const s = String((p as { status?: string }).status ?? 'unknown');
           projectsByStatus[s] = (projectsByStatus[s] ?? 0) + 1;
         }
-
-        const sumAmount = (
-          rows: Array<{ amount?: number | string | null }> | null | undefined,
-        ): number =>
-          (rows ?? []).reduce((acc, r) => acc + Number(r.amount ?? 0), 0);
 
         return {
           organization: {
@@ -194,7 +235,7 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
           clients_active: clientCount.count ?? 0,
           consultants_active: consultantCount.count ?? 0,
           current_month_brl: {
-            period_start: startOfMonthIso(),
+            period_start: monthStart,
             period_end: todayIso(),
             receivables_total: sumAmount(recvMonth.data),
             receivables_received: sumAmount(
@@ -218,13 +259,34 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
 
     listProjects: tool({
       description:
-        'Lista projetos da organização com informações básicas (id, nome, cliente, status, valores, datas). Filtra por status quando informado. Use para responder "quais projetos...", "quantos projetos com status X", etc.',
-      inputSchema: z.object({
-        status: z.enum(PROJECT_STATUS).optional(),
-        search: searchTerm.optional().describe('Busca parcial por nome do projeto.'),
-        limit: z.number().int().min(1).max(MAX_LIST_LIMIT).default(10),
+        'Lista projetos da organização com informações básicas (id, nome, cliente, status, valores, datas). Use para responder "quais projetos...", "quantos projetos com status X", etc.',
+      inputSchema: jsonSchema<{ status?: string; search?: string; limit?: number }>({
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            enum: [...PROJECT_STATUS],
+            description: 'Filtra projetos pelo status.',
+          },
+          search: {
+            type: 'string',
+            description: 'Busca parcial por nome do projeto.',
+            maxLength: 120,
+          },
+          limit: {
+            type: 'integer',
+            minimum: 1,
+            maximum: MAX_LIST_LIMIT,
+            description: `Quantidade máxima de projetos retornados (default ${DEFAULT_LIST_LIMIT}).`,
+          },
+        },
+        additionalProperties: false,
       }),
-      execute: async ({ status, search, limit }) => {
+      execute: async (input) => {
+        const status = pickEnum(input?.status, PROJECT_STATUS);
+        const search = normalizeString(input?.search);
+        const limit = clampLimit(input?.limit);
+
         let q = client
           .from('project')
           .select(
@@ -295,10 +357,20 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
     getProject: tool({
       description:
         'Retorna detalhes completos de um projeto específico pelo id: dados básicos, cliente, consultor, contagem de tarefas por status, recebimentos e pagamentos relacionados. Use quando o usuário pedir detalhes de um projeto.',
-      inputSchema: z.object({
-        projectId: id32,
+      inputSchema: jsonSchema<{ projectId: string }>({
+        type: 'object',
+        properties: {
+          projectId: {
+            type: 'string',
+            description: 'ID do projeto (32 caracteres alfanuméricos).',
+          },
+        },
+        required: ['projectId'],
+        additionalProperties: false,
       }),
-      execute: async ({ projectId }) => {
+      execute: async (input) => {
+        const projectId = assertId(input?.projectId, 'projectId');
+
         const { data: proj, error } = await client
           .from('project')
           .select(
@@ -391,12 +463,33 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
     listClients: tool({
       description:
         'Lista clientes da organização. Aceita busca parcial pelo nome da empresa. Use para responder "quais clientes...", "encontre o cliente X", etc.',
-      inputSchema: z.object({
-        search: searchTerm.optional(),
-        status: z.enum(['active', 'inactive', 'prospect']).optional(),
-        limit: z.number().int().min(1).max(MAX_LIST_LIMIT).default(10),
+      inputSchema: jsonSchema<{ status?: string; search?: string; limit?: number }>({
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            enum: [...CLIENT_STATUS],
+            description: 'Filtra pelo status do cliente.',
+          },
+          search: {
+            type: 'string',
+            description: 'Busca parcial pelo nome da empresa.',
+            maxLength: 120,
+          },
+          limit: {
+            type: 'integer',
+            minimum: 1,
+            maximum: MAX_LIST_LIMIT,
+            description: `Quantidade máxima de clientes (default ${DEFAULT_LIST_LIMIT}).`,
+          },
+        },
+        additionalProperties: false,
       }),
-      execute: async ({ search, status, limit }) => {
+      execute: async (input) => {
+        const status = pickEnum(input?.status, CLIENT_STATUS);
+        const search = normalizeString(input?.search);
+        const limit = clampLimit(input?.limit);
+
         let q = client
           .from('client')
           .select('id, company_name, contact_person, email, phone, status')
@@ -417,12 +510,33 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
     listConsultants: tool({
       description:
         'Lista consultores da organização. Aceita busca parcial por nome. Use para perguntas sobre a equipe.',
-      inputSchema: z.object({
-        search: searchTerm.optional(),
-        status: z.enum(['active', 'inactive']).optional(),
-        limit: z.number().int().min(1).max(MAX_LIST_LIMIT).default(10),
+      inputSchema: jsonSchema<{ status?: string; search?: string; limit?: number }>({
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            enum: [...CONSULTANT_STATUS],
+            description: 'Filtra pelo status do consultor.',
+          },
+          search: {
+            type: 'string',
+            description: 'Busca parcial pelo nome do consultor.',
+            maxLength: 120,
+          },
+          limit: {
+            type: 'integer',
+            minimum: 1,
+            maximum: MAX_LIST_LIMIT,
+            description: `Quantidade máxima de consultores (default ${DEFAULT_LIST_LIMIT}).`,
+          },
+        },
+        additionalProperties: false,
       }),
-      execute: async ({ search, status, limit }) => {
+      execute: async (input) => {
+        const status = pickEnum(input?.status, CONSULTANT_STATUS);
+        const search = normalizeString(input?.search);
+        const limit = clampLimit(input?.limit);
+
         let q = client
           .from('consultant')
           .select('id, name, email, specialty, availability, status')
@@ -443,13 +557,45 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
     listTasks: tool({
       description:
         'Lista tarefas da organização. Pode filtrar por projeto, status ou prioridade. Use para perguntas sobre pendências, próximas entregas, etc.',
-      inputSchema: z.object({
-        projectId: id32.optional(),
-        status: z.enum(TASK_STATUS).optional(),
-        priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
-        limit: z.number().int().min(1).max(MAX_LIST_LIMIT).default(10),
+      inputSchema: jsonSchema<{
+        projectId?: string;
+        status?: string;
+        priority?: string;
+        limit?: number;
+      }>({
+        type: 'object',
+        properties: {
+          projectId: {
+            type: 'string',
+            description: 'ID do projeto (32 caracteres alfanuméricos).',
+          },
+          status: {
+            type: 'string',
+            enum: [...TASK_STATUS],
+            description: 'Filtra pelo status da tarefa.',
+          },
+          priority: {
+            type: 'string',
+            enum: [...TASK_PRIORITY],
+            description: 'Filtra pela prioridade.',
+          },
+          limit: {
+            type: 'integer',
+            minimum: 1,
+            maximum: MAX_LIST_LIMIT,
+            description: `Quantidade máxima de tarefas (default ${DEFAULT_LIST_LIMIT}).`,
+          },
+        },
+        additionalProperties: false,
       }),
-      execute: async ({ projectId, status, priority, limit }) => {
+      execute: async (input) => {
+        const projectId = input?.projectId
+          ? assertId(input.projectId, 'projectId')
+          : null;
+        const status = pickEnum(input?.status, TASK_STATUS);
+        const priority = pickEnum(input?.priority, TASK_PRIORITY);
+        const limit = clampLimit(input?.limit);
+
         let q = client
           .from('task')
           .select(
@@ -472,12 +618,28 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
 
     getFinancialSummary: tool({
       description:
-        'Retorna um resumo financeiro consolidado da organização para um período: total a receber, recebido, a pagar, pago, despesas, e saldo. Datas no formato YYYY-MM-DD. Use para análises financeiras de período.',
-      inputSchema: z.object({
-        periodStart: isoDate.describe('Data inicial inclusiva, formato YYYY-MM-DD.'),
-        periodEnd: isoDate.describe('Data final inclusiva, formato YYYY-MM-DD.'),
+        'Retorna um resumo financeiro consolidado da organização para um período: total a receber, recebido, a pagar, pago, despesas, e faturamento. Datas no formato YYYY-MM-DD. Use para análises financeiras de período.',
+      inputSchema: jsonSchema<{ periodStart: string; periodEnd: string }>({
+        type: 'object',
+        properties: {
+          periodStart: {
+            type: 'string',
+            description: 'Data inicial inclusiva no formato YYYY-MM-DD.',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+          },
+          periodEnd: {
+            type: 'string',
+            description: 'Data final inclusiva no formato YYYY-MM-DD.',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+          },
+        },
+        required: ['periodStart', 'periodEnd'],
+        additionalProperties: false,
       }),
-      execute: async ({ periodStart, periodEnd }) => {
+      execute: async (input) => {
+        const periodStart = assertIsoDate(input?.periodStart, 'periodStart');
+        const periodEnd = assertIsoDate(input?.periodEnd, 'periodEnd');
+
         const [recv, pay, exp, billing] = await Promise.all([
           client
             .from('project_receivable')
@@ -505,9 +667,6 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
             .lte('due_date', periodEnd),
         ]);
 
-        const sum = (rows: Array<{ amount?: number | string | null }> | null | undefined): number =>
-          (rows ?? []).reduce((acc, r) => acc + Number(r.amount ?? 0), 0);
-
         const recvData = recv.data ?? [];
         const payData = pay.data ?? [];
         const expData = exp.data ?? [];
@@ -516,28 +675,28 @@ function buildTools(opts: { client: SupabaseClient; orgId: string }) {
         return {
           period: { start: periodStart, end: periodEnd },
           receivables_brl: {
-            total: sum(recvData),
-            received: sum(recvData.filter((r) => r.status === 'received')),
-            open: sum(recvData.filter((r) => r.status === 'open')),
-            overdue: sum(recvData.filter((r) => r.status === 'overdue')),
+            total: sumAmount(recvData),
+            received: sumAmount(recvData.filter((r) => r.status === 'received')),
+            open: sumAmount(recvData.filter((r) => r.status === 'open')),
+            overdue: sumAmount(recvData.filter((r) => r.status === 'overdue')),
             count: recvData.length,
           },
           payables_brl: {
-            total: sum(payData),
-            paid: sum(payData.filter((r) => r.status === 'paid')),
-            open: sum(payData.filter((r) => r.status === 'open')),
-            overdue: sum(payData.filter((r) => r.status === 'overdue')),
+            total: sumAmount(payData),
+            paid: sumAmount(payData.filter((r) => r.status === 'paid')),
+            open: sumAmount(payData.filter((r) => r.status === 'open')),
+            overdue: sumAmount(payData.filter((r) => r.status === 'overdue')),
             count: payData.length,
           },
           expenses_brl: {
-            total: sum(expData),
+            total: sumAmount(expData),
             count: expData.length,
           },
           billing_brl: {
-            total: sum(billData),
-            billed: sum(billData.filter((r) => r.status === 'billed')),
-            received: sum(billData.filter((r) => r.status === 'received')),
-            to_bill: sum(billData.filter((r) => r.status === 'to_bill')),
+            total: sumAmount(billData),
+            billed: sumAmount(billData.filter((r) => r.status === 'billed')),
+            received: sumAmount(billData.filter((r) => r.status === 'received')),
+            to_bill: sumAmount(billData.filter((r) => r.status === 'to_bill')),
             count: billData.length,
           },
         };
