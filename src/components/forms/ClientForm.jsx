@@ -57,7 +57,13 @@ export default function ClientForm({ open, onClose, client, onSave, loading }) {
     }
   }, [client]);
 
-  const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+  const set = (field) => (eventOrValue) => {
+    const value =
+      eventOrValue && typeof eventOrValue === 'object' && 'target' in eventOrValue
+        ? eventOrValue.target?.value ?? ''
+        : eventOrValue ?? '';
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleFileUpload = async (field, file) => {
     if (!file) return;
