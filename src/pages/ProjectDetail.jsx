@@ -9,7 +9,6 @@ import {
   DollarSign, 
   Clock, 
   CheckCircle2,
-  Plus,
   Upload,
   FileText,
   Trash2,
@@ -56,7 +55,6 @@ export default function ProjectDetail() {
   const [editingTimeEntry, setEditingTimeEntry] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [editProjectOpen, setEditProjectOpen] = useState(false);
-  const [cloneProjectOpen, setCloneProjectOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [serviceReportOpen, setServiceReportOpen] = useState(false);
   
@@ -178,15 +176,6 @@ export default function ProjectDetail() {
       const errorMsg = error?.message || 'Erro ao salvar o atendimento';
       setUpdateError(errorMsg);
     }
-  });
-
-  const createProjectMutation = useMutation({
-    mutationFn: (data) => api.entities.Project.create(data),
-    onSuccess: (newProject) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      setCloneProjectOpen(false);
-      window.location.href = createPageUrl(`ProjectDetail?id=${newProject.id}`);
-    },
   });
 
   const createTaskMutation = useMutation({
@@ -413,12 +402,6 @@ export default function ProjectDetail() {
                 <Pencil className="w-4 h-4 mr-2" />
                 Editar Atendimento
               </Button>
-              {(project.project_type === 'consulting' || project.project_type === 'diagnostic') && (
-                <Button variant="outline" onClick={() => setCloneProjectOpen(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Clonar Atendimento
-                </Button>
-              )}
               <Button variant="outline" asChild>
                 <Link to={createPageUrl(`ProjectFinancial?id=${projectId}`)}>
                   <DollarSign className="w-4 h-4 mr-2" />
@@ -651,29 +634,6 @@ export default function ProjectDetail() {
         loading={saveServiceReportMutation.isPending}
       />
 
-      <ProjectForm
-        open={cloneProjectOpen}
-        onClose={() => setCloneProjectOpen(false)}
-        project={{
-          ...project,
-          consultant_id: '',
-          client_id: '',
-          area: '',
-          subarea: '',
-          custom_area: '',
-          custom_subarea: '',
-          start_date: '',
-          name: '',
-          schedule_generated: false,
-          status: 'planning',
-          progress: 0,
-        }}
-        onSave={(data) => createProjectMutation.mutate(data)}
-        loading={createProjectMutation.isPending}
-        clients={clients}
-        consultants={consultants}
-        serviceModels={[]}
-      />
     </div>
   );
 }
