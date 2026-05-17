@@ -11,18 +11,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import ConsultantConflictModal from './ConsultantConflictModal';
+import { generateScheduleDates, estimateScheduleEndDate, isHoliday } from '@/lib/scheduleDates';
 
 const statusConfig = {
   scheduled: { label: 'Agendada', color: 'bg-blue-100 text-blue-700' },
   completed: { label: 'Concluída', color: 'bg-emerald-100 text-emerald-700' },
   cancelled: { label: 'Cancelada', color: 'bg-rose-100 text-rose-700' }
 };
-
-const HOLIDAYS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','12-25'];
-
-function isHoliday(dateStr) {
-  return HOLIDAYS.includes(dateStr.slice(5));
-}
 
 // Computes which calendar dates should be skipped (off days) based on project days_off config
 function computeAutoSkipDates(project) {
@@ -61,37 +56,6 @@ function computeAutoSkipDates(project) {
   return skipDates;
 }
 
-function generateScheduleDates(config, skipDates = new Set()) {
-  const { start_date, estimated_hours, hours_per_day, consider_sundays, consider_holidays } = config;
-  if (!start_date || !estimated_hours || !hours_per_day) return [];
-
-  const hpd = parseFloat(hours_per_day);
-  const totalH = parseFloat(estimated_hours);
-  const workDaysNeeded = Math.ceil(totalH / hpd);
-
-  const dates = [];
-  let current = new Date(start_date + 'T12:00:00');
-  let workDayCount = 0;
-  let iterations = 0;
-
-  while (workDayCount < workDaysNeeded && iterations < 1500) {
-    iterations++;
-    const dow = current.getDay();
-    const dateStr = current.toISOString().split('T')[0];
-    const skipSunday = dow === 0 && consider_sundays !== 'yes';
-    const skipHoliday = isHoliday(dateStr) && consider_holidays !== 'yes';
-    const skipOff = skipDates.has(dateStr);
-
-    if (!skipSunday && !skipHoliday && !skipOff) {
-      const hoursThisDay = Math.min(hpd, totalH - workDayCount * hpd);
-      dates.push({ date: dateStr, hours: Math.round(hoursThisDay * 10) / 10 });
-      workDayCount++;
-    }
-    current = addDays(current, 1);
-  }
-  return dates;
-}
-
 // Modal for editing schedule config before regenerating
 function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
   const [config, setConfig] = useState({
@@ -101,6 +65,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
     consider_sundays: project?.consider_sundays || 'no',
     consider_holidays: project?.consider_holidays || 'no',
     days_off: project?.days_off || 0,
+    max_work_days_per_week: project?.max_work_days_per_week ?? 3,
   });
   const [daysOffDates, setDaysOffDates] = useState([]);
 
@@ -115,6 +80,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
         consider_sundays: project.consider_sundays || 'no',
         consider_holidays: project.consider_holidays || 'no',
         days_off: daysOff,
+        max_work_days_per_week: project.max_work_days_per_week ?? 3,
       });
       // Pre-fill off dates from schedule_config if available
       const savedOffDates = (project.schedule_config || [])
@@ -148,25 +114,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
     setDaysOffDates(prev => prev.map((d, i) => i === idx ? value : d));
   };
 
-  // Preview end date
-  const previewEndDate = (() => {
-    const hpd = parseFloat(config.hours_per_day);
-    const totalH = parseFloat(config.estimated_hours);
-    const daysOff = parseInt(config.days_off) || 0;
-    if (!config.start_date || !hpd || !totalH) return null;
-    const workDays = Math.ceil(totalH / hpd);
-    let current = new Date(config.start_date + 'T12:00:00');
-    let counted = 0; let last = new Date(current); let iter = 0;
-    while (counted < workDays + daysOff && iter < 600) {
-      iter++;
-      const dow = current.getDay();
-      const dateStr = current.toISOString().split('T')[0];
-      const skip = (dow === 0 && config.consider_sundays !== 'yes') || (isHoliday(dateStr) && config.consider_holidays !== 'yes');
-      if (!skip) { counted++; last = new Date(current); }
-      current = addDays(current, 1);
-    }
-    return last.toLocaleDateString('pt-BR');
-  })();
+  const previewEndDate = estimateScheduleEndDate(config, parseInt(config.days_off, 10) || 0);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -209,6 +157,19 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
             </div>
           </div>
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Dias de atendimento por semana (norma) *</label>
+            <select
+              name="max_work_days_per_week"
+              value={String(config.max_work_days_per_week ?? 3)}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm bg-white mb-3"
+            >
+              <option value="2">Até 2 dias por semana (não consecutivos)</option>
+              <option value="3">Até 3 dias por semana (não consecutivos)</option>
+            </select>
+            <p className="text-xs text-slate-500 mb-3">
+              A agenda será distribuída sem dias corridos, conforme a norma do programa.
+            </p>
             <label className="block text-sm font-medium text-slate-700 mb-1">Dias de folga no período</label>
             <input type="number" name="days_off" step="1" min="0" value={config.days_off} onChange={handleChange}
               className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="0" />
@@ -472,6 +433,7 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
       consider_sundays: config.consider_sundays,
       consider_holidays: config.consider_holidays,
       days_off: parseInt(config.days_off) || 0,
+      max_work_days_per_week: parseInt(config.max_work_days_per_week, 10) || 3,
       schedule_generated: true,
       ...(endDate ? { end_date: endDate } : {})
     });

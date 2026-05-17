@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import MoneyInput from "@/components/ui/MoneyInput";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { parseMoneyBRToNumber, validateISODate, validatePhone } from "@/lib/validators";
+import { assignWorkDates, isHoliday } from "@/lib/scheduleDates";
 
 const TYPE_LABELS = {
   diagnostic: 'Diagnóstico',
@@ -36,6 +37,7 @@ const emptyForm = {
   km_rodado: '', start_date: '', hours_per_day: '4',
   consider_sundays: 'no', consider_holidays: 'no',
   days_off: '0', days_off_position: 'end',
+  max_work_days_per_week: '3',
   estimated_hours: '', contracted_value: '', hourly_rate: '',
   subsidy_percent: '70', payment_method: '',
   sebrae_manager_name: '', sebrae_manager_phone: '',
@@ -128,15 +130,17 @@ function RichTextArea({ name, value, onChange, rows = 4, style, placeholder, inp
   );
 }
 
-function isHoliday(date) {
-  const holidays = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','12-25'];
-  const md = `${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-  return holidays.includes(md);
-}
-
 // skipDates: Set of yyyy-MM-dd dates to skip (explicit off days)
 function generateScheduleRows(formData, activities, skipDates = new Set()) {
-  const { start_date, hours_per_day, consider_sundays, consider_holidays, days_off, days_off_position } = formData;
+  const {
+    start_date,
+    hours_per_day,
+    consider_sundays,
+    consider_holidays,
+    days_off,
+    days_off_position,
+    max_work_days_per_week,
+  } = formData;
   if (!start_date || !hours_per_day || activities.length === 0) return [];
 
   const hpd = parseFloat(hours_per_day) || 4;
@@ -172,23 +176,39 @@ function generateScheduleRows(formData, activities, skipDates = new Set()) {
     } else slots = [...slots, ...offSlots];
   }
 
-  // Assign dates, skipping weekends/holidays AND explicit off dates
+  const workSlots = slots.filter((s) => !s.isDayOff);
+  const workDates = assignWorkDates({
+    start_date,
+    count: workSlots.length,
+    consider_sundays,
+    consider_holidays,
+    skipDates,
+    max_work_days_per_week,
+  });
+  let workDateIdx = 0;
+
   const rows = [];
-  let current = new Date(start_date + 'T12:00:00');
+  let offCursor = new Date(`${start_date}T12:00:00`);
+
   for (const slot of slots) {
-    while (true) {
-      const dow = current.getDay();
-      const skipSunday = dow === 0 && consider_sundays !== 'yes';
-      const skipHoliday = consider_holidays !== 'yes' && isHoliday(current);
-      const dateStr = current.toISOString().split('T')[0];
-      const skipOff = skipDates.has(dateStr);
-      if (!skipSunday && !skipHoliday && !skipOff) break;
-      current = new Date(current);
-      current.setDate(current.getDate() + 1);
+    if (slot.isDayOff) {
+      while (true) {
+        const dow = offCursor.getDay();
+        const dateStr = offCursor.toISOString().split('T')[0];
+        const skipSunday = dow === 0 && consider_sundays !== 'yes';
+        const skipHoliday = consider_holidays !== 'yes' && isHoliday(dateStr);
+        if (!skipSunday && !skipHoliday) break;
+        offCursor.setDate(offCursor.getDate() + 1);
+      }
+      rows.push({ date: format(offCursor, 'dd/MM/yyyy'), ...slot });
+      offCursor.setDate(offCursor.getDate() + 1);
+    } else {
+      const iso = workDates[workDateIdx];
+      workDateIdx += 1;
+      if (!iso) continue;
+      const [y, m, d] = iso.split('-');
+      rows.push({ date: `${d}/${m}/${y}`, ...slot });
     }
-    rows.push({ date: format(current, 'dd/MM/yyyy'), ...slot });
-    current = new Date(current);
-    current.setDate(current.getDate() + 1);
   }
   return rows;
 }
@@ -258,6 +278,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         consider_holidays: project.consider_holidays || 'no',
         days_off: project.days_off !== undefined ? String(project.days_off) : '0',
         days_off_position: project.days_off_position || 'end',
+        max_work_days_per_week: String(project.max_work_days_per_week ?? 3),
         estimated_hours: project.estimated_hours || '',
         contracted_value: project.contracted_value || '',
         hourly_rate: project.hourly_rate || '',
@@ -313,6 +334,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     }
   }, [formData.start_date, formData.hours_per_day, formData.consider_sundays,
       formData.consider_holidays, formData.days_off, formData.days_off_position,
+      formData.max_work_days_per_week,
       formData.activities, formData.project_type, formData.schedule_config, formData.activity_groups,
       daysOffConfirmed]);
 
@@ -457,7 +479,8 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       while (true) {
         const dow = current.getDay();
         const skipSunday = dow === 0 && consider_sundays !== 'yes';
-        const skipHoliday = consider_holidays !== 'yes' && isHoliday(current);
+        const dateStrLoop = current.toISOString().split('T')[0];
+        const skipHoliday = consider_holidays !== 'yes' && isHoliday(dateStrLoop);
         if (!skipSunday && !skipHoliday) break;
         current = new Date(current);
         current.setDate(current.getDate() + 1);
@@ -779,6 +802,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       consider_holidays: formData.consider_holidays,
       days_off: parseInt(formData.days_off) || 0,
       days_off_position: formData.days_off_position,
+      max_work_days_per_week: parseInt(formData.max_work_days_per_week, 10) || 3,
       estimated_hours: parseFloat(formData.estimated_hours) || 0,
       contracted_value: finalContractedValue,
       hourly_rate: parseMoneyBRToNumber(formData.hourly_rate) || 0,
@@ -1762,6 +1786,22 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                     <option value="no">Não</option>
                     <option value="yes">Sim</option>
                   </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Dias de atendimento por semana (norma) *</label>
+                  <select
+                    name="max_work_days_per_week"
+                    value={formData.max_work_days_per_week}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    required
+                  >
+                    <option value="2">Até 2 dias por semana (não consecutivos)</option>
+                    <option value="3">Até 3 dias por semana (não consecutivos)</option>
+                  </select>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                    A agenda será distribuída sem dias corridos, conforme a norma do programa.
+                  </p>
                 </div>
                 <div>
                   <label style={labelStyle}>Dias de Folga no Período</label>
