@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { setCurrentOrganizationAccess, setCurrentOrganizationId } from '@/lib/organizationScope';
 
@@ -16,12 +16,16 @@ export const TenantProvider = ({ children }) => {
   const [subscription, setSubscription] = useState(null);
   const [isLoadingTenant, setIsLoadingTenant] = useState(true);
   const [tenantError, setTenantError] = useState(null);
+  const hasInitializedRef = useRef(false);
+  const currentUserIdRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const loadTenantForSession = async (session) => {
-      setIsLoadingTenant(true);
+    const loadTenantForSession = async (session, { showLoadingScreen = false } = {}) => {
+      if (showLoadingScreen) {
+        setIsLoadingTenant(true);
+      }
       setTenantError(null);
 
       try {
@@ -112,19 +116,47 @@ export const TenantProvider = ({ children }) => {
         });
       } finally {
         if (!cancelled) {
-          setIsLoadingTenant(false);
+          if (showLoadingScreen) {
+            setIsLoadingTenant(false);
+          }
+          hasInitializedRef.current = Boolean(session?.user?.id);
         }
       }
     };
 
     supabase.auth.getSession().then(({ data }) => {
-      void loadTenantForSession(data?.session ?? null);
+      void loadTenantForSession(data?.session ?? null, { showLoadingScreen: true });
     });
 
     const {
       data: { subscription: authSubscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      void loadTenantForSession(session);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // Renovação de token ao voltar à aba — não recarregar organização.
+      if (event === 'TOKEN_REFRESHED') {
+        return;
+      }
+
+      const nextUserId = session?.user?.id ?? null;
+
+      if (!session) {
+        currentUserIdRef.current = null;
+        hasInitializedRef.current = false;
+        void loadTenantForSession(null);
+        return;
+      }
+
+      // SIGNED_IN/INITIAL_SESSION repetidos ao focar a janela (sync entre abas).
+      if (
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') &&
+        hasInitializedRef.current &&
+        currentUserIdRef.current === nextUserId
+      ) {
+        return;
+      }
+
+      currentUserIdRef.current = nextUserId;
+      const showLoadingScreen = !hasInitializedRef.current;
+      void loadTenantForSession(session, { showLoadingScreen });
     });
 
     return () => {

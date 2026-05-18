@@ -1,7 +1,7 @@
 # Graph Report - C:\Users\user\Cursor\gestao-agil  (2026-05-18)
 
 ## Corpus Check
-- 170 files · ~136,084 words
+- 170 files · ~167,398 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

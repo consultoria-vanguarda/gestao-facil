@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 import { api } from '@/api/appApi';
 import { supabase } from '@/api/supabaseClient';
@@ -17,11 +18,17 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const tenantBootstrappedRef = useRef(false);
+  const authenticatedUserIdRef = useRef(null);
 
   useEffect(() => {
-    if (isLoadingTenant) {
+    if (isLoadingTenant && !tenantBootstrappedRef.current) {
       setIsLoadingAuth(true);
       return;
+    }
+
+    if (!isLoadingTenant) {
+      tenantBootstrappedRef.current = true;
     }
 
     if (tenantError?.type === 'organization_not_found') {
@@ -39,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         if (!cancelled) {
           setUser(null);
           setIsAuthenticated(false);
+          authenticatedUserIdRef.current = null;
           setAuthError(null);
           setIsLoadingAuth(false);
         }
@@ -52,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
         setUser(currentUser);
         setIsAuthenticated(true);
+        authenticatedUserIdRef.current = currentUser?.id ?? session.user?.id ?? null;
         setAuthError(null);
       } catch (error) {
         if (cancelled) return;
@@ -80,6 +89,14 @@ export const AuthProvider = ({ children }) => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       // TOKEN_REFRESHED: renovação ao voltar à aba — não precisa re-sync do perfil nem bloquear o app.
       if (event === 'TOKEN_REFRESHED') {
+        return;
+      }
+
+      if (
+        event === 'SIGNED_IN' &&
+        session?.user?.id &&
+        authenticatedUserIdRef.current === session.user.id
+      ) {
         return;
       }
 
