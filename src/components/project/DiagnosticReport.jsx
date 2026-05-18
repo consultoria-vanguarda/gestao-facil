@@ -1,9 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { format, parseISO } from 'date-fns';
-import { APP_LOGO_URL } from '@/lib/branding';
+import { SEBRAE_LOGO_URL } from '@/lib/branding';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
-
-const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 /**
  * Generates and downloads the "Relatório de Diagnóstico" PDF.
