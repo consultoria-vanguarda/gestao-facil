@@ -9,7 +9,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\eslint.config.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_eslint_config_js",
-      "community": 74,
+      "community": 75,
       "norm_label": "eslint.config.js"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\postcss.config.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_postcss_config_js",
-      "community": 75,
+      "community": 76,
       "norm_label": "postcss.config.js"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\tailwind.config.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_tailwind_config_js",
-      "community": 76,
+      "community": 77,
       "norm_label": "tailwind.config.js"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\vite.config.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_vite_config_js",
-      "community": 77,
+      "community": 78,
       "norm_label": "vite.config.js"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parsePublicPoliciesPdf.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_functions_parsepublicpoliciespdf_ts",
-      "community": 78,
+      "community": 79,
       "norm_label": "parsepublicpoliciespdf.ts"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parseViabilityPdf.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_functions_parseviabilitypdf_ts",
-      "community": 17,
+      "community": 18,
       "norm_label": "parseviabilitypdf.ts"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parseViabilityPdf.ts",
       "source_location": "L23",
       "id": "parseviabilitypdf_normalizetext",
-      "community": 17,
+      "community": 18,
       "norm_label": "normalizetext()"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parseViabilityPdf.ts",
       "source_location": "L32",
       "id": "parseviabilitypdf_parsecurrencybr",
-      "community": 17,
+      "community": 18,
       "norm_label": "parsecurrencybr()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parseViabilityPdf.ts",
       "source_location": "L39",
       "id": "parseviabilitypdf_parsehours",
-      "community": 17,
+      "community": 18,
       "norm_label": "parsehours()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\functions\\parseViabilityPdf.ts",
       "source_location": "L46",
       "id": "parseviabilitypdf_extractviabilitydata",
-      "community": 17,
+      "community": 18,
       "norm_label": "extractviabilitydata()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\create-test-user.mjs",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_scripts_create_test_user_mjs",
-      "community": 18,
+      "community": 19,
       "norm_label": "create-test-user.mjs"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\create-test-user.mjs",
       "source_location": "L22",
       "id": "create_test_user_loadenvlocal",
-      "community": 18,
+      "community": 19,
       "norm_label": "loadenvlocal()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\create-test-user.mjs",
       "source_location": "L62",
       "id": "create_test_user_finduserbyemail",
-      "community": 18,
+      "community": 19,
       "norm_label": "finduserbyemail()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\create-test-user.mjs",
       "source_location": "L76",
       "id": "create_test_user_ensureprofileadmin",
-      "community": 18,
+      "community": 19,
       "norm_label": "ensureprofileadmin()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\create-test-user.mjs",
       "source_location": "L91",
       "id": "create_test_user_main",
-      "community": 18,
+      "community": 19,
       "norm_label": "main()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\seed-saas-admin.mjs",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_scripts_seed_saas_admin_mjs",
-      "community": 21,
+      "community": 22,
       "norm_label": "seed-saas-admin.mjs"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\seed-saas-admin.mjs",
       "source_location": "L25",
       "id": "seed_saas_admin_loadenvlocal",
-      "community": 21,
+      "community": 22,
       "norm_label": "loadenvlocal()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\seed-saas-admin.mjs",
       "source_location": "L70",
       "id": "seed_saas_admin_finduserbyemail",
-      "community": 21,
+      "community": 22,
       "norm_label": "finduserbyemail()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\scripts\\seed-saas-admin.mjs",
       "source_location": "L84",
       "id": "seed_saas_admin_main",
-      "community": 21,
+      "community": 22,
       "norm_label": "main()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\Layout.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_layout_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "layout.jsx"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\Layout.jsx",
       "source_location": "L75",
       "id": "layout_layout",
-      "community": 4,
+      "community": 2,
       "norm_label": "layout()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\main.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_main_jsx",
-      "community": 79,
+      "community": 80,
       "norm_label": "main.jsx"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages.config.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_config_js",
-      "community": 80,
+      "community": 81,
       "norm_label": "pages.config.js"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_api_appapi_js",
-      "community": 11,
+      "community": 9,
       "norm_label": "appapi.js"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L5",
       "id": "appapi_generateid",
-      "community": 11,
+      "community": 9,
       "norm_label": "generateid()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L11",
       "id": "appapi_parsesort",
-      "community": 11,
+      "community": 9,
       "norm_label": "parsesort()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L19",
       "id": "appapi_applyfilters",
-      "community": 11,
+      "community": 9,
       "norm_label": "applyfilters()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L33",
       "id": "appapi_createentity",
-      "community": 11,
+      "community": 9,
       "norm_label": "createentity()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L129",
       "id": "appapi_storageuploadfile",
-      "community": 11,
+      "community": 9,
       "norm_label": "storageuploadfile()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L146",
       "id": "appapi_getfunctionerrormessage",
-      "community": 11,
+      "community": 9,
       "norm_label": "getfunctionerrormessage()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L167",
       "id": "appapi_invokefunctionwithanonfallback",
-      "community": 11,
+      "community": 9,
       "norm_label": "invokefunctionwithanonfallback()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\appApi.js",
       "source_location": "L215",
       "id": "appapi_invokeedgefunctionwithsession",
-      "community": 11,
+      "community": 9,
       "norm_label": "invokeedgefunctionwithsession()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\api\\supabaseClient.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_api_supabaseclient_js",
-      "community": 81,
+      "community": 82,
       "norm_label": "supabaseclient.js"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\TenantNotFoundError.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_tenantnotfounderror_jsx",
-      "community": 34,
+      "community": 35,
       "norm_label": "tenantnotfounderror.jsx"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\TenantNotFoundError.jsx",
       "source_location": "L3",
       "id": "tenantnotfounderror_tenantnotfounderror",
-      "community": 34,
+      "community": 35,
       "norm_label": "tenantnotfounderror()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\UserNotRegisteredError.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_usernotregisterederror_jsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "usernotregisterederror.jsx"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\UserNotRegisteredError.jsx",
       "source_location": "L3",
       "id": "usernotregisterederror_usernotregisterederror",
-      "community": 35,
+      "community": 36,
       "norm_label": "usernotregisterederror()"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ai\\AiAssistant.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ai_aiassistant_jsx",
-      "community": 5,
+      "community": 4,
       "norm_label": "aiassistant.jsx"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ai\\AiAssistant.jsx",
       "source_location": "L20",
       "id": "aiassistant_textfromparts",
-      "community": 5,
+      "community": 4,
       "norm_label": "textfromparts()"
     },
     {
@@ -459,7 +459,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ai\\AiAssistant.jsx",
       "source_location": "L29",
       "id": "aiassistant_aiassistant",
-      "community": 5,
+      "community": 4,
       "norm_label": "aiassistant()"
     },
     {
@@ -468,7 +468,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\AccountsTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_accountstab_jsx",
-      "community": 24,
+      "community": 25,
       "norm_label": "accountstab.jsx"
     },
     {
@@ -477,7 +477,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\AccountsTab.jsx",
       "source_location": "L9",
       "id": "accountstab_fmt",
-      "community": 24,
+      "community": 25,
       "norm_label": "fmt()"
     },
     {
@@ -486,7 +486,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\AccountsTab.jsx",
       "source_location": "L13",
       "id": "accountstab_accountstab",
-      "community": 24,
+      "community": 25,
       "norm_label": "accountstab()"
     },
     {
@@ -495,7 +495,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\BillingTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_billingtab_jsx",
-      "community": 9,
+      "community": 5,
       "norm_label": "billingtab.jsx"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\BillingTab.jsx",
       "source_location": "L12",
       "id": "billingtab_fmt",
-      "community": 9,
+      "community": 5,
       "norm_label": "fmt()"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\BillingTab.jsx",
       "source_location": "L20",
       "id": "billingtab_billingtab",
-      "community": 9,
+      "community": 5,
       "norm_label": "billingtab()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ChartOfAccountsTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_chartofaccountstab_jsx",
-      "community": 25,
+      "community": 26,
       "norm_label": "chartofaccountstab.jsx"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ChartOfAccountsTab.jsx",
       "source_location": "L13",
       "id": "chartofaccountstab_suggestsubcode",
-      "community": 25,
+      "community": 26,
       "norm_label": "suggestsubcode()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ChartOfAccountsTab.jsx",
       "source_location": "L25",
       "id": "chartofaccountstab_chartofaccountstab",
-      "community": 25,
+      "community": 26,
       "norm_label": "chartofaccountstab()"
     },
     {
@@ -549,7 +549,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\DRETab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_dretab_jsx",
-      "community": 26,
+      "community": 27,
       "norm_label": "dretab.jsx"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\DRETab.jsx",
       "source_location": "L8",
       "id": "dretab_fmt",
-      "community": 26,
+      "community": 27,
       "norm_label": "fmt()"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\DRETab.jsx",
       "source_location": "L10",
       "id": "dretab_dretab",
-      "community": 26,
+      "community": 27,
       "norm_label": "dretab()"
     },
     {
@@ -576,7 +576,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ExpensesTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_expensestab_jsx",
-      "community": 2,
+      "community": 5,
       "norm_label": "expensestab.jsx"
     },
     {
@@ -585,7 +585,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ExpensesTab.jsx",
       "source_location": "L23",
       "id": "expensestab_fmt",
-      "community": 2,
+      "community": 5,
       "norm_label": "fmt()"
     },
     {
@@ -594,7 +594,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ExpensesTab.jsx",
       "source_location": "L37",
       "id": "expensestab_expenseformmodal",
-      "community": 2,
+      "community": 5,
       "norm_label": "expenseformmodal()"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ExpensesTab.jsx",
       "source_location": "L217",
       "id": "expensestab_paymodal",
-      "community": 2,
+      "community": 5,
       "norm_label": "paymodal()"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ExpensesTab.jsx",
       "source_location": "L269",
       "id": "expensestab_expensestab",
-      "community": 2,
+      "community": 5,
       "norm_label": "expensestab()"
     },
     {
@@ -621,7 +621,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_financialdashboard_jsx",
-      "community": 9,
+      "community": 5,
       "norm_label": "financialdashboard.jsx"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L15",
       "id": "financialdashboard_fmt",
-      "community": 9,
+      "community": 5,
       "norm_label": "fmt()"
     },
     {
@@ -639,7 +639,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L16",
       "id": "financialdashboard_fmtshort",
-      "community": 9,
+      "community": 5,
       "norm_label": "fmtshort()"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L22",
       "id": "financialdashboard_normalizedatekey",
-      "community": 9,
+      "community": 5,
       "norm_label": "normalizedatekey()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L45",
       "id": "financialdashboard_isonorbefore",
-      "community": 9,
+      "community": 5,
       "norm_label": "isonorbefore()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L52",
       "id": "financialdashboard_formatdateptbr",
-      "community": 9,
+      "community": 5,
       "norm_label": "formatdateptbr()"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\FinancialDashboard.jsx",
       "source_location": "L58",
       "id": "financialdashboard_financialdashboard",
-      "community": 9,
+      "community": 5,
       "norm_label": "financialdashboard()"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\PeriodContext.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_periodcontext_jsx",
-      "community": 9,
+      "community": 5,
       "norm_label": "periodcontext.jsx"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\PeriodContext.jsx",
       "source_location": "L5",
       "id": "periodcontext_periodprovider",
-      "community": 9,
+      "community": 5,
       "norm_label": "periodprovider()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\PeriodContext.jsx",
       "source_location": "L19",
       "id": "periodcontext_useperiod",
-      "community": 9,
+      "community": 5,
       "norm_label": "useperiod()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\PeriodSelector.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_periodselector_jsx",
-      "community": 36,
+      "community": 37,
       "norm_label": "periodselector.jsx"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\PeriodSelector.jsx",
       "source_location": "L16",
       "id": "periodselector_periodselector",
-      "community": 36,
+      "community": 37,
       "norm_label": "periodselector()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ReportsTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_reportstab_jsx",
-      "community": 19,
+      "community": 20,
       "norm_label": "reportstab.jsx"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ReportsTab.jsx",
       "source_location": "L16",
       "id": "reportstab_fmt",
-      "community": 19,
+      "community": 20,
       "norm_label": "fmt()"
     },
     {
@@ -747,7 +747,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ReportsTab.jsx",
       "source_location": "L52",
       "id": "reportstab_reportstab",
-      "community": 19,
+      "community": 20,
       "norm_label": "reportstab()"
     },
     {
@@ -756,7 +756,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ReportsTab.jsx",
       "source_location": "L511",
       "id": "reportstab_summarycard",
-      "community": 19,
+      "community": 20,
       "norm_label": "summarycard()"
     },
     {
@@ -765,7 +765,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\ReportsTab.jsx",
       "source_location": "L531",
       "id": "reportstab_detailmodal",
-      "community": 19,
+      "community": 20,
       "norm_label": "detailmodal()"
     },
     {
@@ -774,7 +774,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\TaxRatesTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_financial_taxratestab_jsx",
-      "community": 27,
+      "community": 28,
       "norm_label": "taxratestab.jsx"
     },
     {
@@ -783,7 +783,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\TaxRatesTab.jsx",
       "source_location": "L10",
       "id": "taxratestab_fmt",
-      "community": 27,
+      "community": 28,
       "norm_label": "fmt()"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\financial\\TaxRatesTab.jsx",
       "source_location": "L12",
       "id": "taxratestab_taxratestab",
-      "community": 27,
+      "community": 28,
       "norm_label": "taxratestab()"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ClientForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_clientform_jsx",
-      "community": 37,
+      "community": 38,
       "norm_label": "clientform.jsx"
     },
     {
@@ -810,7 +810,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ClientForm.jsx",
       "source_location": "L31",
       "id": "clientform_clientform",
-      "community": 37,
+      "community": 38,
       "norm_label": "clientform()"
     },
     {
@@ -819,7 +819,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ConsultantForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_consultantform_jsx",
-      "community": 38,
+      "community": 39,
       "norm_label": "consultantform.jsx"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ConsultantForm.jsx",
       "source_location": "L15",
       "id": "consultantform_consultantform",
-      "community": 38,
+      "community": 39,
       "norm_label": "consultantform()"
     },
     {
@@ -837,7 +837,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ExpenseForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_expenseform_jsx",
-      "community": 3,
+      "community": 6,
       "norm_label": "expenseform.jsx"
     },
     {
@@ -846,7 +846,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ExpenseForm.jsx",
       "source_location": "L24",
       "id": "expenseform_expenseform",
-      "community": 3,
+      "community": 6,
       "norm_label": "expenseform()"
     },
     {
@@ -862,7 +862,7 @@
       "label": "normalizeMultiline()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L53",
+      "source_location": "L58",
       "id": "projectform_normalizemultiline",
       "community": 3,
       "norm_label": "normalizemultiline()"
@@ -871,7 +871,7 @@
       "label": "produtoFinalForPersistence()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L57",
+      "source_location": "L62",
       "id": "projectform_produtofinalforpersistence",
       "community": 3,
       "norm_label": "produtofinalforpersistence()"
@@ -880,7 +880,7 @@
       "label": "RichTextArea()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L64",
+      "source_location": "L69",
       "id": "projectform_richtextarea",
       "community": 3,
       "norm_label": "richtextarea()"
@@ -889,18 +889,18 @@
       "label": "generateScheduleRows()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L134",
+      "source_location": "L139",
       "id": "projectform_generateschedulerows",
-      "community": 7,
+      "community": 3,
       "norm_label": "generateschedulerows()"
     },
     {
       "label": "ProjectForm()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L216",
+      "source_location": "L229",
       "id": "projectform_projectform",
-      "community": 3,
+      "community": 6,
       "norm_label": "projectform()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\PublicPoliciesForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_publicpoliciesform_jsx",
-      "community": 3,
+      "community": 6,
       "norm_label": "publicpoliciesform.jsx"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\PublicPoliciesForm.jsx",
       "source_location": "L7",
       "id": "publicpoliciesform_publicpoliciesform",
-      "community": 3,
+      "community": 6,
       "norm_label": "publicpoliciesform()"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ScheduleForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_scheduleform_jsx",
-      "community": 39,
+      "community": 40,
       "norm_label": "scheduleform.jsx"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ScheduleForm.jsx",
       "source_location": "L10",
       "id": "scheduleform_scheduleform",
-      "community": 39,
+      "community": 40,
       "norm_label": "scheduleform()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ServiceModelForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_servicemodelform_jsx",
-      "community": 40,
+      "community": 41,
       "norm_label": "servicemodelform.jsx"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ServiceModelForm.jsx",
       "source_location": "L23",
       "id": "servicemodelform_servicemodelform",
-      "community": 40,
+      "community": 41,
       "norm_label": "servicemodelform()"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\TaskForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_taskform_jsx",
-      "community": 41,
+      "community": 42,
       "norm_label": "taskform.jsx"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\TaskForm.jsx",
       "source_location": "L11",
       "id": "taskform_taskform",
-      "community": 41,
+      "community": 42,
       "norm_label": "taskform()"
     },
     {
@@ -981,7 +981,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\TimeEntryForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_forms_timeentryform_jsx",
-      "community": 42,
+      "community": 43,
       "norm_label": "timeentryform.jsx"
     },
     {
@@ -990,7 +990,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\TimeEntryForm.jsx",
       "source_location": "L11",
       "id": "timeentryform_timeentryform",
-      "community": 42,
+      "community": 43,
       "norm_label": "timeentryform()"
     },
     {
@@ -999,7 +999,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\kanban\\KanbanBoard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_kanban_kanbanboard_jsx",
-      "community": 43,
+      "community": 44,
       "norm_label": "kanbanboard.jsx"
     },
     {
@@ -1008,7 +1008,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\kanban\\KanbanBoard.jsx",
       "source_location": "L11",
       "id": "kanbanboard_kanbanboard",
-      "community": 43,
+      "community": 44,
       "norm_label": "kanbanboard()"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\kanban\\ProjectKanbanCard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_kanban_projectkanbancard_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectkanbancard.jsx"
     },
     {
@@ -1026,7 +1026,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\kanban\\ProjectKanbanCard.jsx",
       "source_location": "L20",
       "id": "projectkanbancard_projectkanbancard",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectkanbancard()"
     },
     {
@@ -1035,7 +1035,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\ContactSection.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_landing_contactsection_jsx",
-      "community": 44,
+      "community": 45,
       "norm_label": "contactsection.jsx"
     },
     {
@@ -1044,7 +1044,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\ContactSection.jsx",
       "source_location": "L4",
       "id": "contactsection_contactsection",
-      "community": 44,
+      "community": 45,
       "norm_label": "contactsection()"
     },
     {
@@ -1053,7 +1053,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\GestaoUpLogo.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_landing_gestaouplogo_jsx",
-      "community": 45,
+      "community": 46,
       "norm_label": "gestaouplogo.jsx"
     },
     {
@@ -1062,7 +1062,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\GestaoUpLogo.jsx",
       "source_location": "L1",
       "id": "gestaouplogo_gestaouplogo",
-      "community": 45,
+      "community": 46,
       "norm_label": "gestaouplogo()"
     },
     {
@@ -1071,7 +1071,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\HeroSection.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_landing_herosection_jsx",
-      "community": 46,
+      "community": 47,
       "norm_label": "herosection.jsx"
     },
     {
@@ -1080,7 +1080,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\HeroSection.jsx",
       "source_location": "L39",
       "id": "herosection_herosection",
-      "community": 46,
+      "community": 47,
       "norm_label": "herosection()"
     },
     {
@@ -1089,7 +1089,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\ProblemSolutionSection.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_landing_problemsolutionsection_jsx",
-      "community": 47,
+      "community": 48,
       "norm_label": "problemsolutionsection.jsx"
     },
     {
@@ -1098,7 +1098,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\ProblemSolutionSection.jsx",
       "source_location": "L39",
       "id": "problemsolutionsection_problemsolutionsection",
-      "community": 47,
+      "community": 48,
       "norm_label": "problemsolutionsection()"
     },
     {
@@ -1107,7 +1107,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\SectionContainer.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_landing_sectioncontainer_jsx",
-      "community": 48,
+      "community": 49,
       "norm_label": "sectioncontainer.jsx"
     },
     {
@@ -1116,7 +1116,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\landing\\SectionContainer.jsx",
       "source_location": "L1",
       "id": "sectioncontainer_sectioncontainer",
-      "community": 48,
+      "community": 49,
       "norm_label": "sectioncontainer()"
     },
     {
@@ -1125,7 +1125,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultantConflictModal.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_consultantconflictmodal_jsx",
-      "community": 49,
+      "community": 50,
       "norm_label": "consultantconflictmodal.jsx"
     },
     {
@@ -1134,7 +1134,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultantConflictModal.jsx",
       "source_location": "L14",
       "id": "consultantconflictmodal_consultantconflictmodal",
-      "community": 49,
+      "community": 50,
       "norm_label": "consultantconflictmodal()"
     },
     {
@@ -1150,7 +1150,7 @@
       "label": "numberToWordsInteger()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "consultingproposal_numbertowordsinteger",
       "community": 10,
       "norm_label": "numbertowordsinteger()"
@@ -1159,7 +1159,7 @@
       "label": "numberToWordsCurrency()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "id": "consultingproposal_numbertowordscurrency",
       "community": 10,
       "norm_label": "numbertowordscurrency()"
@@ -1168,7 +1168,7 @@
       "label": "drawJustifiedText()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L104",
+      "source_location": "L105",
       "id": "consultingproposal_drawjustifiedtext",
       "community": 10,
       "norm_label": "drawjustifiedtext()"
@@ -1177,7 +1177,7 @@
       "label": "styleToPdfFont()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L120",
+      "source_location": "L121",
       "id": "consultingproposal_styletopdffont",
       "community": 10,
       "norm_label": "styletopdffont()"
@@ -1186,7 +1186,7 @@
       "label": "parseRichRuns()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L127",
+      "source_location": "L128",
       "id": "consultingproposal_parserichruns",
       "community": 10,
       "norm_label": "parserichruns()"
@@ -1195,7 +1195,7 @@
       "label": "measureText()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L163",
+      "source_location": "L164",
       "id": "consultingproposal_measuretext",
       "community": 10,
       "norm_label": "measuretext()"
@@ -1204,7 +1204,7 @@
       "label": "wrapRichRuns()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L169",
+      "source_location": "L170",
       "id": "consultingproposal_wraprichruns",
       "community": 10,
       "norm_label": "wraprichruns()"
@@ -1213,7 +1213,7 @@
       "label": "drawRichLine()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L200",
+      "source_location": "L201",
       "id": "consultingproposal_drawrichline",
       "community": 10,
       "norm_label": "drawrichline()"
@@ -1222,7 +1222,7 @@
       "label": "drawJustifiedBox()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L213",
+      "source_location": "L214",
       "id": "consultingproposal_drawjustifiedbox",
       "community": 10,
       "norm_label": "drawjustifiedbox()"
@@ -1231,16 +1231,16 @@
       "label": "buildScheduleRows()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L240",
+      "source_location": "L241",
       "id": "consultingproposal_buildschedulerows",
-      "community": 10,
+      "community": 3,
       "norm_label": "buildschedulerows()"
     },
     {
       "label": "getMonthLabel()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L319",
+      "source_location": "L331",
       "id": "consultingproposal_getmonthlabel",
       "community": 10,
       "norm_label": "getmonthlabel()"
@@ -1249,7 +1249,7 @@
       "label": "downloadConsultingProposal()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L328",
+      "source_location": "L340",
       "id": "consultingproposal_downloadconsultingproposal",
       "community": 10,
       "norm_label": "downloadconsultingproposal()"
@@ -1260,7 +1260,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\DeliverablesTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_deliverablestab_jsx",
-      "community": 50,
+      "community": 51,
       "norm_label": "deliverablestab.jsx"
     },
     {
@@ -1269,7 +1269,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\DeliverablesTab.jsx",
       "source_location": "L6",
       "id": "deliverablestab_deliverablestab",
-      "community": 50,
+      "community": 51,
       "norm_label": "deliverablestab()"
     },
     {
@@ -1278,7 +1278,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\DiagnosticReport.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_diagnosticreport_jsx",
-      "community": 12,
+      "community": 11,
       "norm_label": "diagnosticreport.jsx"
     },
     {
@@ -1287,7 +1287,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\DiagnosticReport.jsx",
       "source_location": "L9",
       "id": "diagnosticreport_downloaddiagnosticreport",
-      "community": 12,
+      "community": 11,
       "norm_label": "downloaddiagnosticreport()"
     },
     {
@@ -1323,52 +1323,52 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
-      "community": 7,
+      "community": 3,
       "norm_label": "scheduletab.jsx"
     },
     {
       "label": "computeAutoSkipDates()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L23",
+      "source_location": "L27",
       "id": "scheduletab_computeautoskipdates",
-      "community": 7,
+      "community": 3,
       "norm_label": "computeautoskipdates()"
     },
     {
       "label": "ScheduleConfigModal()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L60",
+      "source_location": "L64",
       "id": "scheduletab_scheduleconfigmodal",
-      "community": 7,
+      "community": 3,
       "norm_label": "scheduleconfigmodal()"
     },
     {
       "label": "PhaseCard()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L208",
+      "source_location": "L215",
       "id": "scheduletab_phasecard",
-      "community": 7,
+      "community": 3,
       "norm_label": "phasecard()"
     },
     {
       "label": "checkConsultantConflicts()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L302",
+      "source_location": "L309",
       "id": "scheduletab_checkconsultantconflicts",
-      "community": 7,
+      "community": 3,
       "norm_label": "checkconsultantconflicts()"
     },
     {
       "label": "ScheduleTab()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L356",
+      "source_location": "L363",
       "id": "scheduletab_scheduletab",
-      "community": 7,
+      "community": 3,
       "norm_label": "scheduletab()"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ServiceReportForm.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_servicereportform_jsx",
-      "community": 51,
+      "community": 52,
       "norm_label": "servicereportform.jsx"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ServiceReportForm.jsx",
       "source_location": "L12",
       "id": "servicereportform_servicereportform",
-      "community": 51,
+      "community": 52,
       "norm_label": "servicereportform()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ServiceReportPDF.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_project_servicereportpdf_jsx",
-      "community": 12,
+      "community": 11,
       "norm_label": "servicereportpdf.jsx"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ServiceReportPDF.jsx",
       "source_location": "L16",
       "id": "servicereportpdf_downloadservicereport",
-      "community": 12,
+      "community": 11,
       "norm_label": "downloadservicereport()"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\accordion.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_accordion_jsx",
-      "community": 82,
+      "community": 83,
       "norm_label": "accordion.jsx"
     },
     {
@@ -1449,7 +1449,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\alert.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_alert_jsx",
-      "community": 83,
+      "community": 84,
       "norm_label": "alert.jsx"
     },
     {
@@ -1458,7 +1458,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\aspect-ratio.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_aspect_ratio_jsx",
-      "community": 84,
+      "community": 85,
       "norm_label": "aspect-ratio.jsx"
     },
     {
@@ -1467,7 +1467,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\avatar.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_avatar_jsx",
-      "community": 85,
+      "community": 86,
       "norm_label": "avatar.jsx"
     },
     {
@@ -1521,7 +1521,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\button.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_button_jsx",
-      "community": 86,
+      "community": 87,
       "norm_label": "button.jsx"
     },
     {
@@ -1548,7 +1548,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\card.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_card_jsx",
-      "community": 87,
+      "community": 88,
       "norm_label": "card.jsx"
     },
     {
@@ -1557,7 +1557,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\carousel.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_carousel_jsx",
-      "community": 52,
+      "community": 53,
       "norm_label": "carousel.jsx"
     },
     {
@@ -1566,7 +1566,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\carousel.jsx",
       "source_location": "L10",
       "id": "carousel_usecarousel",
-      "community": 52,
+      "community": 53,
       "norm_label": "usecarousel()"
     },
     {
@@ -1593,7 +1593,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\chart.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_chart_jsx",
-      "community": 22,
+      "community": 23,
       "norm_label": "chart.jsx"
     },
     {
@@ -1602,7 +1602,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\chart.jsx",
       "source_location": "L15",
       "id": "chart_usechart",
-      "community": 22,
+      "community": 23,
       "norm_label": "usechart()"
     },
     {
@@ -1611,7 +1611,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\chart.jsx",
       "source_location": "L49",
       "id": "chart_chartstyle",
-      "community": 22,
+      "community": 23,
       "norm_label": "chartstyle()"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\chart.jsx",
       "source_location": "L266",
       "id": "chart_getpayloadconfigfrompayload",
-      "community": 22,
+      "community": 23,
       "norm_label": "getpayloadconfigfrompayload()"
     },
     {
@@ -1629,7 +1629,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\checkbox.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_checkbox_jsx",
-      "community": 88,
+      "community": 89,
       "norm_label": "checkbox.jsx"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\collapsible.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_collapsible_jsx",
-      "community": 89,
+      "community": 90,
       "norm_label": "collapsible.jsx"
     },
     {
@@ -1791,7 +1791,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\EmptyState.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_emptystate_jsx",
-      "community": 53,
+      "community": 54,
       "norm_label": "emptystate.jsx"
     },
     {
@@ -1800,7 +1800,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\EmptyState.jsx",
       "source_location": "L5",
       "id": "emptystate_emptystate",
-      "community": 53,
+      "community": 54,
       "norm_label": "emptystate()"
     },
     {
@@ -1809,7 +1809,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\form.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_form_jsx",
-      "community": 28,
+      "community": 29,
       "norm_label": "form.jsx"
     },
     {
@@ -1818,7 +1818,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\form.jsx",
       "source_location": "L13",
       "id": "form_formfield",
-      "community": 28,
+      "community": 29,
       "norm_label": "formfield()"
     },
     {
@@ -1827,7 +1827,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\form.jsx",
       "source_location": "L25",
       "id": "form_useformfield",
-      "community": 28,
+      "community": 29,
       "norm_label": "useformfield()"
     },
     {
@@ -1836,7 +1836,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\hover-card.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_hover_card_jsx",
-      "community": 90,
+      "community": 91,
       "norm_label": "hover-card.jsx"
     },
     {
@@ -1845,7 +1845,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\input-otp.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_input_otp_jsx",
-      "community": 91,
+      "community": 92,
       "norm_label": "input-otp.jsx"
     },
     {
@@ -1854,7 +1854,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\input.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_input_jsx",
-      "community": 92,
+      "community": 93,
       "norm_label": "input.jsx"
     },
     {
@@ -1863,7 +1863,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\label.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_label_jsx",
-      "community": 93,
+      "community": 94,
       "norm_label": "label.jsx"
     },
     {
@@ -1872,7 +1872,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_menubar_jsx",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubar.jsx"
     },
     {
@@ -1881,7 +1881,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L9",
       "id": "menubar_menubarmenu",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubarmenu()"
     },
     {
@@ -1890,7 +1890,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L15",
       "id": "menubar_menubargroup",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubargroup()"
     },
     {
@@ -1899,7 +1899,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L21",
       "id": "menubar_menubarportal",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubarportal()"
     },
     {
@@ -1908,7 +1908,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L27",
       "id": "menubar_menubarradiogroup",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubarradiogroup()"
     },
     {
@@ -1917,7 +1917,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L33",
       "id": "menubar_menubarsub",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubarsub()"
     },
     {
@@ -1926,7 +1926,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\menubar.jsx",
       "source_location": "L171",
       "id": "menubar_menubarshortcut",
-      "community": 0,
+      "community": 15,
       "norm_label": "menubarshortcut()"
     },
     {
@@ -1935,7 +1935,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\MoneyInput.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_moneyinput_jsx",
-      "community": 54,
+      "community": 55,
       "norm_label": "moneyinput.jsx"
     },
     {
@@ -1944,7 +1944,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\MoneyInput.jsx",
       "source_location": "L7",
       "id": "moneyinput_moneyinput",
-      "community": 54,
+      "community": 55,
       "norm_label": "moneyinput()"
     },
     {
@@ -1953,7 +1953,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\navigation-menu.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_navigation_menu_jsx",
-      "community": 94,
+      "community": 95,
       "norm_label": "navigation-menu.jsx"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\PageHeader.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_pageheader_jsx",
-      "community": 55,
+      "community": 56,
       "norm_label": "pageheader.jsx"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\PageHeader.jsx",
       "source_location": "L5",
       "id": "pageheader_pageheader",
-      "community": 55,
+      "community": 56,
       "norm_label": "pageheader()"
     },
     {
@@ -2034,7 +2034,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\PhoneInput.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_phoneinput_jsx",
-      "community": 56,
+      "community": 57,
       "norm_label": "phoneinput.jsx"
     },
     {
@@ -2043,7 +2043,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\PhoneInput.jsx",
       "source_location": "L5",
       "id": "phoneinput_phoneinput",
-      "community": 56,
+      "community": 57,
       "norm_label": "phoneinput()"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\popover.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_popover_jsx",
-      "community": 95,
+      "community": 96,
       "norm_label": "popover.jsx"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\progress.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_progress_jsx",
-      "community": 96,
+      "community": 97,
       "norm_label": "progress.jsx"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\radio-group.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_radio_group_jsx",
-      "community": 97,
+      "community": 98,
       "norm_label": "radio-group.jsx"
     },
     {
@@ -2106,7 +2106,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\scroll-area.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_scroll_area_jsx",
-      "community": 98,
+      "community": 99,
       "norm_label": "scroll-area.jsx"
     },
     {
@@ -2115,7 +2115,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\select.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_select_jsx",
-      "community": 99,
+      "community": 100,
       "norm_label": "select.jsx"
     },
     {
@@ -2124,7 +2124,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\separator.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_separator_jsx",
-      "community": 100,
+      "community": 101,
       "norm_label": "separator.jsx"
     },
     {
@@ -2160,7 +2160,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\sidebar.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_sidebar_jsx",
-      "community": 57,
+      "community": 58,
       "norm_label": "sidebar.jsx"
     },
     {
@@ -2169,7 +2169,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\sidebar.jsx",
       "source_location": "L29",
       "id": "sidebar_usesidebar",
-      "community": 57,
+      "community": 58,
       "norm_label": "usesidebar()"
     },
     {
@@ -2196,7 +2196,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\slider.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_slider_jsx",
-      "community": 101,
+      "community": 102,
       "norm_label": "slider.jsx"
     },
     {
@@ -2205,7 +2205,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\sonner.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_sonner_jsx",
-      "community": 58,
+      "community": 59,
       "norm_label": "sonner.jsx"
     },
     {
@@ -2214,7 +2214,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\sonner.jsx",
       "source_location": "L5",
       "id": "sonner_toaster",
-      "community": 58,
+      "community": 59,
       "norm_label": "toaster()"
     },
     {
@@ -2223,7 +2223,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\StatCard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_statcard_jsx",
-      "community": 59,
+      "community": 60,
       "norm_label": "statcard.jsx"
     },
     {
@@ -2232,7 +2232,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\StatCard.jsx",
       "source_location": "L5",
       "id": "statcard_statcard",
-      "community": 59,
+      "community": 60,
       "norm_label": "statcard()"
     },
     {
@@ -2241,7 +2241,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\StatusBadge.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_statusbadge_jsx",
-      "community": 60,
+      "community": 61,
       "norm_label": "statusbadge.jsx"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\StatusBadge.jsx",
       "source_location": "L37",
       "id": "statusbadge_statusbadge",
-      "community": 60,
+      "community": 61,
       "norm_label": "statusbadge()"
     },
     {
@@ -2259,7 +2259,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\switch.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_switch_jsx",
-      "community": 102,
+      "community": 103,
       "norm_label": "switch.jsx"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\table.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_table_jsx",
-      "community": 103,
+      "community": 104,
       "norm_label": "table.jsx"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\tabs.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_tabs_jsx",
-      "community": 104,
+      "community": 105,
       "norm_label": "tabs.jsx"
     },
     {
@@ -2286,7 +2286,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\textarea.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_textarea_jsx",
-      "community": 105,
+      "community": 106,
       "norm_label": "textarea.jsx"
     },
     {
@@ -2295,7 +2295,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\toast.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_toast_jsx",
-      "community": 106,
+      "community": 107,
       "norm_label": "toast.jsx"
     },
     {
@@ -2304,7 +2304,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\toaster.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_toaster_jsx",
-      "community": 5,
+      "community": 4,
       "norm_label": "toaster.jsx"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\toaster.jsx",
       "source_location": "L11",
       "id": "toaster_toaster",
-      "community": 5,
+      "community": 4,
       "norm_label": "toaster()"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\toggle-group.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_toggle_group_jsx",
-      "community": 107,
+      "community": 108,
       "norm_label": "toggle-group.jsx"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\toggle.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_toggle_jsx",
-      "community": 108,
+      "community": 109,
       "norm_label": "toggle.jsx"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\tooltip.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_tooltip_jsx",
-      "community": 109,
+      "community": 110,
       "norm_label": "tooltip.jsx"
     },
     {
@@ -2349,7 +2349,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_ui_use_toast_jsx",
-      "community": 5,
+      "community": 4,
       "norm_label": "use-toast.jsx"
     },
     {
@@ -2358,7 +2358,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L16",
       "id": "use_toast_genid",
-      "community": 5,
+      "community": 4,
       "norm_label": "genid()"
     },
     {
@@ -2367,7 +2367,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L23",
       "id": "use_toast_addtoremovequeue",
-      "community": 5,
+      "community": 4,
       "norm_label": "addtoremovequeue()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L39",
       "id": "use_toast_clearfromremovequeue",
-      "community": 5,
+      "community": 4,
       "norm_label": "_clearfromremovequeue()"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L47",
       "id": "use_toast_reducer",
-      "community": 5,
+      "community": 4,
       "norm_label": "reducer()"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L106",
       "id": "use_toast_dispatch",
-      "community": 5,
+      "community": 4,
       "norm_label": "dispatch()"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L113",
       "id": "use_toast_toast",
-      "community": 5,
+      "community": 4,
       "norm_label": "toast()"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\ui\\use-toast.jsx",
       "source_location": "L144",
       "id": "use_toast_usetoast",
-      "community": 5,
+      "community": 4,
       "norm_label": "usetoast()"
     },
     {
@@ -2421,7 +2421,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\constants.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_constants_jsx",
-      "community": 110,
+      "community": 111,
       "norm_label": "constants.jsx"
     },
     {
@@ -2430,7 +2430,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\dateFilters.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_datefilters_jsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "datefilters.jsx"
     },
     {
@@ -2439,7 +2439,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\dateFilters.jsx",
       "source_location": "L6",
       "id": "datefilters_getdaterange",
-      "community": 6,
+      "community": 7,
       "norm_label": "getdaterange()"
     },
     {
@@ -2448,7 +2448,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\dateFilters.jsx",
       "source_location": "L27",
       "id": "datefilters_filterbyperiod",
-      "community": 6,
+      "community": 7,
       "norm_label": "filterbyperiod()"
     },
     {
@@ -2457,7 +2457,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_financialcalculations_jsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "financialcalculations.jsx"
     },
     {
@@ -2466,7 +2466,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L4",
       "id": "financialcalculations_calculatetotalrevenue",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculatetotalrevenue()"
     },
     {
@@ -2475,7 +2475,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L11",
       "id": "financialcalculations_calculatetotallabor",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculatetotallabor()"
     },
     {
@@ -2484,7 +2484,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L21",
       "id": "financialcalculations_calculatetotalexpenses",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculatetotalexpenses()"
     },
     {
@@ -2493,7 +2493,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L28",
       "id": "financialcalculations_calculatetotalhours",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculatetotalhours()"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L35",
       "id": "financialcalculations_calculateprofit",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculateprofit()"
     },
     {
@@ -2511,7 +2511,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L42",
       "id": "financialcalculations_calculateprofitmargin",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculateprofitmargin()"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L49",
       "id": "financialcalculations_calculatefinancialmetrics",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculatefinancialmetrics()"
     },
     {
@@ -2529,7 +2529,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\financialCalculations.jsx",
       "source_location": "L71",
       "id": "financialcalculations_calculateprojectprofitability",
-      "community": 6,
+      "community": 7,
       "norm_label": "calculateprojectprofitability()"
     },
     {
@@ -2538,7 +2538,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\hourlyRateTables.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_hourlyratetables_jsx",
-      "community": 3,
+      "community": 6,
       "norm_label": "hourlyratetables.jsx"
     },
     {
@@ -2547,7 +2547,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\hourlyRateTables.jsx",
       "source_location": "L162",
       "id": "hourlyratetables_getconsultinghourlyrate",
-      "community": 3,
+      "community": 6,
       "norm_label": "getconsultinghourlyrate()"
     },
     {
@@ -2556,7 +2556,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\hourlyRateTables.jsx",
       "source_location": "L179",
       "id": "hourlyratetables_getdiagnosticrate",
-      "community": 3,
+      "community": 6,
       "norm_label": "getdiagnosticrate()"
     },
     {
@@ -2565,7 +2565,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\hourlyRateTables.jsx",
       "source_location": "L186",
       "id": "hourlyratetables_getinstructionalhourlyrate",
-      "community": 3,
+      "community": 6,
       "norm_label": "getinstructionalhourlyrate()"
     },
     {
@@ -2574,7 +2574,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\serviceAreas.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_serviceareas_jsx",
-      "community": 3,
+      "community": 6,
       "norm_label": "serviceareas.jsx"
     },
     {
@@ -2583,7 +2583,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\serviceAreas.jsx",
       "source_location": "L257",
       "id": "serviceareas_getsubareas",
-      "community": 3,
+      "community": 6,
       "norm_label": "getsubareas()"
     },
     {
@@ -2592,7 +2592,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\serviceAreas.jsx",
       "source_location": "L261",
       "id": "serviceareas_getsubareaswithdetails",
-      "community": 3,
+      "community": 6,
       "norm_label": "getsubareaswithdetails()"
     },
     {
@@ -2601,7 +2601,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\simplesNacionalHelper.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_utils_simplesnacionalhelper_jsx",
-      "community": 29,
+      "community": 30,
       "norm_label": "simplesnacionalhelper.jsx"
     },
     {
@@ -2610,7 +2610,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\simplesNacionalHelper.jsx",
       "source_location": "L13",
       "id": "simplesnacionalhelper_lancaimpostodespesa",
-      "community": 29,
+      "community": 30,
       "norm_label": "lancaimpostodespesa()"
     },
     {
@@ -2619,7 +2619,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\utils\\simplesNacionalHelper.jsx",
       "source_location": "L62",
       "id": "simplesnacionalhelper_lancaimpostodespesalote",
-      "community": 29,
+      "community": 30,
       "norm_label": "lancaimpostodespesalote()"
     },
     {
@@ -2628,7 +2628,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\viability\\downloadViabilityAnalysisPdf.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_components_viability_downloadviabilityanalysispdf_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "downloadviabilityanalysispdf.js"
     },
     {
@@ -2637,7 +2637,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\viability\\downloadViabilityAnalysisPdf.js",
       "source_location": "L11",
       "id": "downloadviabilityanalysispdf_fmtmoney",
-      "community": 12,
+      "community": 11,
       "norm_label": "fmtmoney()"
     },
     {
@@ -2646,7 +2646,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\viability\\downloadViabilityAnalysisPdf.js",
       "source_location": "L16",
       "id": "downloadviabilityanalysispdf_formatcidadeuf",
-      "community": 12,
+      "community": 11,
       "norm_label": "formatcidadeuf()"
     },
     {
@@ -2655,7 +2655,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\viability\\downloadViabilityAnalysisPdf.js",
       "source_location": "L23",
       "id": "downloadviabilityanalysispdf_distancemethodlabel",
-      "community": 12,
+      "community": 11,
       "norm_label": "distancemethodlabel()"
     },
     {
@@ -2664,7 +2664,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\viability\\downloadViabilityAnalysisPdf.js",
       "source_location": "L48",
       "id": "downloadviabilityanalysispdf_downloadviabilityanalysispdf",
-      "community": 12,
+      "community": 11,
       "norm_label": "downloadviabilityanalysispdf()"
     },
     {
@@ -2709,7 +2709,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\hooks\\use-mobile.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_hooks_use_mobile_jsx",
-      "community": 61,
+      "community": 62,
       "norm_label": "use-mobile.jsx"
     },
     {
@@ -2718,7 +2718,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\hooks\\use-mobile.jsx",
       "source_location": "L5",
       "id": "use_mobile_useismobile",
-      "community": 61,
+      "community": 62,
       "norm_label": "useismobile()"
     },
     {
@@ -2727,7 +2727,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\app-params.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_app_params_js",
-      "community": 23,
+      "community": 24,
       "norm_label": "app-params.js"
     },
     {
@@ -2736,7 +2736,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\app-params.js",
       "source_location": "L7",
       "id": "app_params_tosnakecase",
-      "community": 23,
+      "community": 24,
       "norm_label": "tosnakecase()"
     },
     {
@@ -2745,7 +2745,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\app-params.js",
       "source_location": "L11",
       "id": "app_params_getappparamvalue",
-      "community": 23,
+      "community": 24,
       "norm_label": "getappparamvalue()"
     },
     {
@@ -2754,7 +2754,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\app-params.js",
       "source_location": "L39",
       "id": "app_params_getappparams",
-      "community": 23,
+      "community": 24,
       "norm_label": "getappparams()"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\branding.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_branding_js",
-      "community": 111,
+      "community": 112,
       "norm_label": "branding.js"
     },
     {
@@ -2799,7 +2799,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\imageDataUrl.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_imagedataurl_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "imagedataurl.js"
     },
     {
@@ -2808,7 +2808,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\imageDataUrl.js",
       "source_location": "L1",
       "id": "imagedataurl_blobtodataurl",
-      "community": 12,
+      "community": 11,
       "norm_label": "blobtodataurl()"
     },
     {
@@ -2817,7 +2817,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\imageDataUrl.js",
       "source_location": "L10",
       "id": "imagedataurl_loadimageasdataurl",
-      "community": 12,
+      "community": 11,
       "norm_label": "loadimageasdataurl()"
     },
     {
@@ -2916,7 +2916,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\PageNotFound.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_pagenotfound_jsx",
-      "community": 62,
+      "community": 63,
       "norm_label": "pagenotfound.jsx"
     },
     {
@@ -2925,7 +2925,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\PageNotFound.jsx",
       "source_location": "L6",
       "id": "pagenotfound_pagenotfound",
-      "community": 62,
+      "community": 63,
       "norm_label": "pagenotfound()"
     },
     {
@@ -2952,7 +2952,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\projectDraftAudio.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_projectdraftaudio_js",
-      "community": 30,
+      "community": 31,
       "norm_label": "projectdraftaudio.js"
     },
     {
@@ -2961,7 +2961,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\projectDraftAudio.js",
       "source_location": "L20",
       "id": "projectdraftaudio_isallowedprojectdraftmime",
-      "community": 30,
+      "community": 31,
       "norm_label": "isallowedprojectdraftmime()"
     },
     {
@@ -2970,7 +2970,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\projectDraftAudio.js",
       "source_location": "L27",
       "id": "projectdraftaudio_buildprojectdraftaudiopath",
-      "community": 30,
+      "community": 31,
       "norm_label": "buildprojectdraftaudiopath()"
     },
     {
@@ -2979,7 +2979,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\query-client.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_query_client_js",
-      "community": 112,
+      "community": 113,
       "norm_label": "query-client.js"
     },
     {
@@ -2988,7 +2988,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_scheduledates_js",
-      "community": 7,
+      "community": 3,
       "norm_label": "scheduledates.js"
     },
     {
@@ -2997,7 +2997,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L9",
       "id": "scheduledates_isholiday",
-      "community": 7,
+      "community": 3,
       "norm_label": "isholiday()"
     },
     {
@@ -3006,7 +3006,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L15",
       "id": "scheduledates_getweekkey",
-      "community": 7,
+      "community": 3,
       "norm_label": "getweekkey()"
     },
     {
@@ -3015,7 +3015,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L23",
       "id": "scheduledates_calendardaydiff",
-      "community": 7,
+      "community": 3,
       "norm_label": "calendardaydiff()"
     },
     {
@@ -3024,7 +3024,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L29",
       "id": "scheduledates_isblockedcalendarday",
-      "community": 7,
+      "community": 3,
       "norm_label": "isblockedcalendarday()"
     },
     {
@@ -3033,7 +3033,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L38",
       "id": "scheduledates_canscheduleworkday",
-      "community": 7,
+      "community": 3,
       "norm_label": "canscheduleworkday()"
     },
     {
@@ -3042,7 +3042,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L67",
       "id": "scheduledates_assignworkdates",
-      "community": 7,
+      "community": 3,
       "norm_label": "assignworkdates()"
     },
     {
@@ -3051,17 +3051,107 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
       "source_location": "L117",
       "id": "scheduledates_generatescheduledates",
-      "community": 7,
+      "community": 3,
       "norm_label": "generatescheduledates()"
     },
     {
       "label": "estimateScheduleEndDate()",
       "file_type": "code",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
-      "source_location": "L142",
+      "source_location": "L152",
       "id": "scheduledates_estimatescheduleenddate",
-      "community": 7,
+      "community": 3,
       "norm_label": "estimatescheduleenddate()"
+    },
+    {
+      "label": "scheduleHours.js",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L1",
+      "id": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "community": 14,
+      "norm_label": "schedulehours.js"
+    },
+    {
+      "label": "patternSignature()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L7",
+      "id": "schedulehours_patternsignature",
+      "community": 14,
+      "norm_label": "patternsignature()"
+    },
+    {
+      "label": "averageHoursPerDay()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L12",
+      "id": "schedulehours_averagehoursperday",
+      "community": 14,
+      "norm_label": "averagehoursperday()"
+    },
+    {
+      "label": "distributeRandomIntegerHours()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L23",
+      "id": "schedulehours_distributerandomintegerhours",
+      "community": 14,
+      "norm_label": "distributerandomintegerhours()"
+    },
+    {
+      "label": "buildUniqueDailyHours()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L81",
+      "id": "schedulehours_builduniquedailyhours",
+      "community": 14,
+      "norm_label": "builduniquedailyhours()"
+    },
+    {
+      "label": "collectUsedPatternsFromProjects()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L111",
+      "id": "schedulehours_collectusedpatternsfromprojects",
+      "community": 14,
+      "norm_label": "collectusedpatternsfromprojects()"
+    },
+    {
+      "label": "collectUsedPatternsFromSchedules()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L135",
+      "id": "schedulehours_collectusedpatternsfromschedules",
+      "community": 14,
+      "norm_label": "collectusedpatternsfromschedules()"
+    },
+    {
+      "label": "collectUsedPatternsForConsultant()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L160",
+      "id": "schedulehours_collectusedpatternsforconsultant",
+      "community": 14,
+      "norm_label": "collectusedpatternsforconsultant()"
+    },
+    {
+      "label": "buildDailyHoursForEstimatedProject()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L184",
+      "id": "schedulehours_builddailyhoursforestimatedproject",
+      "community": 14,
+      "norm_label": "builddailyhoursforestimatedproject()"
+    },
+    {
+      "label": "applyRandomHoursToWorkSlots()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L209",
+      "id": "schedulehours_applyrandomhourstoworkslots",
+      "community": 14,
+      "norm_label": "applyrandomhourstoworkslots()"
     },
     {
       "label": "supabasePublicStorage.js",
@@ -3069,7 +3159,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\supabasePublicStorage.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_supabasepublicstorage_js",
-      "community": 11,
+      "community": 9,
       "norm_label": "supabasepublicstorage.js"
     },
     {
@@ -3078,7 +3168,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\supabasePublicStorage.js",
       "source_location": "L5",
       "id": "supabasepublicstorage_getpublicstoragebucket",
-      "community": 11,
+      "community": 9,
       "norm_label": "getpublicstoragebucket()"
     },
     {
@@ -3087,7 +3177,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\supabasePublicStorage.js",
       "source_location": "L10",
       "id": "supabasepublicstorage_publicstorageobjecturl",
-      "community": 11,
+      "community": 9,
       "norm_label": "publicstorageobjecturl()"
     },
     {
@@ -3096,7 +3186,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\tenant.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_tenant_js",
-      "community": 31,
+      "community": 32,
       "norm_label": "tenant.js"
     },
     {
@@ -3105,7 +3195,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\tenant.js",
       "source_location": "L1",
       "id": "tenant_getmainlandingurl",
-      "community": 31,
+      "community": 32,
       "norm_label": "getmainlandingurl()"
     },
     {
@@ -3114,7 +3204,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\tenant.js",
       "source_location": "L13",
       "id": "tenant_gettenantcontext",
-      "community": 31,
+      "community": 32,
       "norm_label": "gettenantcontext()"
     },
     {
@@ -3249,7 +3339,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\validators.js",
       "source_location": "L91",
       "id": "validators_parsemoneybrtonumber",
-      "community": 3,
+      "community": 6,
       "norm_label": "parsemoneybrtonumber()"
     },
     {
@@ -3258,7 +3348,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\validators.js",
       "source_location": "L112",
       "id": "validators_validatemoney",
-      "community": 3,
+      "community": 6,
       "norm_label": "validatemoney()"
     },
     {
@@ -3357,7 +3447,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\viabilityEngine.js",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_lib_viabilityengine_js",
-      "community": 32,
+      "community": 33,
       "norm_label": "viabilityengine.js"
     },
     {
@@ -3366,7 +3456,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\viabilityEngine.js",
       "source_location": "L8",
       "id": "viabilityengine_round2",
-      "community": 32,
+      "community": 33,
       "norm_label": "round2()"
     },
     {
@@ -3375,7 +3465,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\viabilityEngine.js",
       "source_location": "L18",
       "id": "viabilityengine_analisarviabilidadeprojeto",
-      "community": 32,
+      "community": 33,
       "norm_label": "analisarviabilidadeprojeto()"
     },
     {
@@ -3384,7 +3474,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ClientDocuments.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_clientdocuments_jsx",
-      "community": 63,
+      "community": 64,
       "norm_label": "clientdocuments.jsx"
     },
     {
@@ -3393,7 +3483,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ClientDocuments.jsx",
       "source_location": "L23",
       "id": "clientdocuments_clientdocuments",
-      "community": 63,
+      "community": 64,
       "norm_label": "clientdocuments()"
     },
     {
@@ -3402,7 +3492,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ClientPortal.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_clientportal_jsx",
-      "community": 64,
+      "community": 65,
       "norm_label": "clientportal.jsx"
     },
     {
@@ -3411,7 +3501,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ClientPortal.jsx",
       "source_location": "L23",
       "id": "clientportal_clientportal",
-      "community": 64,
+      "community": 65,
       "norm_label": "clientportal()"
     },
     {
@@ -3420,7 +3510,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Clients.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_clients_jsx",
-      "community": 65,
+      "community": 66,
       "norm_label": "clients.jsx"
     },
     {
@@ -3429,7 +3519,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Clients.jsx",
       "source_location": "L11",
       "id": "clients_clients",
-      "community": 65,
+      "community": 66,
       "norm_label": "clients()"
     },
     {
@@ -3438,7 +3528,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantDashboard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_consultantdashboard_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "consultantdashboard.jsx"
     },
     {
@@ -3447,7 +3537,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantDashboard.jsx",
       "source_location": "L22",
       "id": "consultantdashboard_consultantdashboard",
-      "community": 4,
+      "community": 2,
       "norm_label": "consultantdashboard()"
     },
     {
@@ -3456,7 +3546,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantExpenses.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_consultantexpenses_jsx",
-      "community": 66,
+      "community": 67,
       "norm_label": "consultantexpenses.jsx"
     },
     {
@@ -3465,7 +3555,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantExpenses.jsx",
       "source_location": "L43",
       "id": "consultantexpenses_consultantexpenses",
-      "community": 66,
+      "community": 67,
       "norm_label": "consultantexpenses()"
     },
     {
@@ -3474,7 +3564,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantProjects.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_consultantprojects_jsx",
-      "community": 67,
+      "community": 68,
       "norm_label": "consultantprojects.jsx"
     },
     {
@@ -3483,7 +3573,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantProjects.jsx",
       "source_location": "L34",
       "id": "consultantprojects_consultantprojects",
-      "community": 67,
+      "community": 68,
       "norm_label": "consultantprojects()"
     },
     {
@@ -3492,7 +3582,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Consultants.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_consultants_jsx",
-      "community": 68,
+      "community": 69,
       "norm_label": "consultants.jsx"
     },
     {
@@ -3501,7 +3591,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Consultants.jsx",
       "source_location": "L11",
       "id": "consultants_consultants",
-      "community": 68,
+      "community": 69,
       "norm_label": "consultants()"
     },
     {
@@ -3510,7 +3600,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantTimeEntries.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_consultanttimeentries_jsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "consultanttimeentries.jsx"
     },
     {
@@ -3519,7 +3609,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ConsultantTimeEntries.jsx",
       "source_location": "L34",
       "id": "consultanttimeentries_consultanttimeentries",
-      "community": 6,
+      "community": 7,
       "norm_label": "consultanttimeentries()"
     },
     {
@@ -3528,7 +3618,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Dashboard.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_dashboard_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "dashboard.jsx"
     },
     {
@@ -3537,7 +3627,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Dashboard.jsx",
       "source_location": "L15",
       "id": "dashboard_dashboard",
-      "community": 4,
+      "community": 2,
       "norm_label": "dashboard()"
     },
     {
@@ -3546,7 +3636,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Expenses.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_expenses_jsx",
-      "community": 69,
+      "community": 70,
       "norm_label": "expenses.jsx"
     },
     {
@@ -3555,7 +3645,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Expenses.jsx",
       "source_location": "L33",
       "id": "expenses_expenses",
-      "community": 69,
+      "community": 70,
       "norm_label": "expenses()"
     },
     {
@@ -3564,7 +3654,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Financial.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_financial_jsx",
-      "community": 70,
+      "community": 71,
       "norm_label": "financial.jsx"
     },
     {
@@ -3573,7 +3663,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Financial.jsx",
       "source_location": "L16",
       "id": "financial_financial",
-      "community": 70,
+      "community": 71,
       "norm_label": "financial()"
     },
     {
@@ -3645,7 +3735,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\LandingPage.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_landingpage_jsx",
-      "community": 33,
+      "community": 34,
       "norm_label": "landingpage.jsx"
     },
     {
@@ -3654,7 +3744,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\LandingPage.jsx",
       "source_location": "L17",
       "id": "landingpage_scrollprogressbar",
-      "community": 33,
+      "community": 34,
       "norm_label": "scrollprogressbar()"
     },
     {
@@ -3663,7 +3753,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\LandingPage.jsx",
       "source_location": "L28",
       "id": "landingpage_landingpage",
-      "community": 33,
+      "community": 34,
       "norm_label": "landingpage()"
     },
     {
@@ -3672,7 +3762,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Login.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_login_jsx",
-      "community": 2,
+      "community": 4,
       "norm_label": "login.jsx"
     },
     {
@@ -3681,7 +3771,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Login.jsx",
       "source_location": "L12",
       "id": "login_loginpage",
-      "community": 2,
+      "community": 4,
       "norm_label": "loginpage()"
     },
     {
@@ -3690,7 +3780,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\MySubscription.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_mysubscription_jsx",
-      "community": 5,
+      "community": 4,
       "norm_label": "mysubscription.jsx"
     },
     {
@@ -3699,7 +3789,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\MySubscription.jsx",
       "source_location": "L16",
       "id": "mysubscription_statuslabel",
-      "community": 5,
+      "community": 4,
       "norm_label": "statuslabel()"
     },
     {
@@ -3708,7 +3798,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\MySubscription.jsx",
       "source_location": "L32",
       "id": "mysubscription_mysubscription",
-      "community": 5,
+      "community": 4,
       "norm_label": "mysubscription()"
     },
     {
@@ -3717,7 +3807,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectDetail.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_projectdetail_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectdetail.jsx"
     },
     {
@@ -3726,7 +3816,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectDetail.jsx",
       "source_location": "L48",
       "id": "projectdetail_projectdetail",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectdetail()"
     },
     {
@@ -3735,7 +3825,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectFinancial.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_projectfinancial_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectfinancial.jsx"
     },
     {
@@ -3744,7 +3834,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectFinancial.jsx",
       "source_location": "L13",
       "id": "projectfinancial_projectfinancial",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectfinancial()"
     },
     {
@@ -3753,7 +3843,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectReports.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_projectreports_jsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectreports.jsx"
     },
     {
@@ -3762,7 +3852,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectReports.jsx",
       "source_location": "L13",
       "id": "projectreports_projectreports",
-      "community": 4,
+      "community": 2,
       "norm_label": "projectreports()"
     },
     {
@@ -3771,7 +3861,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Projects.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_projects_jsx",
-      "community": 3,
+      "community": 6,
       "norm_label": "projects.jsx"
     },
     {
@@ -3780,7 +3870,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Projects.jsx",
       "source_location": "L21",
       "id": "projects_projects",
-      "community": 3,
+      "community": 6,
       "norm_label": "projects()"
     },
     {
@@ -3789,7 +3879,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectsKanban.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_projectskanban_jsx",
-      "community": 71,
+      "community": 72,
       "norm_label": "projectskanban.jsx"
     },
     {
@@ -3798,7 +3888,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ProjectsKanban.jsx",
       "source_location": "L8",
       "id": "projectskanban_projectskanban",
-      "community": 71,
+      "community": 72,
       "norm_label": "projectskanban()"
     },
     {
@@ -3807,7 +3897,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Reports.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_reports_jsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "reports.jsx"
     },
     {
@@ -3816,7 +3906,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Reports.jsx",
       "source_location": "L15",
       "id": "reports_reports",
-      "community": 6,
+      "community": 7,
       "norm_label": "reports()"
     },
     {
@@ -3825,7 +3915,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\SaasAdmin.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_saasadmin_jsx",
-      "community": 2,
+      "community": 4,
       "norm_label": "saasadmin.jsx"
     },
     {
@@ -3834,7 +3924,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\SaasAdmin.jsx",
       "source_location": "L36",
       "id": "saasadmin_saasadmin",
-      "community": 2,
+      "community": 4,
       "norm_label": "saasadmin()"
     },
     {
@@ -3843,7 +3933,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ServiceAreas.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_serviceareas_jsx",
-      "community": 72,
+      "community": 73,
       "norm_label": "serviceareas.jsx"
     },
     {
@@ -3852,7 +3942,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\ServiceAreas.jsx",
       "source_location": "L9",
       "id": "serviceareas_serviceareas",
-      "community": 72,
+      "community": 73,
       "norm_label": "serviceareas()"
     },
     {
@@ -3861,7 +3951,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Services.jsx",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_pages_services_jsx",
-      "community": 73,
+      "community": 74,
       "norm_label": "services.jsx"
     },
     {
@@ -3870,7 +3960,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\pages\\Services.jsx",
       "source_location": "L20",
       "id": "services_services",
-      "community": 73,
+      "community": 74,
       "norm_label": "services()"
     },
     {
@@ -3897,7 +3987,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\types\\database.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_types_database_ts",
-      "community": 113,
+      "community": 114,
       "norm_label": "database.ts"
     },
     {
@@ -3906,7 +3996,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\utils\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_src_utils_index_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "index.ts"
     },
     {
@@ -3915,7 +4005,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\utils\\index.ts",
       "source_location": "L1",
       "id": "index_createpageurl",
-      "community": 4,
+      "community": 2,
       "norm_label": "createpageurl()"
     },
     {
@@ -3924,7 +4014,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\utils\\index.ts",
       "source_location": "L6",
       "id": "index_createhourlyratesviabilityurl",
-      "community": 4,
+      "community": 2,
       "norm_label": "createhourlyratesviabilityurl()"
     },
     {
@@ -3933,7 +4023,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_ai_chat_index_ts",
-      "community": 13,
+      "community": 12,
       "norm_label": "index.ts"
     },
     {
@@ -3942,7 +4032,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L77",
       "id": "index_escapeilike",
-      "community": 13,
+      "community": 12,
       "norm_label": "escapeilike()"
     },
     {
@@ -3951,7 +4041,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L81",
       "id": "index_todayiso",
-      "community": 13,
+      "community": 12,
       "norm_label": "todayiso()"
     },
     {
@@ -3960,7 +4050,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L85",
       "id": "index_startofmonthiso",
-      "community": 13,
+      "community": 12,
       "norm_label": "startofmonthiso()"
     },
     {
@@ -3969,7 +4059,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L92",
       "id": "index_clamplimit",
-      "community": 13,
+      "community": 12,
       "norm_label": "clamplimit()"
     },
     {
@@ -3978,7 +4068,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L98",
       "id": "index_normalizestring",
-      "community": 13,
+      "community": 12,
       "norm_label": "normalizestring()"
     },
     {
@@ -3987,7 +4077,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L104",
       "id": "index_assertid",
-      "community": 13,
+      "community": 12,
       "norm_label": "assertid()"
     },
     {
@@ -3996,7 +4086,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L111",
       "id": "index_assertisodate",
-      "community": 13,
+      "community": 12,
       "norm_label": "assertisodate()"
     },
     {
@@ -4005,7 +4095,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L118",
       "id": "index_pickenum",
-      "community": 13,
+      "community": 12,
       "norm_label": "pickenum()"
     },
     {
@@ -4014,7 +4104,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L127",
       "id": "index_resolvelanguagemodel",
-      "community": 13,
+      "community": 12,
       "norm_label": "resolvelanguagemodel()"
     },
     {
@@ -4023,7 +4113,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-chat\\index.ts",
       "source_location": "L159",
       "id": "index_buildtools",
-      "community": 13,
+      "community": 12,
       "norm_label": "buildtools()"
     },
     {
@@ -4032,7 +4122,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_ai_project_draft_index_ts",
-      "community": 15,
+      "community": 16,
       "norm_label": "index.ts"
     },
     {
@@ -4041,7 +4131,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L24",
       "id": "index_mimefrompath",
-      "community": 15,
+      "community": 16,
       "norm_label": "mimefrompath()"
     },
     {
@@ -4050,7 +4140,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L35",
       "id": "index_bytestobase64",
-      "community": 15,
+      "community": 16,
       "norm_label": "bytestobase64()"
     },
     {
@@ -4059,7 +4149,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L44",
       "id": "index_defaulttemplatefallback",
-      "community": 15,
+      "community": 16,
       "norm_label": "defaulttemplatefallback()"
     },
     {
@@ -4068,7 +4158,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L55",
       "id": "index_buildjsonprompt",
-      "community": 15,
+      "community": 16,
       "norm_label": "buildjsonprompt()"
     },
     {
@@ -4077,7 +4167,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L94",
       "id": "index_geminigeneratejson",
-      "community": 15,
+      "community": 16,
       "norm_label": "geminigeneratejson()"
     },
     {
@@ -4086,7 +4176,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\ai-project-draft\\index.ts",
       "source_location": "L154",
       "id": "index_normalizepayload",
-      "community": 15,
+      "community": 16,
       "norm_label": "normalizepayload()"
     },
     {
@@ -4095,7 +4185,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\billing-create-checkout-session\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_billing_create_checkout_session_index_ts",
-      "community": 16,
+      "community": 17,
       "norm_label": "index.ts"
     },
     {
@@ -4104,7 +4194,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\stripe-webhook\\index.ts",
       "source_location": "L4",
       "id": "index_requiredenv",
-      "community": 16,
+      "community": 17,
       "norm_label": "requiredenv()"
     },
     {
@@ -4113,7 +4203,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\billing-create-portal-session\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_billing_create_portal_session_index_ts",
-      "community": 16,
+      "community": 17,
       "norm_label": "index.ts"
     },
     {
@@ -4122,7 +4212,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_googledistancekm_index_ts",
-      "community": 14,
+      "community": 13,
       "norm_label": "index.ts"
     },
     {
@@ -4131,7 +4221,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L13",
       "id": "index_normalizecepdigits",
-      "community": 14,
+      "community": 13,
       "norm_label": "normalizecepdigits()"
     },
     {
@@ -4140,7 +4230,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L17",
       "id": "index_ceptoquery",
-      "community": 14,
+      "community": 13,
       "norm_label": "ceptoquery()"
     },
     {
@@ -4149,7 +4239,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L32",
       "id": "index_extractcityuf",
-      "community": 14,
+      "community": 13,
       "norm_label": "extractcityuf()"
     },
     {
@@ -4158,7 +4248,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L57",
       "id": "index_placefromgeocodejson",
-      "community": 14,
+      "community": 13,
       "norm_label": "placefromgeocodejson()"
     },
     {
@@ -4167,7 +4257,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L79",
       "id": "index_haversinekm",
-      "community": 14,
+      "community": 13,
       "norm_label": "haversinekm()"
     },
     {
@@ -4176,7 +4266,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L91",
       "id": "index_isrouteunavailableerror",
-      "community": 14,
+      "community": 13,
       "norm_label": "isrouteunavailableerror()"
     },
     {
@@ -4185,7 +4275,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L99",
       "id": "index_fetchdistancematrixmeters",
-      "community": 14,
+      "community": 13,
       "norm_label": "fetchdistancematrixmeters()"
     },
     {
@@ -4194,7 +4284,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L147",
       "id": "index_geocodebrazilcepplace",
-      "community": 14,
+      "community": 13,
       "norm_label": "geocodebrazilcepplace()"
     },
     {
@@ -4203,7 +4293,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L184",
       "id": "index_coordpair",
-      "community": 14,
+      "community": 13,
       "norm_label": "coordpair()"
     },
     {
@@ -4212,7 +4302,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\googleDistanceKm\\index.ts",
       "source_location": "L188",
       "id": "index_localityjson",
-      "community": 14,
+      "community": 13,
       "norm_label": "localityjson()"
     },
     {
@@ -4221,7 +4311,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\parseViabilityPdf\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_parseviabilitypdf_index_ts",
-      "community": 20,
+      "community": 21,
       "norm_label": "index.ts"
     },
     {
@@ -4230,7 +4320,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\parseViabilityPdf\\index.ts",
       "source_location": "L23",
       "id": "index_normalizetext",
-      "community": 20,
+      "community": 21,
       "norm_label": "normalizetext()"
     },
     {
@@ -4239,7 +4329,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\parseViabilityPdf\\index.ts",
       "source_location": "L32",
       "id": "index_parsecurrencybr",
-      "community": 20,
+      "community": 21,
       "norm_label": "parsecurrencybr()"
     },
     {
@@ -4248,7 +4338,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\parseViabilityPdf\\index.ts",
       "source_location": "L39",
       "id": "index_parsehours",
-      "community": 20,
+      "community": 21,
       "norm_label": "parsehours()"
     },
     {
@@ -4257,7 +4347,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\parseViabilityPdf\\index.ts",
       "source_location": "L46",
       "id": "index_extractviabilitydata",
-      "community": 20,
+      "community": 21,
       "norm_label": "extractviabilitydata()"
     },
     {
@@ -4266,7 +4356,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\saas-invite-tenant-admin\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_saas_invite_tenant_admin_index_ts",
-      "community": 114,
+      "community": 115,
       "norm_label": "index.ts"
     },
     {
@@ -4275,7 +4365,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\stripe-webhook\\index.ts",
       "source_location": "L1",
       "id": "c_users_user_cursor_gestao_agil_supabase_functions_stripe_webhook_index_ts",
-      "community": 16,
+      "community": 17,
       "norm_label": "index.ts"
     },
     {
@@ -4284,7 +4374,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\stripe-webhook\\index.ts",
       "source_location": "L21",
       "id": "index_mapstatustoreadonlyreason",
-      "community": 16,
+      "community": 17,
       "norm_label": "mapstatustoreadonlyreason()"
     },
     {
@@ -4293,7 +4383,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\stripe-webhook\\index.ts",
       "source_location": "L27",
       "id": "index_extractplannickname",
-      "community": 16,
+      "community": 17,
       "norm_label": "extractplannickname()"
     },
     {
@@ -4302,7 +4392,7 @@
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\supabase\\functions\\stripe-webhook\\index.ts",
       "source_location": "L53",
       "id": "index_upsertorganizationbycustomer",
-      "community": 16,
+      "community": 17,
       "norm_label": "upsertorganizationbycustomer()"
     }
   ],
@@ -5571,7 +5661,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L53",
+      "source_location": "L58",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_forms_projectform_jsx",
       "_tgt": "projectform_normalizemultiline",
@@ -5583,7 +5673,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L57",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_forms_projectform_jsx",
       "_tgt": "projectform_produtofinalforpersistence",
@@ -5595,7 +5685,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L64",
+      "source_location": "L69",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_forms_projectform_jsx",
       "_tgt": "projectform_richtextarea",
@@ -5607,7 +5697,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L134",
+      "source_location": "L139",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_forms_projectform_jsx",
       "_tgt": "projectform_generateschedulerows",
@@ -5619,7 +5709,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L216",
+      "source_location": "L229",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_forms_projectform_jsx",
       "_tgt": "projectform_projectform",
@@ -5631,13 +5721,25 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
-      "source_location": "L58",
+      "source_location": "L63",
       "weight": 1.0,
       "_src": "projectform_produtofinalforpersistence",
       "_tgt": "projectform_normalizemultiline",
       "source": "projectform_normalizemultiline",
       "target": "projectform_produtofinalforpersistence",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\forms\\ProjectForm.jsx",
+      "source_location": "L173",
+      "weight": 1.0,
+      "_src": "projectform_generateschedulerows",
+      "_tgt": "schedulehours_applyrandomhourstoworkslots",
+      "source": "projectform_generateschedulerows",
+      "target": "schedulehours_applyrandomhourstoworkslots"
     },
     {
       "relation": "calls",
@@ -5907,7 +6009,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_numbertowordsinteger",
@@ -5919,7 +6021,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_numbertowordscurrency",
@@ -5931,7 +6033,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L104",
+      "source_location": "L105",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_drawjustifiedtext",
@@ -5943,7 +6045,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L120",
+      "source_location": "L121",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_styletopdffont",
@@ -5955,7 +6057,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L127",
+      "source_location": "L128",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_parserichruns",
@@ -5967,7 +6069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L163",
+      "source_location": "L164",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_measuretext",
@@ -5979,7 +6081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L169",
+      "source_location": "L170",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_wraprichruns",
@@ -5991,7 +6093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L200",
+      "source_location": "L201",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_drawrichline",
@@ -6003,7 +6105,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L213",
+      "source_location": "L214",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_drawjustifiedbox",
@@ -6015,7 +6117,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L240",
+      "source_location": "L241",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_buildschedulerows",
@@ -6027,7 +6129,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L319",
+      "source_location": "L331",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_getmonthlabel",
@@ -6039,7 +6141,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L328",
+      "source_location": "L340",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_consultingproposal_jsx",
       "_tgt": "consultingproposal_downloadconsultingproposal",
@@ -6051,7 +6153,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L653",
+      "source_location": "L665",
       "weight": 1.0,
       "_src": "consultingproposal_downloadconsultingproposal",
       "_tgt": "consultingproposal_numbertowordsinteger",
@@ -6063,7 +6165,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L887",
+      "source_location": "L899",
       "weight": 1.0,
       "_src": "consultingproposal_downloadconsultingproposal",
       "_tgt": "consultingproposal_numbertowordscurrency",
@@ -6075,7 +6177,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L234",
+      "source_location": "L235",
       "weight": 1.0,
       "_src": "consultingproposal_drawjustifiedbox",
       "_tgt": "consultingproposal_drawjustifiedtext",
@@ -6087,7 +6189,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L165",
+      "source_location": "L166",
       "weight": 1.0,
       "_src": "consultingproposal_measuretext",
       "_tgt": "consultingproposal_styletopdffont",
@@ -6099,7 +6201,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L205",
+      "source_location": "L206",
       "weight": 1.0,
       "_src": "consultingproposal_drawrichline",
       "_tgt": "consultingproposal_styletopdffont",
@@ -6111,7 +6213,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L187",
+      "source_location": "L188",
       "weight": 1.0,
       "_src": "consultingproposal_wraprichruns",
       "_tgt": "consultingproposal_measuretext",
@@ -6123,7 +6225,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
-      "source_location": "L642",
+      "source_location": "L654",
       "weight": 1.0,
       "_src": "consultingproposal_downloadconsultingproposal",
       "_tgt": "consultingproposal_buildschedulerows",
@@ -6142,6 +6244,18 @@
       "_tgt": "scheduledates_isholiday",
       "source": "consultingproposal_buildschedulerows",
       "target": "scheduledates_isholiday"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ConsultingProposal.jsx",
+      "source_location": "L314",
+      "weight": 1.0,
+      "_src": "consultingproposal_buildschedulerows",
+      "_tgt": "schedulehours_applyrandomhourstoworkslots",
+      "source": "consultingproposal_buildschedulerows",
+      "target": "schedulehours_applyrandomhourstoworkslots"
     },
     {
       "relation": "calls",
@@ -6231,7 +6345,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L23",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
       "_tgt": "scheduletab_computeautoskipdates",
@@ -6243,7 +6357,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L60",
+      "source_location": "L64",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
       "_tgt": "scheduletab_scheduleconfigmodal",
@@ -6255,7 +6369,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L208",
+      "source_location": "L215",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
       "_tgt": "scheduletab_phasecard",
@@ -6267,7 +6381,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L302",
+      "source_location": "L309",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
       "_tgt": "scheduletab_checkconsultantconflicts",
@@ -6279,7 +6393,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\components\\project\\ScheduleTab.jsx",
-      "source_location": "L356",
+      "source_location": "L363",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_components_project_scheduletab_jsx",
       "_tgt": "scheduletab_scheduletab",
@@ -8391,7 +8505,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
-      "source_location": "L142",
+      "source_location": "L152",
       "weight": 1.0,
       "_src": "c_users_user_cursor_gestao_agil_src_lib_scheduledates_js",
       "_tgt": "scheduledates_estimatescheduleenddate",
@@ -8487,7 +8601,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
-      "source_location": "L126",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "scheduledates_generatescheduledates",
       "_tgt": "scheduledates_assignworkdates",
@@ -8499,12 +8613,228 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleDates.js",
-      "source_location": "L148",
+      "source_location": "L158",
       "weight": 1.0,
       "_src": "scheduledates_estimatescheduleenddate",
       "_tgt": "scheduledates_assignworkdates",
       "source": "scheduledates_assignworkdates",
       "target": "scheduledates_estimatescheduleenddate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_patternsignature",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_patternsignature",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_averagehoursperday",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_averagehoursperday",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_distributerandomintegerhours",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_distributerandomintegerhours",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_builduniquedailyhours",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_builduniquedailyhours",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L111",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_collectusedpatternsfromprojects",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_collectusedpatternsfromprojects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_collectusedpatternsfromschedules",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_collectusedpatternsfromschedules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_collectusedpatternsforconsultant",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_collectusedpatternsforconsultant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L184",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_builddailyhoursforestimatedproject",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_builddailyhoursforestimatedproject",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L209",
+      "weight": 1.0,
+      "_src": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "_tgt": "schedulehours_applyrandomhourstoworkslots",
+      "source": "c_users_user_cursor_gestao_agil_src_lib_schedulehours_js",
+      "target": "schedulehours_applyrandomhourstoworkslots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L95",
+      "weight": 1.0,
+      "_src": "schedulehours_builduniquedailyhours",
+      "_tgt": "schedulehours_patternsignature",
+      "source": "schedulehours_patternsignature",
+      "target": "schedulehours_builduniquedailyhours",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "schedulehours_collectusedpatternsfromprojects",
+      "_tgt": "schedulehours_patternsignature",
+      "source": "schedulehours_patternsignature",
+      "target": "schedulehours_collectusedpatternsfromprojects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L153",
+      "weight": 1.0,
+      "_src": "schedulehours_collectusedpatternsfromschedules",
+      "_tgt": "schedulehours_patternsignature",
+      "source": "schedulehours_patternsignature",
+      "target": "schedulehours_collectusedpatternsfromschedules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_src": "schedulehours_builduniquedailyhours",
+      "_tgt": "schedulehours_distributerandomintegerhours",
+      "source": "schedulehours_distributerandomintegerhours",
+      "target": "schedulehours_builduniquedailyhours",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L201",
+      "weight": 1.0,
+      "_src": "schedulehours_builddailyhoursforestimatedproject",
+      "_tgt": "schedulehours_builduniquedailyhours",
+      "source": "schedulehours_builduniquedailyhours",
+      "target": "schedulehours_builddailyhoursforestimatedproject",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L220",
+      "weight": 1.0,
+      "_src": "schedulehours_applyrandomhourstoworkslots",
+      "_tgt": "schedulehours_builduniquedailyhours",
+      "source": "schedulehours_builduniquedailyhours",
+      "target": "schedulehours_applyrandomhourstoworkslots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L173",
+      "weight": 1.0,
+      "_src": "schedulehours_collectusedpatternsforconsultant",
+      "_tgt": "schedulehours_collectusedpatternsfromprojects",
+      "source": "schedulehours_collectusedpatternsfromprojects",
+      "target": "schedulehours_collectusedpatternsforconsultant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L176",
+      "weight": 1.0,
+      "_src": "schedulehours_collectusedpatternsforconsultant",
+      "_tgt": "schedulehours_collectusedpatternsfromschedules",
+      "source": "schedulehours_collectusedpatternsfromschedules",
+      "target": "schedulehours_collectusedpatternsforconsultant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\user\\Cursor\\gestao-agil\\src\\lib\\scheduleHours.js",
+      "source_location": "L195",
+      "weight": 1.0,
+      "_src": "schedulehours_builddailyhoursforestimatedproject",
+      "_tgt": "schedulehours_collectusedpatternsforconsultant",
+      "source": "schedulehours_collectusedpatternsforconsultant",
+      "target": "schedulehours_builddailyhoursforestimatedproject",
       "confidence_score": 1.0
     },
     {

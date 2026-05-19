@@ -12,6 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import ConsultantConflictModal from './ConsultantConflictModal';
 import { generateScheduleDates, estimateScheduleEndDate, isHoliday } from '@/lib/scheduleDates';
+import {
+  averageHoursPerDay,
+  buildDailyHoursForEstimatedProject,
+} from '@/lib/scheduleHours';
 
 const statusConfig = {
   scheduled: { label: 'Agendada', color: 'bg-blue-100 text-blue-700' },
@@ -134,9 +138,12 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
               className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="Ex: 40" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Horas por dia *</label>
-            <input type="number" name="hours_per_day" step="0.5" min="0.5" max="24" value={config.hours_per_day} onChange={handleChange}
+            <label className="block text-sm font-medium text-slate-700 mb-1">Horas por dia (referência) *</label>
+            <input type="number" name="hours_per_day" step="1" min="1" max="24" value={config.hours_per_day} onChange={handleChange}
               className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="Ex: 4" />
+            <p className="text-xs text-slate-500 mt-1">
+              Usado para calcular o número de dias; as horas de cada fase serão distribuídas automaticamente em valores inteiros.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -424,12 +431,17 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
     }
 
     const startDate = finalDates[0]?.date || config.start_date;
+    const workHoursList = workDates.map((d) => parseFloat(d.hours) || 0);
+    const avgHoursPerDay =
+      workHoursList.length > 0
+        ? averageHoursPerDay(workHoursList)
+        : parseFloat(config.hours_per_day) || 0;
 
     // Save config + end_date back to project (do NOT overwrite schedule_config — managed by ProjectForm)
     await api.entities.Project.update(projectId, {
       start_date: startDate || config.start_date,
       estimated_hours: parseFloat(config.estimated_hours) || 0,
-      hours_per_day: parseFloat(config.hours_per_day) || 0,
+      hours_per_day: avgHoursPerDay,
       consider_sundays: config.consider_sundays,
       consider_holidays: config.consider_holidays,
       days_off: parseInt(config.days_off) || 0,
@@ -465,23 +477,33 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
     }
 
     const skipDates = new Set(offDates);
-    // Gerar TODAS as fases de trabalho, pulando os dias de folga
-    const workDates = generateScheduleDates(config, skipDates);
+    const dailyHours = await buildDailyHoursForEstimatedProject(
+      config,
+      consultantId,
+      projectId,
+      api,
+    );
+    const workDates = generateScheduleDates(config, skipDates, dailyHours);
     if (workDates.length === 0) {
       alert('Configurações insuficientes para gerar agenda.');
       return;
     }
+
+    const configWithAvg = {
+      ...config,
+      hours_per_day: averageHoursPerDay(workDates.map((d) => d.hours)) || config.hours_per_day,
+    };
 
     const offEntries = offDates.map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
     const finalDates = [...workDates, ...offEntries].sort((a, b) => a.date.localeCompare(b.date));
 
     const result = await checkConsultantConflicts(consultantId, workDates, projectId);
     if (result.hasConflicts) {
-      setPendingConfig({ dates: finalDates, config });
+      setPendingConfig({ dates: finalDates, config: configWithAvg });
       setConflictInfo(result);
       return;
     }
-    await applySchedule(finalDates, config);
+    await applySchedule(finalDates, configWithAvg);
   };
 
   const handleGenerateNew = async () => {
@@ -570,20 +592,31 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
 
       // Fallback: gerar datas automaticamente, respeitando dias de folga do projeto
       const autoSkipDates = computeAutoSkipDates(project);
-      const dates = generateScheduleDates(project, autoSkipDates);
+      const dailyHours = await buildDailyHoursForEstimatedProject(
+        project,
+        consultantId,
+        projectId,
+        api,
+      );
+      const dates = generateScheduleDates(project, autoSkipDates, dailyHours);
       if (dates.length === 0) {
         setConfigModalOpen(true);
         return;
       }
+      const projectWithAvg = {
+        ...project,
+        hours_per_day:
+          averageHoursPerDay(dates.map((d) => d.hours)) || project.hours_per_day,
+      };
       const offEntries = [...autoSkipDates].map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
       const allDates = [...dates, ...offEntries].sort((a, b) => a.date.localeCompare(b.date));
       const result = await checkConsultantConflicts(consultantId, dates, projectId);
       if (result.hasConflicts) {
-        setPendingConfig({ dates: allDates, config: project });
+        setPendingConfig({ dates: allDates, config: projectWithAvg });
         setConflictInfo(result);
         return;
       }
-      await applySchedule(allDates, project);
+      await applySchedule(allDates, projectWithAvg);
     } else {
       // Regenerating: open config modal
       setConfigModalOpen(true);
@@ -647,12 +680,23 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
 
     // Fallback: gerar datas automaticamente, respeitando dias de folga
     const autoSkip = computeAutoSkipDates(newConfig);
-    const newWorkDates = generateScheduleDates(newConfig, autoSkip);
+    const dailyHours = await buildDailyHoursForEstimatedProject(
+      newConfig,
+      consultantId,
+      projectId,
+      api,
+    );
+    const newWorkDates = generateScheduleDates(newConfig, autoSkip, dailyHours);
+    const newConfigWithAvg = {
+      ...newConfig,
+      hours_per_day:
+        averageHoursPerDay(newWorkDates.map((d) => d.hours)) || newConfig.hours_per_day,
+    };
     const newOffEntries = [...autoSkip].map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
     const newFinalDates = [...newWorkDates, ...newOffEntries].sort((a, b) => a.date.localeCompare(b.date));
     setConflictInfo(null);
     setPendingConfig(null);
-    await applySchedule(newFinalDates, newConfig);
+    await applySchedule(newFinalDates, newConfigWithAvg);
   };
 
   const handleComplete = async (session) => {

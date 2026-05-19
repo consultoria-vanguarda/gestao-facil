@@ -5,6 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
 import { APP_LOGO_URL } from '@/lib/branding';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import { applyRandomHoursToWorkSlots } from '@/lib/scheduleHours';
 
 const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
@@ -291,26 +292,37 @@ function buildScheduleRows(project) {
   let current = new Date(startDate + 'T12:00:00');
   while (current.getDay() === 0 || isHoliday(current)) current = nextWorkDay(current);
 
-  for (const act of activities) {
-    const numDays = act.days ? Math.max(1, parseInt(act.days)) : Math.ceil((parseFloat(act.hours) || 0) / hoursPerDay);
-    const totalHrs = parseFloat(act.hours) || hoursPerDay;
-
-    const totalInt = Math.round(totalHrs);
-    const baseH = Math.floor(totalInt / numDays);
-    const extraDays = totalInt % numDays;
-
+  const slots = [];
+  activities.forEach((act) => {
+    const numDays = act.days
+      ? Math.max(1, parseInt(act.days, 10))
+      : Math.ceil((parseFloat(act.hours) || 0) / hoursPerDay);
     for (let d = 0; d < numDays; d++) {
-      const hours = baseH + (d < extraDays ? 1 : 0);
-      rows.push({
+      slots.push({
         activity: act.description || '',
         delivery: act.delivery || '',
         modality: act.modality || '',
-        date: format(current, 'dd/MM/yyyy'),
-        dateObj: new Date(current),
-        hours: hours,
+        hours: 0,
       });
-      current = nextWorkDay(current);
     }
+  });
+
+  const totalHours =
+    Math.round(parseFloat(project.estimated_hours) || 0) ||
+    Math.round(activities.reduce((sum, a) => sum + (parseFloat(a.hours) || 0), 0));
+
+  const slotsWithHours = applyRandomHoursToWorkSlots(slots, totalHours, new Set());
+
+  for (const slot of slotsWithHours) {
+    rows.push({
+      activity: slot.activity,
+      delivery: slot.delivery,
+      modality: slot.modality,
+      date: format(current, 'dd/MM/yyyy'),
+      dateObj: new Date(current),
+      hours: slot.hours,
+    });
+    current = nextWorkDay(current);
   }
   return rows;
 }

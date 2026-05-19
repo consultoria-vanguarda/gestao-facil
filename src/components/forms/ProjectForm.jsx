@@ -17,6 +17,11 @@ import MoneyInput from "@/components/ui/MoneyInput";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { parseMoneyBRToNumber, validateISODate, validatePhone } from "@/lib/validators";
 import { assignWorkDates, isHoliday } from "@/lib/scheduleDates";
+import {
+  applyRandomHoursToWorkSlots,
+  averageHoursPerDay,
+  collectUsedPatternsForConsultant,
+} from "@/lib/scheduleHours";
 
 const TYPE_LABELS = {
   diagnostic: 'Diagnóstico',
@@ -131,7 +136,7 @@ function RichTextArea({ name, value, onChange, rows = 4, style, placeholder, inp
 }
 
 // skipDates: Set of yyyy-MM-dd dates to skip (explicit off days)
-function generateScheduleRows(formData, activities, skipDates = new Set()) {
+function generateScheduleRows(formData, activities, skipDates = new Set(), usedPatterns = new Set()) {
   const {
     start_date,
     hours_per_day,
@@ -140,32 +145,40 @@ function generateScheduleRows(formData, activities, skipDates = new Set()) {
     days_off,
     days_off_position,
     max_work_days_per_week,
+    estimated_hours,
   } = formData;
   if (!start_date || !hours_per_day || activities.length === 0) return [];
 
   const hpd = parseFloat(hours_per_day) || 4;
   const daysOffCount = parseInt(days_off) || 0;
 
-  // Flatten activities into day slots with correct hour distribution
+  // Flatten activities into day slots (quantidade de dias fixa por atividade)
   const activityDays = [];
   activities.forEach((act) => {
     const numDays = act.days ? Math.max(1, parseInt(act.days)) : Math.ceil((parseFloat(act.hours) || 0) / hpd);
-    const totalHrs = parseFloat(act.hours) || hpd;
-    const totalInt = Math.round(totalHrs);
-    const baseH = Math.floor(totalInt / numDays);
-    const extraDays = totalInt % numDays;
     for (let d = 0; d < numDays; d++) {
       activityDays.push({
         activity: act.description,
-        hours: baseH + (d < extraDays ? 1 : 0),
+        hours: 0,
         modality: act.modality || '',
         delivery: act.delivery || '',
       });
     }
   });
 
+  const totalHours =
+    Math.round(parseFloat(estimated_hours) || 0) ||
+    Math.round(activities.reduce((sum, a) => sum + (parseFloat(a.hours) || 0), 0));
+
+  const workSlotsWithHours = applyRandomHoursToWorkSlots(
+    activityDays,
+    totalHours,
+    usedPatterns,
+  );
+  const activityDaysWithHours = workSlotsWithHours;
+
   // Only insert positional off-day slots when NOT using explicit skipDates
-  let slots = [...activityDays];
+  let slots = [...activityDaysWithHours];
   if (daysOffCount > 0 && skipDates.size === 0) {
     const offSlot = { activity: 'FOLGA', hours: 0, isDayOff: true };
     const offSlots = Array(daysOffCount).fill(null).map(() => ({ ...offSlot }));
@@ -235,6 +248,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   // Days-off confirmation state
   const [daysOffProposal, setDaysOffProposal] = useState(null); // array of { date: 'dd/MM/yyyy' } or null
   const [daysOffConfirmed, setDaysOffConfirmed] = useState(false);
+  const [consultantUsedPatterns, setConsultantUsedPatterns] = useState(new Set());
 
   // Public Policies state
   const [ppArea, setPpArea] = useState('');
@@ -314,6 +328,26 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     }
   }, [open, project]);
 
+  // Padrões de horas já usados por outros projetos do consultor
+  useEffect(() => {
+    if (!open || !formData.consultant_id) {
+      setConsultantUsedPatterns(new Set());
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const patterns = await collectUsedPatternsForConsultant(
+        formData.consultant_id,
+        project?.id,
+        api,
+      );
+      if (!cancelled) setConsultantUsedPatterns(patterns);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, formData.consultant_id, project?.id]);
+
   // Recalculate schedule when relevant fields change
   useEffect(() => {
     if (formData.project_type === 'consulting' && formData.activities.length > 0) {
@@ -328,7 +362,14 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
           setScheduleRows(formData.schedule_config);
         } else if (!daysOffConfirmed) {
           // Auto-gerar o cronograma somente se folgas não foram confirmadas manualmente
-          setScheduleRows(generateScheduleRows(formData, formData.activities));
+          setScheduleRows(
+            generateScheduleRows(
+              formData,
+              formData.activities,
+              new Set(),
+              consultantUsedPatterns,
+            ),
+          );
         }
       }
     }
@@ -336,6 +377,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       formData.consider_holidays, formData.days_off, formData.days_off_position,
       formData.max_work_days_per_week,
       formData.activities, formData.project_type, formData.schedule_config, formData.activity_groups,
+      formData.estimated_hours, consultantUsedPatterns,
       daysOffConfirmed]);
 
   // Auto-calculate estimated hours from activities
@@ -536,7 +578,12 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     const skipDates = new Set(daysOffProposal.map(d => d.date)); // d.date is yyyy-MM-dd
 
     // Regenerate work rows, skipping the off-day dates so all work slots are preserved
-    const workRows = generateScheduleRows({ ...formData, days_off: '0' }, formData.activities, skipDates);
+    const workRows = generateScheduleRows(
+      { ...formData, days_off: '0' },
+      formData.activities,
+      skipDates,
+      consultantUsedPatterns,
+    );
 
     // Merge and sort
     const parseRowDate = (dateStr) => {
@@ -779,6 +826,14 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       }
     }
 
+    const workHoursForAvg = enrichedScheduleConfig
+      .filter((r) => !r.isDayOff)
+      .map((r) => parseFloat(r.hours) || 0);
+    const avgHoursPerDay =
+      workHoursForAvg.length > 0
+        ? averageHoursPerDay(workHoursForAvg)
+        : parseFloat(formData.hours_per_day) || 4;
+
     const dataToSave = {
       name: autoName,
       client_id: formData.client_id,
@@ -797,7 +852,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       activity_groups: formData.activity_groups || {},
       km_rodado: parseFloat(formData.km_rodado) || 0,
       start_date: formData.start_date,
-      hours_per_day: parseFloat(formData.hours_per_day) || 4,
+      hours_per_day: avgHoursPerDay,
       consider_sundays: formData.consider_sundays,
       consider_holidays: formData.consider_holidays,
       days_off: parseInt(formData.days_off) || 0,
@@ -1770,8 +1825,11 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                   <input type="number" name="estimated_hours" value={formData.estimated_hours} onChange={handleChange} style={{ ...inputStyle, backgroundColor: '#f1f5f9' }} readOnly />
                 </div>
                 <div>
-                  <label style={labelStyle}>Horas por Dia</label>
-                  <input type="number" name="hours_per_day" value={formData.hours_per_day} onChange={handleChange} min="0.5" step="0.5" style={inputStyle} />
+                  <label style={labelStyle}>Horas por Dia (referência)</label>
+                  <input type="number" name="hours_per_day" value={formData.hours_per_day} onChange={handleChange} min="1" step="1" style={inputStyle} />
+                  <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                    Define quantos dias de atendimento; as horas de cada fase são distribuídas automaticamente em valores inteiros.
+                  </p>
                 </div>
                 <div>
                   <label style={labelStyle}>Considerar Domingos?</label>

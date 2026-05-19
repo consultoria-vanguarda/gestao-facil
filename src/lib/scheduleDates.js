@@ -114,14 +114,17 @@ export function assignWorkDates({
 }
 
 /** Para projetos com horas estimadas: retorna [{ date, hours }] */
-export function generateScheduleDates(config, skipDates = new Set()) {
+export function generateScheduleDates(config, skipDates = new Set(), dailyHours = null) {
   const { start_date, estimated_hours, hours_per_day, consider_sundays, consider_holidays, max_work_days_per_week } =
     config;
   if (!start_date || !estimated_hours || !hours_per_day) return [];
 
   const hpd = parseFloat(hours_per_day);
   const totalH = parseFloat(estimated_hours);
-  const workDaysNeeded = Math.ceil(totalH / hpd);
+  const workDaysNeeded =
+    Array.isArray(dailyHours) && dailyHours.length > 0
+      ? dailyHours.length
+      : Math.ceil(totalH / hpd);
 
   const workDateStrings = assignWorkDates({
     start_date,
@@ -131,6 +134,13 @@ export function generateScheduleDates(config, skipDates = new Set()) {
     skipDates,
     max_work_days_per_week,
   });
+
+  if (Array.isArray(dailyHours) && dailyHours.length > 0) {
+    return workDateStrings.map((date, index) => ({
+      date,
+      hours: Math.round(Number(dailyHours[index]) || 0),
+    }));
+  }
 
   return workDateStrings.map((date, index) => {
     const hoursThisDay = Math.min(hpd, totalH - index * hpd);
