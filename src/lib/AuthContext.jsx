@@ -13,32 +13,28 @@ import { useTenant } from '@/lib/TenantContext';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { organizationId, isLoadingTenant, tenantError } = useTenant();
+  const { tenantError } = useTenant();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
-  const tenantBootstrappedRef = useRef(false);
   const authenticatedUserIdRef = useRef(null);
+  const authBootstrappedRef = useRef(false);
 
+  // Erro de tenant sem organização: não mantém sessão “fantasma” no layout.
   useEffect(() => {
-    if (isLoadingTenant && !tenantBootstrappedRef.current) {
-      setIsLoadingAuth(true);
-      return;
-    }
-
-    if (!isLoadingTenant) {
-      tenantBootstrappedRef.current = true;
-    }
-
     if (tenantError?.type === 'organization_not_found') {
       setUser(null);
       setIsAuthenticated(false);
       setAuthError(null);
       setIsLoadingAuth(false);
-      return;
+      authBootstrappedRef.current = false;
+      authenticatedUserIdRef.current = null;
     }
+  }, [tenantError?.type]);
 
+  // Listener de auth estável (não remonta quando organizationId muda no TenantContext).
+  useEffect(() => {
     let cancelled = false;
 
     const syncFromSession = async (session, { showGlobalLoader = false } = {}) => {
@@ -47,6 +43,7 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           setIsAuthenticated(false);
           authenticatedUserIdRef.current = null;
+          authBootstrappedRef.current = false;
           setAuthError(null);
           setIsLoadingAuth(false);
         }
@@ -61,6 +58,7 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
         setIsAuthenticated(true);
         authenticatedUserIdRef.current = currentUser?.id ?? session.user?.id ?? null;
+        authBootstrappedRef.current = true;
         setAuthError(null);
       } catch (error) {
         if (cancelled) return;
@@ -72,6 +70,8 @@ export const AuthProvider = ({ children }) => {
         }
         setUser(null);
         setIsAuthenticated(false);
+        authenticatedUserIdRef.current = null;
+        authBootstrappedRef.current = false;
         if (error?.status === 401 || error?.status === 403) {
           setAuthError({
             type: 'auth_required',
@@ -79,42 +79,58 @@ export const AuthProvider = ({ children }) => {
           });
         }
       } finally {
-        // Só desliga o loader global se esta chamada o ligou — evita corridas com SIGNED_IN/USER_UPDATED em paralelo.
-        if (showGlobalLoader && !cancelled) setIsLoadingAuth(false);
+        if (!cancelled) setIsLoadingAuth(false);
       }
     };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      // TOKEN_REFRESHED: renovação ao voltar à aba — não precisa re-sync do perfil nem bloquear o app.
+    const onAuthStateChange = (event, session) => {
       if (event === 'TOKEN_REFRESHED') {
         return;
       }
 
+      const nextUserId = session?.user?.id ?? null;
+
       if (
-        event === 'SIGNED_IN' &&
-        session?.user?.id &&
-        authenticatedUserIdRef.current === session.user.id
+        session &&
+        authBootstrappedRef.current &&
+        authenticatedUserIdRef.current === nextUserId &&
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
       ) {
         return;
       }
 
-      // Apenas a primeira hidratação da sessão pode usar o ecrã de loading do App.
-      // SIGNED_IN volta a disparar em vários browsers ao focar a janela (storage/sync) e não pode
-      // esconder a UI inteira de novo.
-      const showGlobalLoader = event === 'INITIAL_SESSION';
+      if (!session) {
+        void syncFromSession(null);
+        return;
+      }
 
+      const showGlobalLoader =
+        !authBootstrappedRef.current && event === 'INITIAL_SESSION';
       void syncFromSession(session, { showGlobalLoader });
+    };
+
+    void supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      const session = data?.session ?? null;
+      if (session) {
+        void syncFromSession(session, {
+          showGlobalLoader: !authBootstrappedRef.current,
+        });
+      } else {
+        void syncFromSession(null);
+      }
     });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(onAuthStateChange);
 
     return () => {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [isLoadingTenant, organizationId, tenantError?.type]);
+  }, []);
 
-  /** Atualiza o perfil no contexto (ex.: após salvar nome em Configurações) sem ecrã de loading global. */
   const refreshUser = useCallback(async () => {
     try {
       const {
@@ -124,6 +140,8 @@ export const AuthProvider = ({ children }) => {
       const currentUser = await api.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
+      authenticatedUserIdRef.current = currentUser?.id ?? session.user?.id ?? null;
+      authBootstrappedRef.current = true;
       setAuthError(null);
     } catch (e) {
       console.error('refreshUser failed:', e);
@@ -134,6 +152,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setAuthError(null);
+    authBootstrappedRef.current = false;
+    authenticatedUserIdRef.current = null;
 
     if (shouldRedirect) {
       void api.auth.logout().finally(() => {
@@ -149,15 +169,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated,
-      isLoadingAuth,
-      authError,
-      logout,
-      navigateToLogin,
-      refreshUser,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoadingAuth,
+        authError,
+        logout,
+        navigateToLogin,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

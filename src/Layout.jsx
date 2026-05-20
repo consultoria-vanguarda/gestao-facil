@@ -75,7 +75,7 @@ const clientMenuItems = [
 export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [readOnlyDialogOpen, setReadOnlyDialogOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { subscription } = useTenant();
   const location = useLocation();
   const viabilityTabActive =
@@ -269,7 +269,7 @@ export default function Layout({ children, currentPageName }) {
         </div>
       </main>
 
-      {user && <AiAssistant />}
+      {(user || isAuthenticated) && <AiAssistant />}
 
       <Dialog open={readOnlyDialogOpen} onOpenChange={setReadOnlyDialogOpen}>
         <DialogContent>

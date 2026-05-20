@@ -41,14 +41,23 @@ export const TenantProvider = ({ children }) => {
           return;
         }
 
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('organization_id')
-          .eq('id', userId)
-          .maybeSingle();
-        if (profileError) throw profileError;
+        // Perfil pode demorar alguns ms após sign-up (trigger handle_new_auth_user).
+        let orgId = null;
+        const profileAttempts = 4;
+        for (let attempt = 0; attempt < profileAttempts; attempt++) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('id', userId)
+            .maybeSingle();
+          if (profileError) throw profileError;
+          orgId = profile?.organization_id ?? null;
+          if (orgId) break;
+          if (attempt < profileAttempts - 1) {
+            await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+          }
+        }
 
-        const orgId = profile?.organization_id;
         if (!orgId) {
           if (!cancelled) {
             setTenant(null);
