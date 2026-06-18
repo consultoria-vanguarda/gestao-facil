@@ -4,6 +4,8 @@
  * - dias de atendimento não podem ser consecutivos no calendário
  */
 
+import { minDaysForHours, parseMaxHoursPerDay } from '@/lib/scheduleHours';
+
 const HOLIDAYS = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '12-25'];
 
 export function isHoliday(dateStr) {
@@ -115,16 +117,23 @@ export function assignWorkDates({
 
 /** Para projetos com horas estimadas: retorna [{ date, hours }] */
 export function generateScheduleDates(config, skipDates = new Set(), dailyHours = null) {
-  const { start_date, estimated_hours, hours_per_day, consider_sundays, consider_holidays, max_work_days_per_week } =
-    config;
-  if (!start_date || !estimated_hours || !hours_per_day) return [];
+  const {
+    start_date,
+    estimated_hours,
+    max_hours_per_day,
+    hours_per_day,
+    consider_sundays,
+    consider_holidays,
+    max_work_days_per_week,
+  } = config;
+  const maxHpd = parseMaxHoursPerDay(max_hours_per_day ?? hours_per_day, 8);
+  if (!start_date || !estimated_hours || !maxHpd) return [];
 
-  const hpd = parseFloat(hours_per_day);
   const totalH = parseFloat(estimated_hours);
   const workDaysNeeded =
     Array.isArray(dailyHours) && dailyHours.length > 0
       ? dailyHours.length
-      : Math.ceil(totalH / hpd);
+      : minDaysForHours(totalH, maxHpd);
 
   const workDateStrings = assignWorkDates({
     start_date,
@@ -143,18 +152,21 @@ export function generateScheduleDates(config, skipDates = new Set(), dailyHours 
   }
 
   return workDateStrings.map((date, index) => {
-    const hoursThisDay = Math.min(hpd, totalH - index * hpd);
+    const hoursThisDay = Math.min(maxHpd, totalH - index * maxHpd);
     return { date, hours: Math.round(hoursThisDay * 10) / 10 };
   });
 }
 
 /** Previsão de término considerando regras de norma */
 export function estimateScheduleEndDate(config, extraOffDays = 0) {
-  const hpd = parseFloat(config.hours_per_day);
+  const maxHpd = parseMaxHoursPerDay(
+    config.max_hours_per_day ?? config.hours_per_day,
+    8,
+  );
   const totalH = parseFloat(config.estimated_hours);
-  if (!config.start_date || !hpd || !totalH) return null;
+  if (!config.start_date || !maxHpd || !totalH) return null;
 
-  const workDays = Math.ceil(totalH / hpd) + (parseInt(extraOffDays, 10) || 0);
+  const workDays = minDaysForHours(totalH, maxHpd) + (parseInt(extraOffDays, 10) || 0);
   const dates = assignWorkDates({
     start_date: config.start_date,
     count: workDays,

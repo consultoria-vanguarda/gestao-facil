@@ -113,15 +113,16 @@ export default function Consultants() {
     }
 
     // Fallback: calcular as datas de folga com base na posição
-    if (!project.start_date || !project.estimated_hours || !project.hours_per_day) return [`${project.days_off} dia(s)`];
+    if (!project.start_date || !project.estimated_hours) return [`${project.days_off} dia(s)`];
+    if (!project.max_hours_per_day && !project.hours_per_day) return [`${project.days_off} dia(s)`];
 
     const HOLIDAYS_LIST = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','12-25'];
     const isHol = (d) => HOLIDAYS_LIST.includes(d.toISOString().slice(5, 10));
 
-    const hpd = parseFloat(project.hours_per_day);
+    const maxHpd = parseFloat(project.max_hours_per_day ?? project.hours_per_day) || 8;
     const totalH = parseFloat(project.estimated_hours);
     const daysOffCount = parseInt(project.days_off) || 0;
-    const workDaysNeeded = Math.ceil(totalH / hpd);
+    const workDaysNeeded = Math.ceil(totalH / maxHpd);
     const totalSlotsNeeded = workDaysNeeded + daysOffCount;
     const pos = project.days_off_position || 'end';
 

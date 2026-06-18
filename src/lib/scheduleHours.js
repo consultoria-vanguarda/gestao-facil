@@ -3,6 +3,13 @@
  * com unicidade de padrão entre projetos do mesmo consultor.
  */
 
+export class DistributionInfeasibleError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'DistributionInfeasibleError';
+  }
+}
+
 /** Assinatura ordenada das horas por fase (ex.: "3,5,4,6") */
 export function patternSignature(hoursArray) {
   return (hoursArray || []).map((h) => Math.round(Number(h) || 0)).join(',');
@@ -16,8 +23,109 @@ export function averageHoursPerDay(hoursArray) {
   return Math.round(sum / arr.length);
 }
 
+export function parseMaxHoursPerDay(value, fallback = 8) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return Math.max(1, Math.round(Number(fallback) || 8));
+  }
+  return Math.max(1, Math.round(parsed));
+}
+
+export function sumHours(hoursArray) {
+  return (hoursArray || []).reduce(
+    (total, hours) => total + Math.round(Number(hours) || 0),
+    0,
+  );
+}
+
+export function minDaysForHours(totalHours, maxHoursPerDay) {
+  const total = Math.max(0, Math.round(Number(totalHours) || 0));
+  if (total === 0) return 0;
+  const max = parseMaxHoursPerDay(maxHoursPerDay);
+  return Math.ceil(total / max);
+}
+
+export function isDistributionFeasible(totalHours, numDays, maxHoursPerDay, minPerDay = 1) {
+  const total = Math.round(Number(totalHours) || 0);
+  const n = Math.max(0, parseInt(numDays, 10) || 0);
+  if (n === 0) return total === 0;
+
+  const max = parseMaxHoursPerDay(maxHoursPerDay);
+  let min = Math.max(0, minPerDay ?? 1);
+  while (total < n * min && min > 0) {
+    min -= 1;
+  }
+
+  return total <= n * max && total >= n * min;
+}
+
+export function countActivitySlots(activities, maxHoursPerDay) {
+  let total = 0;
+  for (const act of activities || []) {
+    const actHours = parseFloat(act.hours) || 0;
+    const numDays = act.days
+      ? Math.max(1, parseInt(act.days, 10) || 1)
+      : minDaysForHours(actHours, maxHoursPerDay);
+    total += numDays;
+  }
+  return total;
+}
+
+export function validateScheduleDistribution(activities, totalHours, maxHoursPerDay) {
+  const max = parseMaxHoursPerDay(maxHoursPerDay);
+  const fromActivities = (activities || []).reduce(
+    (sum, act) => sum + (parseFloat(act.hours) || 0),
+    0,
+  );
+  const total =
+    Math.round(fromActivities) || Math.round(Number(totalHours) || 0);
+  const totalSlots = countActivitySlots(activities, max);
+  const minDaysRequired = minDaysForHours(total, max);
+
+  const activityErrors = (activities || [])
+    .map((act, idx) => {
+      if (!act.days) return null;
+      const days = Math.max(1, parseInt(act.days, 10) || 1);
+      const actHours = Math.round(parseFloat(act.hours) || 0);
+      const minForAct = minDaysForHours(actHours, max);
+      if (days < minForAct) {
+        return { idx, days, minForAct, actHours };
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  const feasible =
+    activityErrors.length === 0 &&
+    totalSlots >= minDaysRequired &&
+    isDistributionFeasible(total, totalSlots, max);
+
+  let message = null;
+  if (!feasible) {
+    if (activityErrors.length > 0) {
+      const first = activityErrors[0];
+      message =
+        `A atividade ${first.idx + 1} precisa de pelo menos ${first.minForAct} dia(s) para ${first.actHours}h (máximo ${max} h/dia).`;
+    } else if (totalSlots < minDaysRequired) {
+      message = `Com máximo de ${max} h/dia, são necessários pelo menos ${minDaysRequired} dias para ${total} horas (você definiu ${totalSlots}).`;
+    } else {
+      message = `Não é possível distribuir ${total} horas em ${totalSlots} dias com máximo de ${max} h/dia.`;
+    }
+  }
+
+  return {
+    feasible,
+    totalSlots,
+    minDaysRequired,
+    totalHours: total,
+    maxHoursPerDay: max,
+    activityErrors,
+    message,
+  };
+}
+
 /**
- * Distribui totalHours em numDays inteiros (soma exata).
+ * Distribui totalHours em numDays inteiros (soma exata quando viável).
  * @returns {number[]}
  */
 export function distributeRandomIntegerHours(totalHours, numDays, options = {}) {
@@ -27,8 +135,10 @@ export function distributeRandomIntegerHours(totalHours, numDays, options = {}) 
   if (total <= 0) return Array(n).fill(0);
 
   let minPerDay = options.minPerDay ?? 1;
-  let maxPerDay =
-    options.maxPerDay ?? Math.max(8, Math.ceil(total / n) + 2);
+  const maxPerDay =
+    options.maxPerDay != null
+      ? parseMaxHoursPerDay(options.maxPerDay)
+      : Math.max(8, Math.ceil(total / n) + 2);
 
   while (total < n * minPerDay && minPerDay > 0) {
     minPerDay -= 1;
@@ -43,32 +153,49 @@ export function distributeRandomIntegerHours(totalHours, numDays, options = {}) 
       hours[i] = 1;
       rem -= 1;
     }
+    if (sumHours(hours) !== total) {
+      throw new DistributionInfeasibleError(
+        `Não é possível distribuir ${total} horas em ${n} dias.`,
+      );
+    }
     return hours;
+  }
+
+  if (!isDistributionFeasible(total, n, maxPerDay, minPerDay)) {
+    throw new DistributionInfeasibleError(
+      `Não é possível distribuir ${total} horas em ${n} dias com máximo de ${maxPerDay} h/dia.`,
+    );
   }
 
   const hours = Array(n).fill(minPerDay);
   let remaining = total - n * minPerDay;
 
-  const maxIterations = Math.max(remaining * n * 20, n * 50);
-  let iterations = 0;
-
-  while (remaining > 0 && iterations < maxIterations) {
-    iterations += 1;
-    const idx = Math.floor(Math.random() * n);
-    if (hours[idx] < maxPerDay) {
-      hours[idx] += 1;
-      remaining -= 1;
+  while (remaining > 0) {
+    const eligible = [];
+    for (let i = 0; i < n; i += 1) {
+      if (hours[i] < maxPerDay) eligible.push(i);
     }
+    if (eligible.length === 0) break;
+
+    const idx = eligible[Math.floor(Math.random() * eligible.length)];
+    hours[idx] += 1;
+    remaining -= 1;
   }
 
   if (remaining > 0) {
-    for (let i = 0; i < n && remaining > 0; i++) {
+    for (let i = 0; i < n && remaining > 0; i += 1) {
       const add = Math.min(maxPerDay - hours[i], remaining);
       if (add > 0) {
         hours[i] += add;
         remaining -= add;
       }
     }
+  }
+
+  if (sumHours(hours) !== total) {
+    throw new DistributionInfeasibleError(
+      `Falha ao distribuir ${total} horas em ${n} dias com máximo de ${maxPerDay} h/dia.`,
+    );
   }
 
   return hours;
@@ -187,9 +314,12 @@ export async function buildDailyHoursForEstimatedProject(
   excludeProjectId,
   api,
 ) {
-  const hpd = parseFloat(config.hours_per_day) || 4;
+  const maxHpd = parseMaxHoursPerDay(
+    config.max_hours_per_day ?? config.hours_per_day,
+    8,
+  );
   const totalH = Math.round(parseFloat(config.estimated_hours) || 0);
-  const numDays = Math.ceil(totalH / hpd) || 0;
+  const numDays = minDaysForHours(totalH, maxHpd);
   if (numDays === 0 || totalH === 0) return [];
 
   const usedPatterns = await collectUsedPatternsForConsultant(
@@ -202,29 +332,55 @@ export async function buildDailyHoursForEstimatedProject(
     totalHours: totalH,
     numDays,
     usedPatterns,
+    maxPerDay: maxHpd,
   });
 }
 
 /** Aplica horas aleatórias aos slots de trabalho (mantém folgas) */
-export function applyRandomHoursToWorkSlots(workSlots, totalHours, usedPatterns) {
+export function applyRandomHoursToWorkSlots(
+  workSlots,
+  totalHours,
+  usedPatterns,
+  options = {},
+) {
   const numDays = workSlots.length;
   if (numDays === 0) return workSlots;
 
+  const fromSlots = workSlots.reduce(
+    (sum, slot) => sum + (parseFloat(slot.hours) || 0),
+    0,
+  );
   const total =
     totalHours != null
       ? Math.round(Number(totalHours) || 0)
-      : Math.round(
-          workSlots.reduce((s, slot) => s + (parseFloat(slot.hours) || 0), 0),
-        );
+      : Math.round(fromSlots);
 
-  const dailyHours = buildUniqueDailyHours({
-    totalHours: total,
-    numDays,
-    usedPatterns,
-  });
+  const maxPerDay = parseMaxHoursPerDay(
+    options.maxPerDay ?? options.max_hours_per_day,
+    8,
+  );
 
-  return workSlots.map((slot, i) => ({
-    ...slot,
-    hours: dailyHours[i] ?? slot.hours,
-  }));
+  if (!isDistributionFeasible(total, numDays, maxPerDay)) {
+    return null;
+  }
+
+  try {
+    const dailyHours = buildUniqueDailyHours({
+      totalHours: total,
+      numDays,
+      usedPatterns,
+      maxPerDay,
+      ...options,
+    });
+
+    return workSlots.map((slot, i) => ({
+      ...slot,
+      hours: dailyHours[i] ?? slot.hours,
+    }));
+  } catch (error) {
+    if (error instanceof DistributionInfeasibleError) {
+      return null;
+    }
+    throw error;
+  }
 }

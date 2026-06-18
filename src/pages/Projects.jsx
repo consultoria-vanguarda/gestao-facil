@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { api } from '@/api/appApi';
+import { api, formatEntitySaveError } from '@/api/appApi';
+import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
@@ -19,6 +20,7 @@ import { format, parseISO } from 'date-fns';
 import { SERVICE_AREAS, getSubareas } from '../components/utils/serviceAreas';
 
 export default function Projects() {
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -56,10 +58,19 @@ export default function Projects() {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       setFormOpen(false);
       setEditingProject(null);
+      toast({
+        title: 'Atendimento criado',
+        description: 'O atendimento foi salvo com sucesso.',
+      });
     },
     onError: (error) => {
       console.error('Erro ao criar projeto:', error);
-    }
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível criar o atendimento',
+        description: formatEntitySaveError(error),
+      });
+    },
   });
 
   const updateMutation = useMutation({
@@ -68,10 +79,19 @@ export default function Projects() {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       setFormOpen(false);
       setEditingProject(null);
+      toast({
+        title: 'Atendimento atualizado',
+        description: 'As alterações foram salvas com sucesso.',
+      });
     },
     onError: (error) => {
       console.error('Erro ao atualizar projeto:', error);
-    }
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível salvar o atendimento',
+        description: formatEntitySaveError(error),
+      });
+    },
   });
 
   const deleteMutation = useMutation({

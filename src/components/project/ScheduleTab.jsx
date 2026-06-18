@@ -15,6 +15,8 @@ import { generateScheduleDates, estimateScheduleEndDate, isHoliday } from '@/lib
 import {
   averageHoursPerDay,
   buildDailyHoursForEstimatedProject,
+  minDaysForHours,
+  parseMaxHoursPerDay,
 } from '@/lib/scheduleHours';
 
 const statusConfig = {
@@ -25,13 +27,22 @@ const statusConfig = {
 
 // Computes which calendar dates should be skipped (off days) based on project days_off config
 function computeAutoSkipDates(project) {
-  const { start_date, estimated_hours, hours_per_day, consider_sundays, consider_holidays, days_off, days_off_position } = project;
+  const {
+    start_date,
+    estimated_hours,
+    max_hours_per_day,
+    hours_per_day,
+    consider_sundays,
+    consider_holidays,
+    days_off,
+    days_off_position,
+  } = project;
   const daysOffCount = parseInt(days_off) || 0;
   if (!daysOffCount || !start_date) return new Set();
 
-  const hpd = parseFloat(hours_per_day) || 4;
+  const maxHpd = parseMaxHoursPerDay(max_hours_per_day ?? hours_per_day, 8);
   const totalH = parseFloat(estimated_hours) || 0;
-  const workDays = Math.ceil(totalH / hpd);
+  const workDays = minDaysForHours(totalH, maxHpd);
   const totalSlots = workDays + daysOffCount;
 
   let offPositions;
@@ -65,7 +76,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
   const [config, setConfig] = useState({
     start_date: project?.start_date || '',
     estimated_hours: project?.estimated_hours || '',
-    hours_per_day: project?.hours_per_day || 4,
+    max_hours_per_day: project?.max_hours_per_day ?? project?.hours_per_day ?? 8,
     consider_sundays: project?.consider_sundays || 'no',
     consider_holidays: project?.consider_holidays || 'no',
     days_off: project?.days_off || 0,
@@ -80,7 +91,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
       setConfig({
         start_date: project.start_date || '',
         estimated_hours: project.estimated_hours || '',
-        hours_per_day: project.hours_per_day || 4,
+        max_hours_per_day: project.max_hours_per_day ?? project.hours_per_day ?? 8,
         consider_sundays: project.consider_sundays || 'no',
         consider_holidays: project.consider_holidays || 'no',
         days_off: daysOff,
@@ -138,11 +149,11 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
               className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="Ex: 40" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Horas por dia (referência) *</label>
-            <input type="number" name="hours_per_day" step="1" min="1" max="24" value={config.hours_per_day} onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="Ex: 4" />
+            <label className="block text-sm font-medium text-slate-700 mb-1">Máximo de horas por dia *</label>
+            <input type="number" name="max_hours_per_day" step="1" min="1" max="24" value={config.max_hours_per_day} onChange={handleChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" placeholder="Ex: 8" />
             <p className="text-xs text-slate-500 mt-1">
-              Usado para calcular o número de dias; as horas de cada fase serão distribuídas automaticamente em valores inteiros.
+              Usado para calcular o mínimo de dias e distribuir as horas automaticamente em valores inteiros.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -197,7 +208,7 @@ function ScheduleConfigModal({ open, onClose, project, onGenerate }) {
           {previewEndDate && (
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
               📅 Previsão de término: <strong>{previewEndDate}</strong>
-              {' '}({Math.ceil(parseFloat(config.estimated_hours || 0) / parseFloat(config.hours_per_day || 1))} dias úteis)
+              {' '}({minDaysForHours(parseFloat(config.estimated_hours || 0), config.max_hours_per_day)} dias úteis)
             </div>
           )}
         </div>
@@ -435,12 +446,13 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
     const avgHoursPerDay =
       workHoursList.length > 0
         ? averageHoursPerDay(workHoursList)
-        : parseFloat(config.hours_per_day) || 0;
+        : parseMaxHoursPerDay(config.max_hours_per_day ?? config.hours_per_day, 8);
 
     // Save config + end_date back to project (do NOT overwrite schedule_config — managed by ProjectForm)
     await api.entities.Project.update(projectId, {
       start_date: startDate || config.start_date,
       estimated_hours: parseFloat(config.estimated_hours) || 0,
+      max_hours_per_day: parseMaxHoursPerDay(config.max_hours_per_day ?? config.hours_per_day, 8),
       hours_per_day: avgHoursPerDay,
       consider_sundays: config.consider_sundays,
       consider_holidays: config.consider_holidays,
@@ -491,7 +503,10 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
 
     const configWithAvg = {
       ...config,
-      hours_per_day: averageHoursPerDay(workDates.map((d) => d.hours)) || config.hours_per_day,
+      max_hours_per_day: parseMaxHoursPerDay(config.max_hours_per_day ?? config.hours_per_day, 8),
+      hours_per_day:
+        averageHoursPerDay(workDates.map((d) => d.hours)) ||
+        parseMaxHoursPerDay(config.max_hours_per_day ?? config.hours_per_day, 8),
     };
 
     const offEntries = offDates.map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
@@ -605,8 +620,13 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
       }
       const projectWithAvg = {
         ...project,
+        max_hours_per_day: parseMaxHoursPerDay(
+          project.max_hours_per_day ?? project.hours_per_day,
+          8,
+        ),
         hours_per_day:
-          averageHoursPerDay(dates.map((d) => d.hours)) || project.hours_per_day,
+          averageHoursPerDay(dates.map((d) => d.hours)) ||
+          parseMaxHoursPerDay(project.max_hours_per_day ?? project.hours_per_day, 8),
       };
       const offEntries = [...autoSkipDates].map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
       const allDates = [...dates, ...offEntries].sort((a, b) => a.date.localeCompare(b.date));
@@ -689,8 +709,13 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
     const newWorkDates = generateScheduleDates(newConfig, autoSkip, dailyHours);
     const newConfigWithAvg = {
       ...newConfig,
+      max_hours_per_day: parseMaxHoursPerDay(
+        newConfig.max_hours_per_day ?? newConfig.hours_per_day,
+        8,
+      ),
       hours_per_day:
-        averageHoursPerDay(newWorkDates.map((d) => d.hours)) || newConfig.hours_per_day,
+        averageHoursPerDay(newWorkDates.map((d) => d.hours)) ||
+        parseMaxHoursPerDay(newConfig.max_hours_per_day ?? newConfig.hours_per_day, 8),
     };
     const newOffEntries = [...autoSkip].map(d => ({ date: d, hours: 0, is_day_off: true, description: 'Folga' }));
     const newFinalDates = [...newWorkDates, ...newOffEntries].sort((a, b) => a.date.localeCompare(b.date));
@@ -800,7 +825,10 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
   const progressPercent = activeSchedules.length > 0
     ? Math.round((completedSchedules.length / activeSchedules.length) * 100) : 0;
 
-  const canGenerate = project?.start_date && project?.estimated_hours && project?.hours_per_day;
+  const canGenerate =
+    project?.start_date &&
+    project?.estimated_hours &&
+    (project?.max_hours_per_day ?? project?.hours_per_day);
 
   return (
     <>
@@ -851,7 +879,7 @@ export default function ScheduleTab({ projectId, consultantId, consultants, proj
 
           {!canGenerate && schedules.length === 0 && (
             <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
-              ⚠️ Configure <strong>Data de Início</strong>, <strong>Horas Estimadas</strong> e <strong>Horas por Dia</strong> para gerar a agenda.
+              ⚠️ Configure <strong>Data de Início</strong>, <strong>Horas Estimadas</strong> e <strong>Máximo de Horas por Dia</strong> para gerar a agenda.
             </div>
           )}
 

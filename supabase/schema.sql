@@ -84,6 +84,7 @@ CREATE TABLE project (
     start_date            DATE,
     end_date              DATE,
     hours_per_day         NUMERIC(5,2)  DEFAULT 4,
+    max_hours_per_day     NUMERIC(5,2)  DEFAULT 8,
     consider_sundays      VARCHAR(5)    DEFAULT 'no',
     consider_holidays     VARCHAR(5)    DEFAULT 'no',
     days_off              INTEGER       DEFAULT 0,

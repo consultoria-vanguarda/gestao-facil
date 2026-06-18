@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
 import { APP_LOGO_URL } from '@/lib/branding';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
-import { applyRandomHoursToWorkSlots } from '@/lib/scheduleHours';
+import { applyRandomHoursToWorkSlots, minDaysForHours, parseMaxHoursPerDay } from '@/lib/scheduleHours';
 
 const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
@@ -272,7 +272,10 @@ function buildScheduleRows(project) {
   // Fallback: gerar automaticamente a partir das atividades (sem folgas customizadas)
   const activities = project.activities || [];
   const startDate = project.start_date;
-  const hoursPerDay = parseFloat(project.hours_per_day) || 4;
+  const maxHoursPerDay = parseMaxHoursPerDay(
+    project.max_hours_per_day ?? project.hours_per_day,
+    8,
+  );
 
   if (!startDate || activities.length === 0) return [];
 
@@ -296,7 +299,7 @@ function buildScheduleRows(project) {
   activities.forEach((act) => {
     const numDays = act.days
       ? Math.max(1, parseInt(act.days, 10))
-      : Math.ceil((parseFloat(act.hours) || 0) / hoursPerDay);
+      : minDaysForHours(parseFloat(act.hours) || 0, maxHoursPerDay);
     for (let d = 0; d < numDays; d++) {
       slots.push({
         activity: act.description || '',
@@ -308,10 +311,13 @@ function buildScheduleRows(project) {
   });
 
   const totalHours =
-    Math.round(parseFloat(project.estimated_hours) || 0) ||
-    Math.round(activities.reduce((sum, a) => sum + (parseFloat(a.hours) || 0), 0));
+    Math.round(activities.reduce((sum, a) => sum + (parseFloat(a.hours) || 0), 0)) ||
+    Math.round(parseFloat(project.estimated_hours) || 0);
 
-  const slotsWithHours = applyRandomHoursToWorkSlots(slots, totalHours, new Set());
+  const slotsWithHours = applyRandomHoursToWorkSlots(slots, totalHours, new Set(), {
+    maxPerDay: maxHoursPerDay,
+  });
+  if (!slotsWithHours) return [];
 
   for (const slot of slotsWithHours) {
     rows.push({

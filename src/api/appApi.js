@@ -30,6 +30,43 @@ const applyFilters = (query, filters = {}) => {
   return query;
 };
 
+const getMissingColumnFromError = (error) => {
+  const message = error?.message || '';
+  const match = message.match(/Could not find the '([^']+)' column/);
+  return match?.[1] || null;
+};
+
+/** Ajusta payload quando o banco ainda não tem colunas novas (ex.: antes da migration). */
+const applyMissingColumnFallback = (row, missingColumn) => {
+  const fallback = { ...row };
+  delete fallback[missingColumn];
+
+  if (missingColumn === 'max_hours_per_day' && row.max_hours_per_day != null) {
+    fallback.hours_per_day = row.max_hours_per_day;
+  }
+
+  return fallback;
+};
+
+export const formatEntitySaveError = (error) => {
+  const message = error?.message || '';
+  if (message.includes('max_hours_per_day')) {
+    return 'Falha ao salvar: atualize o banco de dados (migration max_hours_per_day) ou tente novamente.';
+  }
+  if (
+    message.includes('somente leitura')
+    || message.includes('read_only')
+    || message.includes('subscription')
+    || error?.code === '42501'
+  ) {
+    return 'Não foi possível salvar: organização em modo somente leitura ou assinatura inativa.';
+  }
+  if (message.includes('organization_id')) {
+    return 'Não foi possível salvar: organização não identificada. Recarregue a página e tente novamente.';
+  }
+  return message || 'Erro ao salvar. Tente novamente.';
+};
+
 const createEntity = (tableName) => {
   const list = async (sort) => {
     const orgId = requireCurrentOrganizationId();
@@ -64,31 +101,56 @@ const createEntity = (tableName) => {
     const row = { ...data };
     if (!row.id) row.id = generateId();
     row.organization_id = orgId;
-    const { data: created, error } = await supabase
-      .from(tableName)
-      .insert(row)
-      .select('*')
-      .single();
-    if (error) throw error;
-    return created;
+
+    let payload = row;
+    let result = await supabase.from(tableName).insert(payload).select('*').single();
+
+    if (result.error?.code === 'PGRST204') {
+      const missingColumn = getMissingColumnFromError(result.error);
+      if (missingColumn && Object.prototype.hasOwnProperty.call(payload, missingColumn)) {
+        payload = applyMissingColumnFallback(payload, missingColumn);
+        result = await supabase.from(tableName).insert(payload).select('*').single();
+      }
+    }
+
+    if (result.error) throw result.error;
+    return result.data;
   };
 
   const update = async (id, data) => {
     const orgId = requireCurrentOrganizationId();
     requireCurrentOrganizationWritable();
-    const { data: updated, error } = await supabase
+
+    let payload = {
+      ...data,
+      organization_id: orgId,
+      updated_date: data?.updated_date ?? new Date().toISOString(),
+    };
+
+    let result = await supabase
       .from(tableName)
-      .update({
-        ...data,
-        organization_id: orgId,
-        updated_date: data?.updated_date ?? new Date().toISOString(),
-      })
+      .update(payload)
       .eq('id', id)
       .eq('organization_id', orgId)
       .select('*')
       .single();
-    if (error) throw error;
-    return updated;
+
+    if (result.error?.code === 'PGRST204') {
+      const missingColumn = getMissingColumnFromError(result.error);
+      if (missingColumn && Object.prototype.hasOwnProperty.call(payload, missingColumn)) {
+        payload = applyMissingColumnFallback(payload, missingColumn);
+        result = await supabase
+          .from(tableName)
+          .update(payload)
+          .eq('id', id)
+          .eq('organization_id', orgId)
+          .select('*')
+          .single();
+      }
+    }
+
+    if (result.error) throw result.error;
+    return result.data;
   };
 
   const remove = async (id) => {

@@ -21,6 +21,11 @@ import {
   applyRandomHoursToWorkSlots,
   averageHoursPerDay,
   collectUsedPatternsForConsultant,
+  countActivitySlots,
+  minDaysForHours,
+  parseMaxHoursPerDay,
+  sumHours,
+  validateScheduleDistribution,
 } from "@/lib/scheduleHours";
 
 const TYPE_LABELS = {
@@ -39,7 +44,7 @@ const emptyForm = {
   activities: [],
   activity_groups: {}, // { groupId: [{ activityIdx, hours }] }
   schedule_config: [], // [{ date, activityIdx, hours, modality, delivery }]
-  km_rodado: '', start_date: '', hours_per_day: '4',
+  km_rodado: '', start_date: '', max_hours_per_day: '8',
   consider_sundays: 'no', consider_holidays: 'no',
   days_off: '0', days_off_position: 'end',
   max_work_days_per_week: '3',
@@ -139,7 +144,7 @@ function RichTextArea({ name, value, onChange, rows = 4, style, placeholder, inp
 function generateScheduleRows(formData, activities, skipDates = new Set(), usedPatterns = new Set()) {
   const {
     start_date,
-    hours_per_day,
+    max_hours_per_day,
     consider_sundays,
     consider_holidays,
     days_off,
@@ -147,15 +152,27 @@ function generateScheduleRows(formData, activities, skipDates = new Set(), usedP
     max_work_days_per_week,
     estimated_hours,
   } = formData;
-  if (!start_date || !hours_per_day || activities.length === 0) return [];
+  if (!start_date || !max_hours_per_day || activities.length === 0) return [];
 
-  const hpd = parseFloat(hours_per_day) || 4;
+  const maxHpd = parseMaxHoursPerDay(max_hours_per_day, 8);
   const daysOffCount = parseInt(days_off) || 0;
+
+  const fromActivities = activities.reduce(
+    (sum, act) => sum + (parseFloat(act.hours) || 0),
+    0,
+  );
+  const totalHours =
+    Math.round(fromActivities) || Math.round(parseFloat(estimated_hours) || 0);
+
+  const validation = validateScheduleDistribution(activities, totalHours, maxHpd);
+  if (!validation.feasible) return [];
 
   // Flatten activities into day slots (quantidade de dias fixa por atividade)
   const activityDays = [];
   activities.forEach((act) => {
-    const numDays = act.days ? Math.max(1, parseInt(act.days)) : Math.ceil((parseFloat(act.hours) || 0) / hpd);
+    const numDays = act.days
+      ? Math.max(1, parseInt(act.days, 10))
+      : minDaysForHours(parseFloat(act.hours) || 0, maxHpd);
     for (let d = 0; d < numDays; d++) {
       activityDays.push({
         activity: act.description,
@@ -166,15 +183,14 @@ function generateScheduleRows(formData, activities, skipDates = new Set(), usedP
     }
   });
 
-  const totalHours =
-    Math.round(parseFloat(estimated_hours) || 0) ||
-    Math.round(activities.reduce((sum, a) => sum + (parseFloat(a.hours) || 0), 0));
-
   const workSlotsWithHours = applyRandomHoursToWorkSlots(
     activityDays,
     totalHours,
     usedPatterns,
+    { maxPerDay: maxHpd },
   );
+  if (!workSlotsWithHours) return [];
+
   const activityDaysWithHours = workSlotsWithHours;
 
   // Only insert positional off-day slots when NOT using explicit skipDates
@@ -287,7 +303,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         schedule_config: project.schedule_config || [],
         km_rodado: project.km_rodado || '',
         start_date: project.start_date || '',
-        hours_per_day: project.hours_per_day || '4',
+        max_hours_per_day: String(project.max_hours_per_day ?? project.hours_per_day ?? 8),
         consider_sundays: project.consider_sundays || 'no',
         consider_holidays: project.consider_holidays || 'no',
         days_off: project.days_off !== undefined ? String(project.days_off) : '0',
@@ -373,7 +389,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         }
       }
     }
-  }, [formData.start_date, formData.hours_per_day, formData.consider_sundays,
+  }, [formData.start_date, formData.max_hours_per_day, formData.consider_sundays,
       formData.consider_holidays, formData.days_off, formData.days_off_position,
       formData.max_work_days_per_week,
       formData.activities, formData.project_type, formData.schedule_config, formData.activity_groups,
@@ -466,7 +482,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         setFormData(prev => ({ ...prev, contracted_value: String(rate) }));
       }
     }
-  }, [formData.km_rodado, formData.estimated_hours, formData.project_type, formData.activities, formData.activity_groups, formData.hours_per_day]);
+  }, [formData.km_rodado, formData.estimated_hours, formData.project_type, formData.activities, formData.activity_groups, formData.max_hours_per_day]);
 
   // Check consultant availability
   useEffect(() => {
@@ -489,15 +505,17 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
 
   // Generate proposed off-day dates based on position/count
   const generateDaysOffProposal = (updatedFormData) => {
-    const { start_date, hours_per_day, consider_sundays, consider_holidays, days_off, days_off_position, activities } = updatedFormData;
+    const { start_date, max_hours_per_day, consider_sundays, consider_holidays, days_off, days_off_position, activities } = updatedFormData;
     if (!start_date || !activities || activities.length === 0) return null;
     const daysOffCount = parseInt(days_off) || 0;
     if (daysOffCount === 0) return null;
 
-    const hpd = parseFloat(hours_per_day) || 4;
+    const maxHpd = parseMaxHoursPerDay(max_hours_per_day, 8);
     const activityDays = [];
     activities.forEach((act) => {
-      const numDays = act.days ? Math.max(1, parseInt(act.days)) : Math.ceil((parseFloat(act.hours) || 0) / hpd);
+      const numDays = act.days
+        ? Math.max(1, parseInt(act.days, 10))
+        : minDaysForHours(parseFloat(act.hours) || 0, maxHpd);
       for (let d = 0; d < numDays; d++) activityDays.push({});
     });
     const totalWorkDays = activityDays.length;
@@ -740,6 +758,8 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const isConsultingSubmit = formData.project_type === 'consulting';
+
     if (!formData.client_id || !formData.consultant_id || !formData.start_date || !formData.project_type) {
       alert('Preencha todos os campos obrigatórios');
       return;
@@ -748,17 +768,36 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       alert('Informe uma data de início válida.');
       return;
     }
-    if (isConsulting && (!formData.sebrae_manager_name || !formData.sebrae_manager_phone)) {
+    if (isConsultingSubmit && (!formData.sebrae_manager_name || !formData.sebrae_manager_phone)) {
       alert('Informe o Gestor Responsável (nome e telefone)');
       return;
     }
-    if (isConsulting && formData.sebrae_manager_phone && !validatePhone(formData.sebrae_manager_phone)) {
+    if (isConsultingSubmit && formData.sebrae_manager_phone && !validatePhone(formData.sebrae_manager_phone)) {
       alert('Informe um telefone válido para o Gestor Responsável.');
       return;
     }
-    if (isConsulting && formData.sebrae_regional_phone && !validatePhone(formData.sebrae_regional_phone)) {
+    if (isConsultingSubmit && formData.sebrae_regional_phone && !validatePhone(formData.sebrae_regional_phone)) {
       alert('Informe um telefone válido para o Gerente Regional.');
       return;
+    }
+
+    if (isConsultingSubmit && formData.activities.length > 0) {
+      const maxHpd = parseMaxHoursPerDay(formData.max_hours_per_day, 8);
+      const fromActivities = formData.activities.reduce(
+        (sum, act) => sum + (parseFloat(act.hours) || 0),
+        0,
+      );
+      const totalHours =
+        Math.round(fromActivities) || Math.round(parseFloat(formData.estimated_hours) || 0);
+      const validation = validateScheduleDistribution(
+        formData.activities,
+        totalHours,
+        maxHpd,
+      );
+      if (!validation.feasible) {
+        alert(validation.message || 'Ajuste os dias das atividades para distribuir as horas corretamente.');
+        return;
+      }
     }
 
     const selectedClient = clients?.find(c => c.id === formData.client_id);
@@ -782,7 +821,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     let enrichedScheduleConfig = (formData.schedule_config && formData.schedule_config.length > 0)
       ? formData.schedule_config
       : scheduleRows;
-    if (isConsulting && formData.schedule_config && formData.schedule_config.length > 0 && formData.km_rodado) {
+    if (isConsultingSubmit && formData.schedule_config && formData.schedule_config.length > 0 && formData.km_rodado) {
       const km = parseFloat(formData.km_rodado) || 0;
       const hasGrouping = Object.keys(formData.activity_groups || {}).length > 0;
 
@@ -832,7 +871,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     const avgHoursPerDay =
       workHoursForAvg.length > 0
         ? averageHoursPerDay(workHoursForAvg)
-        : parseFloat(formData.hours_per_day) || 4;
+        : parseMaxHoursPerDay(formData.max_hours_per_day, 8);
 
     const dataToSave = {
       name: autoName,
@@ -852,6 +891,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       activity_groups: formData.activity_groups || {},
       km_rodado: parseFloat(formData.km_rodado) || 0,
       start_date: formData.start_date,
+      max_hours_per_day: parseMaxHoursPerDay(formData.max_hours_per_day, 8),
       hours_per_day: avgHoursPerDay,
       consider_sundays: formData.consider_sundays,
       consider_holidays: formData.consider_holidays,
@@ -974,6 +1014,15 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   const selectedClient = clients?.find(c => c.id === formData.client_id);
   const isConsulting = formData.project_type === 'consulting';
   const isDiagnostic = formData.project_type === 'diagnostic';
+
+  const scheduleMaxHpd = parseMaxHoursPerDay(formData.max_hours_per_day, 8);
+  const scheduleEstimatedHours = Math.round(parseFloat(formData.estimated_hours) || 0);
+  const scheduleValidation = isConsulting && formData.activities.length > 0
+    ? validateScheduleDistribution(formData.activities, scheduleEstimatedHours, scheduleMaxHpd)
+    : null;
+  const scheduleDistributedHours = sumHours(
+    scheduleRows.filter((row) => !row.isDayOff).map((row) => row.hours),
+  );
 
   const selectedConsultant = consultants?.find(c => c.id === formData.consultant_id);
   const consultantAreas = selectedConsultant?.service_areas || [];
@@ -1825,10 +1874,19 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                   <input type="number" name="estimated_hours" value={formData.estimated_hours} onChange={handleChange} style={{ ...inputStyle, backgroundColor: '#f1f5f9' }} readOnly />
                 </div>
                 <div>
-                  <label style={labelStyle}>Horas por Dia (referência)</label>
-                  <input type="number" name="hours_per_day" value={formData.hours_per_day} onChange={handleChange} min="1" step="1" style={inputStyle} />
+                  <label style={labelStyle}>Máximo de horas por dia</label>
+                  <input type="number" name="max_hours_per_day" value={formData.max_hours_per_day} onChange={handleChange} min="1" max="24" step="1" style={inputStyle} />
                   <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                    Define quantos dias de atendimento; as horas de cada fase são distribuídas automaticamente em valores inteiros.
+                    {(() => {
+                      const maxHpd = parseMaxHoursPerDay(formData.max_hours_per_day, 8);
+                      const totalH = Math.round(parseFloat(formData.estimated_hours) || 0);
+                      const minDays = minDaysForHours(totalH, maxHpd);
+                      const totalSlots = countActivitySlots(formData.activities, maxHpd);
+                      if (totalH > 0) {
+                        return `Com máximo de ${maxHpd} h/dia, são necessários pelo menos ${minDays} dias para ${totalH} horas${totalSlots > 0 ? ` (você definiu ${totalSlots})` : ''}. As horas de cada fase são distribuídas automaticamente em valores inteiros.`;
+                      }
+                      return 'As horas de cada fase são distribuídas automaticamente em valores inteiros, respeitando este limite.';
+                    })()}
                   </p>
                 </div>
                 <div>
@@ -1915,6 +1973,12 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                 </div>
               )}
 
+              {scheduleValidation && !scheduleValidation.feasible && (
+                <div style={{ marginBottom: '12px', padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '13px', color: '#b91c1c' }}>
+                  {scheduleValidation.message}
+                </div>
+              )}
+
               {scheduleRows.length > 0 && (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
@@ -1977,6 +2041,28 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                         );
                       })}
                     </tbody>
+                    <tfoot>
+                      <tr style={{ backgroundColor: '#f8fafc', borderTop: '2px solid #e2e8f0' }}>
+                        <td colSpan={2} style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 600 }}>
+                          Soma das horas:
+                        </td>
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            textAlign: 'center',
+                            fontWeight: 700,
+                            color: scheduleDistributedHours === scheduleEstimatedHours ? '#15803d' : '#b91c1c',
+                          }}
+                        >
+                          {scheduleDistributedHours}h
+                        </td>
+                        <td colSpan={2} style={{ padding: '8px 12px', fontSize: '12px', color: '#64748b' }}>
+                          {scheduleEstimatedHours > 0
+                            ? `de ${scheduleEstimatedHours}h estimadas`
+                            : ''}
+                        </td>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               )}
