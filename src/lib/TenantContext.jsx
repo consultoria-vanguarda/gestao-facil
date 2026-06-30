@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/api/supabaseClient';
 import { setCurrentOrganizationAccess, setCurrentOrganizationId } from '@/lib/organizationScope';
 
@@ -95,7 +95,7 @@ export const TenantProvider = ({ children }) => {
 
         const { data: orgSettings, error: settingsError } = await supabase
           .from('organization_settings')
-          .select('primary_color, secondary_color, logo_url, project_draft_template')
+          .select('primary_color, secondary_color, logo_url, pdf_logo_url, project_draft_template')
           .eq('organization_id', orgId)
           .maybeSingle();
         if (settingsError) throw settingsError;
@@ -190,6 +190,17 @@ export const TenantProvider = ({ children }) => {
     return { ...filters, organization_id: organizationId };
   };
 
+  const refreshSettings = useCallback(async () => {
+    if (!organizationId) return;
+    const { data, error } = await supabase
+      .from('organization_settings')
+      .select('primary_color, secondary_color, logo_url, pdf_logo_url, project_draft_template')
+      .eq('organization_id', organizationId)
+      .maybeSingle();
+    if (error) throw error;
+    setSettings(data || null);
+  }, [organizationId]);
+
   const value = useMemo(
     () => ({
       tenant,
@@ -199,8 +210,9 @@ export const TenantProvider = ({ children }) => {
       isLoadingTenant,
       tenantError,
       withTenantFilter,
+      refreshSettings,
     }),
-    [tenant, settings, organizationId, subscription, isLoadingTenant, tenantError]
+    [tenant, settings, organizationId, subscription, isLoadingTenant, tenantError, refreshSettings]
   );
 
   return (

@@ -4,7 +4,7 @@ import { supabase } from '@/api/supabaseClient';
 import { useAuth } from '@/lib/AuthContext';
 import { useTenant } from '@/lib/TenantContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings as SettingsIcon, User, Bell, Shield, Loader2, Check, Sparkles } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Shield, Loader2, Check, Sparkles, ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion } from 'framer-motion';
+import PdfLogoSettings from '@/components/settings/PdfLogoSettings';
 
 export default function Settings() {
   const [saveStatus, setSaveStatus] = useState(null);
@@ -108,6 +109,12 @@ export default function Settings() {
             <Shield className="w-4 h-4 mr-2" />
             Segurança
           </TabsTrigger>
+          {userType === 'admin' && (
+            <TabsTrigger value="pdf-logo">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Logo PDF
+            </TabsTrigger>
+          )}
           {userType === 'admin' && (
             <TabsTrigger value="project-ai">
               <Sparkles className="w-4 h-4 mr-2" />
@@ -222,6 +229,17 @@ export default function Settings() {
             </Card>
           </motion.div>
         </TabsContent>
+
+        {userType === 'admin' && (
+          <TabsContent value="pdf-logo">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <PdfLogoSettings />
+            </motion.div>
+          </TabsContent>
+        )}
 
         {userType === 'admin' && (
           <TabsContent value="project-ai">

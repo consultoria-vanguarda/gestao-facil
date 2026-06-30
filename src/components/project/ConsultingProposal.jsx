@@ -3,11 +3,8 @@ import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
-import { APP_LOGO_URL } from '@/lib/branding';
-import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 import { applyRandomHoursToWorkSlots, minDaysForHours, parseMaxHoursPerDay } from '@/lib/scheduleHours';
-
-const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 const LEGACY_AREA_LABELS = {
   finances: 'Finanças',
@@ -343,7 +340,7 @@ function getMonthLabel(dateObj, startDateObj) {
   return ordinals[diff] || `${diff+1}º Mês`;
 }
 
-export async function downloadConsultingProposal(project, client) {
+export async function downloadConsultingProposal(project, client, pdfLogoUrl = null) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
   const pageW = 210;
@@ -355,8 +352,7 @@ export async function downloadConsultingProposal(project, client) {
   const todayStr = format(today, 'dd/MM/yyyy');
 
   // Load logo
-  let logoDataUrl = null;
-  try { logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL); } catch(e) {}
+  const logo = await loadTenantPdfLogo(pdfLogoUrl);
 
   // ─── Header ───────────────────────────────────────────────────────────────
   const headerY = 12;
@@ -373,7 +369,7 @@ export async function downloadConsultingProposal(project, client) {
     doc.rect(marginL, headerY, contentW, headerH);
 
     // Logo
-    if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoW, logoH);
+    if (logo) doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
 
     // Vertical divider after logo
     const divX = logoX + logoW + 2;

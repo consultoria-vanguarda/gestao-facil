@@ -40,6 +40,8 @@ import { downloadConsultingProposal } from '../components/project/ConsultingProp
 import ProjectForm from '../components/forms/ProjectForm';
 import ServiceReportForm from '../components/project/ServiceReportForm';
 import { downloadServiceReport } from '../components/project/ServiceReportPDF';
+import { useTenant } from '@/lib/TenantContext';
+import { resolvePdfLogoUrl } from '@/lib/pdfLogoConfig';
 import { Download } from 'lucide-react';
 
 import { format, parseISO } from 'date-fns';
@@ -59,6 +61,8 @@ export default function ProjectDetail() {
   const [serviceReportOpen, setServiceReportOpen] = useState(false);
   
   const queryClient = useQueryClient();
+  const { settings } = useTenant();
+  const pdfLogoUrl = resolvePdfLogoUrl(settings);
 
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
@@ -362,13 +366,13 @@ export default function ProjectDetail() {
           {project.project_type !== 'public_policies' && (
             <>
               {project.project_type === 'diagnostic' && client && (
-                <Button variant="outline" onClick={() => downloadDiagnosticReport(project, client).catch(console.error)}>
+                <Button variant="outline" onClick={() => downloadDiagnosticReport(project, client, pdfLogoUrl).catch(console.error)}>
                   <Download className="w-4 h-4 mr-2" />
                   Download Diagnóstico
                 </Button>
               )}
               {project.project_type === 'consulting' && client && (
-                <Button variant="outline" onClick={() => downloadConsultingProposal(project, client).catch(console.error)}>
+                <Button variant="outline" onClick={() => downloadConsultingProposal(project, client, pdfLogoUrl).catch(console.error)}>
                   <Download className="w-4 h-4 mr-2" />
                   Download Proposta
                 </Button>
@@ -386,7 +390,7 @@ export default function ProjectDetail() {
                       <DropdownMenuItem onClick={() => setServiceReportOpen(true)}>
                         <Pencil className="w-4 h-4 mr-2" /> Editar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadServiceReport(serviceReport, project, client, consultant).catch(console.error)}>
+                      <DropdownMenuItem onClick={() => downloadServiceReport(serviceReport, project, client, consultant, pdfLogoUrl).catch(console.error)}>
                         <Download className="w-4 h-4 mr-2" /> Download do Relatório
                       </DropdownMenuItem>
                     </DropdownMenuContent>

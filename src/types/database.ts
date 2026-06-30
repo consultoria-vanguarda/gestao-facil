@@ -25,6 +25,8 @@ export interface OrganizationSettingsRow {
   primary_color: string | null;
   secondary_color: string | null;
   logo_url: string | null;
+  pdf_logo_url: string | null;
+  project_draft_template?: string | null;
 }
 
 export interface ViabilityCostConfigRow extends TenantScopedRow {

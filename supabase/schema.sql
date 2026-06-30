@@ -457,6 +457,8 @@ CREATE TABLE IF NOT EXISTS organization_settings (
     primary_color   TEXT,
     secondary_color TEXT,
     logo_url        TEXT,
+    pdf_logo_url    TEXT,
+    project_draft_template TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

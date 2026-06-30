@@ -9,6 +9,8 @@ import ViabilityCostConfigModal from '@/components/viability/ViabilityCostConfig
 import { analisarViabilidadeProjeto } from '@/lib/viabilityEngine';
 import { normalizeCepDigits, isValidCepBR, formatCEPInput } from '@/lib/validators';
 import { downloadViabilityAnalysisPdf } from '@/components/viability/downloadViabilityAnalysisPdf';
+import { useTenant } from '@/lib/TenantContext';
+import { resolvePdfLogoUrl } from '@/lib/pdfLogoConfig';
 import { toast } from '@/components/ui/use-toast';
 
 const tabs = [
@@ -94,6 +96,8 @@ export default function HourlyRates() {
   const [motorResult, setMotorResult] = useState(null);
   const [motorDistanceMeta, setMotorDistanceMeta] = useState(null);
   const [pdfExporting, setPdfExporting] = useState(false);
+  const { settings } = useTenant();
+  const pdfLogoUrl = resolvePdfLogoUrl(settings);
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -269,6 +273,7 @@ export default function HourlyRates() {
         distanceMeta: motorDistanceMeta,
         sourcePdfName: selectedFile?.name || '',
         generatedBy: currentUser?.email || '',
+        pdfLogoUrl,
       });
       toast({
         title: 'PDF gerado',

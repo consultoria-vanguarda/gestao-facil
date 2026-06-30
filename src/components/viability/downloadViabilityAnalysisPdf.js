@@ -1,10 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { APP_LOGO_URL } from '@/lib/branding';
-import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 
-/** Mesma logomarca dos relatórios gerenciais (ReportsTab). */
-const LOGO_URL = APP_LOGO_URL;
 
 const BRAND = [30, 58, 95];
 
@@ -44,6 +41,7 @@ function distanceMethodLabel(distanceMeta) {
  * @param {object} [params.distanceMeta] — trecho relevante da resposta googleDistanceKm
  * @param {string} [params.sourcePdfName] — nome do arquivo analisado
  * @param {string} [params.generatedBy] — e-mail do usuário
+ * @param {string} [params.pdfLogoUrl] — logo da organização para o cabeçalho
  */
 export async function downloadViabilityAnalysisPdf({
   analysisResult,
@@ -52,15 +50,14 @@ export async function downloadViabilityAnalysisPdf({
   distanceMeta = null,
   sourcePdfName = '',
   generatedBy = '',
+  pdfLogoUrl = null,
 }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
 
-  try {
-    const img = await loadImageAsDataUrl(LOGO_URL);
-    doc.addImage(img, 'PNG', 10, 8, 40, 14);
-  } catch (_) {
-    /* logo opcional */
+  const logo = await loadTenantPdfLogo(pdfLogoUrl);
+  if (logo) {
+    doc.addImage(logo.dataUrl, logo.format, 10, 8, 40, 14);
   }
 
   doc.setFontSize(16);

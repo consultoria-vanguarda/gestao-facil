@@ -1,12 +1,11 @@
 import { jsPDF } from 'jspdf';
 import { format, parseISO } from 'date-fns';
-import { SEBRAE_LOGO_URL } from '@/lib/branding';
-import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 
 /**
  * Generates and downloads the "Relatório de Diagnóstico" PDF.
  */
-export async function downloadDiagnosticReport(project, client) {
+export async function downloadDiagnosticReport(project, client, pdfLogoUrl = null) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
   const pageW = 210;
@@ -16,13 +15,7 @@ export async function downloadDiagnosticReport(project, client) {
   const contentW = pageW - marginL - marginR;
   const black = [0, 0, 0];
 
-  // Pre-load logo
-  let logoDataUrl = null;
-  try {
-    logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL);
-  } catch (e) {
-    console.warn('Could not load SEBRAE logo:', e);
-  }
+  const logo = await loadTenantPdfLogo(pdfLogoUrl);
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
   function pageBorder() {
@@ -79,8 +72,8 @@ export async function downloadDiagnosticReport(project, client) {
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    if (logoDataUrl) {
-      doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoW, logoH);
+    if (logo) {
+      doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
     }
 
     doc.setFontSize(14);

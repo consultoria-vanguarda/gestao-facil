@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/appApi';
-import { APP_LOGO_URL } from '@/lib/branding';
-import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import { loadTenantPdfLogo, resolvePdfLogoUrl } from '@/lib/pdfLogoConfig';
+import { useTenant } from '@/lib/TenantContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,7 +12,7 @@ import { Download, DollarSign, Clock, TrendingUp, TrendingDown, Users } from 'lu
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-const LOGO_URL = APP_LOGO_URL;
+
 const fmt = (v) => (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // Mapa de situação do projeto → status da entidade Project
@@ -59,7 +59,8 @@ export default function ReportsTab() {
   const [filterSituation, setFilterSituation] = useState('all'); // 'all' | 'planning' | 'in_progress' | 'completed'
   const [filterBillingStatus, setFilterBillingStatus] = useState('all'); // só ativo quando completed
   const [detailModal, setDetailModal] = useState(null);
-
+  const { settings } = useTenant();
+  const pdfLogoUrl = resolvePdfLogoUrl(settings);
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => api.entities.Project.list() });
   const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: () => api.entities.Client.list() });
   const { data: consultants = [] } = useQuery({ queryKey: ['consultants'], queryFn: () => api.entities.Consultant.list() });
@@ -180,10 +181,10 @@ export default function ReportsTab() {
   const handleExportPDF = async () => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
-    try {
-      const img = await loadImageAsDataUrl(LOGO_URL);
-      doc.addImage(img, 'PNG', 10, 8, 40, 14);
-    } catch (_) {}
+    const logo = await loadTenantPdfLogo(pdfLogoUrl);
+    if (logo) {
+      doc.addImage(logo.dataUrl, logo.format, 10, 8, 40, 14);
+    }
 
     doc.setFontSize(16); doc.setTextColor(30, 58, 95);
     doc.text('Relatório Gerencial', pageW / 2, 16, { align: 'center' });

@@ -1,10 +1,8 @@
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { APP_LOGO_URL } from '@/lib/branding';
+import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
-
-const SEBRAE_LOGO_URL = APP_LOGO_URL;
 
 const REPORT_TYPE_LABELS = {
   presencial: 'Consultoria Presencial',
@@ -13,7 +11,7 @@ const REPORT_TYPE_LABELS = {
   final: 'Consultoria Final',
 };
 
-export async function downloadServiceReport(report, project, client, consultant) {
+export async function downloadServiceReport(report, project, client, consultant, pdfLogoUrl = null) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
   const pageW = 210;
@@ -25,9 +23,7 @@ export async function downloadServiceReport(report, project, client, consultant)
   const today = new Date();
   const todayStr = format(today, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 
-  // Load logo
-  let logoDataUrl = null;
-  try { logoDataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL); } catch (e) {}
+  const logo = await loadTenantPdfLogo(pdfLogoUrl);
 
   // Preload result images
   const imageDataUrls = [];
@@ -48,7 +44,7 @@ export async function downloadServiceReport(report, project, client, consultant)
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', logoX, logoY, logoW, logoH);
+    if (logo) doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
 
     const divX = logoX + logoW + 2;
     doc.setLineWidth(0.4);
