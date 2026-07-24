@@ -21,22 +21,25 @@ const CATEGORIES = {
   other: "Outros"
 };
 
+const createEmptyForm = () => ({
+  project_id: '',
+  consultant_id: '',
+  category: 'other',
+  description: '',
+  amount: '',
+  date: '',
+  receipt_url: '',
+  reimbursable: false,
+});
+
 export default function ExpenseForm({ open, onClose, expense, onSave, loading, projects, consultants }) {
-  const [form, setForm] = useState({
-    project_id: '',
-    consultant_id: '',
-    category: 'other',
-    description: '',
-    amount: '',
-    date: '',
-    receipt_url: '',
-    reimbursable: false
-  });
+  const [form, setForm] = useState(createEmptyForm);
   const [uploading, setUploading] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringMonths, setRecurringMonths] = useState(3);
 
   useEffect(() => {
+    if (!open) return;
     if (expense) {
       setForm({
         project_id: expense.project_id || '',
@@ -50,26 +53,17 @@ export default function ExpenseForm({ open, onClose, expense, onSave, loading, p
       });
       setIsRecurring(false);
     } else {
-      setForm({
-        project_id: '',
-        consultant_id: '',
-        category: 'other',
-        description: '',
-        amount: '',
-        date: '',
-        receipt_url: '',
-        reimbursable: false
-      });
+      setForm(createEmptyForm());
       setIsRecurring(false);
     }
-  }, [expense]);
+  }, [expense, open]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
     const { file_url } = await api.integrations.Core.UploadFile({ file });
-    setForm({...form, receipt_url: file_url});
+    setForm((prev) => ({ ...prev, receipt_url: file_url }));
     setUploading(false);
   };
 
@@ -84,12 +78,17 @@ export default function ExpenseForm({ open, onClose, expense, onSave, loading, p
       return;
     }
     const amountNumber = parseMoneyBRToNumber(form.amount) || 0;
-    const base = { ...form, amount: amountNumber, status: 'to_pay' };
+    const base = {
+      ...form,
+      amount: amountNumber,
+      status: 'to_pay',
+      project_id: form.project_id || null,
+      consultant_id: form.consultant_id || null,
+      receipt_url: form.receipt_url || null,
+    };
     if (!isRecurring || expense) {
-      // Single save (edit or non-recurring)
       onSave(base);
     } else {
-      // Recurring: generate N entries with due_date advancing by 1 month each
       const entries = [];
       for (let i = 0; i < recurringMonths; i++) {
         const due = new Date(form.date + 'T12:00:00');
@@ -107,7 +106,7 @@ export default function ExpenseForm({ open, onClose, expense, onSave, loading, p
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose} modal>
+    <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }} modal>
       <DialogContent className="max-w-lg" aria-describedby="expense-description">
         <DialogHeader>
           <DialogTitle>{expense ? 'Editar Despesa' : 'Nova Despesa'}</DialogTitle>

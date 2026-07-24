@@ -38,7 +38,9 @@ export default function TaxRatesTab() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Alíquotas de Imposto Mensais</CardTitle>
-              <p className="text-sm text-slate-500 mt-1">Define o percentual de imposto sobre receitas para cada mês</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Define o percentual sobre receitas do mês. Ao receber uma receita, o sistema cria automaticamente uma despesa a pagar (conta 3.2.01) com o imposto calculado.
+              </p>
             </div>
             <Button onClick={() => { setForm({ month: format(new Date(), 'yyyy-MM'), rate_percent: '', notes: '' }); setModal({}); }} className="bg-[#1e3a5f] hover:bg-[#2d4a6f]">
               <Plus className="w-4 h-4 mr-2" /> Adicionar Mês

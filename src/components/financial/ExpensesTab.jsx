@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePeriod } from './PeriodContext';
-import { api } from '@/api/appApi';
+import { api, formatEntitySaveError } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,28 +19,41 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Plus, Receipt, MoreHorizontal, Pencil, Trash2, Upload, Loader2, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { useToast } from '@/components/ui/use-toast';
 
 const fmt = (v) => `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+// Trigger do banco mapeia to_pay→pending e paid→reimbursed (compat. com tela de despesas).
 const STATUS_CONFIG = {
   to_pay: { label: 'A Pagar', color: 'bg-amber-100 text-amber-800' },
+  pending: { label: 'A Pagar', color: 'bg-amber-100 text-amber-800' },
   paid: { label: 'Pago', color: 'bg-emerald-100 text-emerald-800' },
+  reimbursed: { label: 'Pago', color: 'bg-emerald-100 text-emerald-800' },
 };
 
-const emptyForm = {
-  project_id: '', consultant_id: '', chart_account_id: '',
-  description: '', amount: '', due_date: format(new Date(), 'yyyy-MM-dd'),
-  receipt_url: '', reimbursable: false,
-};
+const isOpenExpense = (status) => status === 'to_pay' || status === 'pending';
+const isPaidExpense = (status) => status === 'paid' || status === 'reimbursed';
+
+const createEmptyForm = () => ({
+  project_id: '',
+  consultant_id: '',
+  chart_account_id: '',
+  description: '',
+  amount: '',
+  due_date: format(new Date(), 'yyyy-MM-dd'),
+  receipt_url: '',
+  reimbursable: false,
+});
 
 // ── Formulário de registro/edição ──────────────────────────────────────────
 function ExpenseFormModal({ open, onClose, expense, projects, consultants, chartAccounts, onSave, loading }) {
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState(createEmptyForm);
   const [uploading, setUploading] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringMonths, setRecurringMonths] = useState(3);
 
   useEffect(() => {
+    if (!open) return;
     if (expense) {
       setForm({
         project_id: expense.project_id || '',
@@ -54,7 +67,7 @@ function ExpenseFormModal({ open, onClose, expense, projects, consultants, chart
       });
       setIsRecurring(false);
     } else {
-      setForm(emptyForm);
+      setForm(createEmptyForm());
       setIsRecurring(false);
     }
   }, [expense, open]);
@@ -93,7 +106,7 @@ function ExpenseFormModal({ open, onClose, expense, projects, consultants, chart
   const expenseAccounts = chartAccounts.filter(a => a.type === 'expense' && a.active !== false);
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <DialogContent className="max-w-lg max-h-[90vh] flex flex-col" aria-describedby="exp-desc">
         <DialogHeader>
           <DialogTitle>{expense ? 'Editar Despesa' : 'Nova Despesa'}</DialogTitle>
@@ -270,6 +283,7 @@ export default function ExpensesTab() {
   const queryClient = useQueryClient();
   const { period } = usePeriod();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [formOpen, setFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -291,31 +305,76 @@ export default function ExpensesTab() {
 
   const createMutation = useMutation({
     mutationFn: (data) => api.entities.Expense.create({ ...data, status: 'to_pay' }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setFormOpen(false); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      setFormOpen(false);
+      setEditingExpense(null);
+      toast({ title: 'Despesa registrada', description: 'O lançamento foi salvo com sucesso.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao criar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível registrar a despesa',
+        description: formatEntitySaveError(error),
+      });
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => api.entities.Expense.update(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setFormOpen(false); setEditingExpense(null); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      setFormOpen(false);
+      setEditingExpense(null);
+      toast({ title: 'Despesa atualizada', description: 'As alterações foram salvas.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao atualizar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível salvar a despesa',
+        description: formatEntitySaveError(error),
+      });
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.entities.Expense.delete(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses'] }); setDeleteConfirm(null); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      setDeleteConfirm(null);
+    },
   });
 
   const handleSave = async (data) => {
     if (editingExpense) {
       updateMutation.mutate({ id: editingExpense.id, data });
-    } else if (Array.isArray(data)) {
-      for (const entry of data) {
-        await api.entities.Expense.create({ ...entry, status: 'to_pay' });
-      }
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      setFormOpen(false);
-    } else {
-      createMutation.mutate(data);
+      return;
     }
+    if (Array.isArray(data)) {
+      try {
+        for (const entry of data) {
+          await api.entities.Expense.create({ ...entry, status: 'to_pay' });
+        }
+        queryClient.invalidateQueries({ queryKey: ['expenses'] });
+        setFormOpen(false);
+        setEditingExpense(null);
+        toast({
+          title: 'Despesas registradas',
+          description: `${data.length} lançamentos recorrentes foram salvos.`,
+        });
+      } catch (error) {
+        console.error('Erro ao criar despesas recorrentes:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Não foi possível registrar as despesas',
+          description: formatEntitySaveError(error),
+        });
+      }
+      return;
+    }
+    createMutation.mutate(data);
   };
 
   const handlePay = async ({ accountId, payDate }) => {
@@ -348,7 +407,7 @@ export default function ExpensesTab() {
   };
 
   const handleReversePayment = async (expense) => {
-    if (!expense || expense.status !== 'paid') return;
+    if (!expense || !isPaidExpense(expense.status)) return;
     const ok = window.confirm('Confirmar reversão desta despesa paga?');
     if (!ok) return;
 
@@ -397,7 +456,10 @@ export default function ExpensesTab() {
 
   const globalPeriodStr = `${period.year}-${String(period.month).padStart(2, '0')}`;
   const filteredExpenses = expenses.filter(e => {
-    const matchStatus = filterStatus === 'all' || e.status === filterStatus;
+    const matchStatus =
+      filterStatus === 'all'
+      || (filterStatus === 'to_pay' && isOpenExpense(e.status))
+      || (filterStatus === 'paid' && isPaidExpense(e.status));
     const matchProject = filterProject === 'all' || e.project_id === filterProject;
     const matchAccount = filterAccount === 'all' || e.chart_account_id === filterAccount;
     let matchPeriod = true;
@@ -411,8 +473,8 @@ export default function ExpensesTab() {
     return matchStatus && matchProject && matchAccount && matchPeriod;
   });
 
-  const totalToPay = expenses.filter(e => e.status === 'to_pay' && (e.due_date || '').startsWith(globalPeriodStr)).reduce((s, e) => s + (e.amount || 0), 0);
-  const totalPaid = expenses.filter(e => e.status === 'paid' && (e.payment_date || '').startsWith(globalPeriodStr)).reduce((s, e) => s + (e.amount || 0), 0);
+  const totalToPay = expenses.filter(e => isOpenExpense(e.status) && (e.due_date || '').startsWith(globalPeriodStr)).reduce((s, e) => s + (e.amount || 0), 0);
+  const totalPaid = expenses.filter(e => isPaidExpense(e.status) && (e.payment_date || '').startsWith(globalPeriodStr)).reduce((s, e) => s + (e.amount || 0), 0);
   const totalFiltered = filteredExpenses.reduce((s, e) => s + (e.amount || 0), 0);
 
   const getAccountLabel = (id) => {
@@ -532,7 +594,7 @@ export default function ExpensesTab() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      {expense.status === 'to_pay' && (
+                      {isOpenExpense(expense.status) && (
                         <button onClick={() => setPayingExpense(expense)}
                           className="flex items-center gap-1 px-2 py-1.5 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded font-medium whitespace-nowrap">
                           <CheckCircle2 className="w-3.5 h-3.5" /> Baixar
@@ -548,7 +610,7 @@ export default function ExpensesTab() {
                           <DropdownMenuItem onClick={() => { setEditingExpense(expense); setFormOpen(true); }}>
                             <Pencil className="w-4 h-4 mr-2" /> Editar
                           </DropdownMenuItem>
-                          {expense.status === 'paid' && (
+                          {isPaidExpense(expense.status) && (
                             <DropdownMenuItem
                               disabled={reverseLoadingId === expense.id}
                               onClick={() => handleReversePayment(expense)}

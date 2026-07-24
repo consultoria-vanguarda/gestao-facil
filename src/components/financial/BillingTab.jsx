@@ -122,8 +122,9 @@ export default function BillingTab() {
     }
 
     // If extra revenue: lança na conta 1.5 como BillingEntry extra
+    let extraEntry = null;
     if (extraRevenue > 0) {
-      await api.entities.BillingEntry.create({
+      extraEntry = await api.entities.BillingEntry.create({
         project_id: entry.project_id || '',
         amount: extraRevenue,
         status: 'received',
@@ -135,8 +136,16 @@ export default function BillingTab() {
       });
     }
 
-    // Lança despesa de imposto (A Pagar, vence no último dia do mês)
-    await lancaImpostoDespesa({ ...entry, amount: entry.amount }, today, taxRates);
+    // Lança despesa de imposto (A Pagar) com base na alíquota do mês do recebimento
+    try {
+      await lancaImpostoDespesa({ ...entry, amount: entry.amount }, today, taxRates);
+      if (extraEntry) {
+        await lancaImpostoDespesa(extraEntry, today, taxRates);
+      }
+    } catch (err) {
+      console.error('Falha ao lançar despesa de imposto:', err);
+      alert('Recebimento registrado, mas falhou ao criar a despesa de imposto. Verifique a alíquota do mês e o plano de contas (3.2.01).');
+    }
 
     queryClient.invalidateQueries({ queryKey: ['billings'] });
     queryClient.invalidateQueries({ queryKey: ['accounts'] });
@@ -283,8 +292,9 @@ export default function BillingTab() {
     }
 
     // If extra revenue: lança na conta 1.5 como BillingEntry extra
+    let extraEntry = null;
     if (extraRevenue > 0) {
-      await api.entities.BillingEntry.create({
+      extraEntry = await api.entities.BillingEntry.create({
         project_id: selectedEntries[0]?.project_id || '',
         amount: extraRevenue,
         status: 'received',
@@ -296,8 +306,23 @@ export default function BillingTab() {
       });
     }
 
-    // Lança despesa de imposto em lote (A Pagar, vence no último dia do mês)
-    await lancaImpostoDespesaLote(originalTotal, batchToday, taxRates, selectedEntries[0]?.project_id);
+    // Lança despesa de imposto em lote (A Pagar) + imposto da receita extra, se houver
+    try {
+      const entryIds = selectedEntries.map((e) => e.id);
+      await lancaImpostoDespesaLote(
+        originalTotal,
+        batchToday,
+        taxRates,
+        selectedEntries[0]?.project_id,
+        entryIds,
+      );
+      if (extraEntry) {
+        await lancaImpostoDespesa(extraEntry, batchToday, taxRates);
+      }
+    } catch (err) {
+      console.error('Falha ao lançar despesa de imposto em lote:', err);
+      alert('Recebimentos registrados, mas falhou ao criar a despesa de imposto. Verifique a alíquota do mês e o plano de contas (3.2.01).');
+    }
 
     queryClient.invalidateQueries({ queryKey: ['billings'] });
     queryClient.invalidateQueries({ queryKey: ['accounts'] });

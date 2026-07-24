@@ -48,6 +48,15 @@ const applyMissingColumnFallback = (row, missingColumn) => {
   return fallback;
 };
 
+/** '' em FKs opcionais quebra INSERT/UPDATE (ex.: project_id REFERENCES). */
+const normalizeEmptyStringsToNull = (data = {}) => {
+  const row = { ...data };
+  for (const [key, value] of Object.entries(row)) {
+    if (value === '') row[key] = null;
+  }
+  return row;
+};
+
 export const formatEntitySaveError = (error) => {
   const message = error?.message || '';
   if (message.includes('max_hours_per_day')) {
@@ -98,7 +107,7 @@ const createEntity = (tableName) => {
   const create = async (data) => {
     const orgId = requireCurrentOrganizationId();
     requireCurrentOrganizationWritable();
-    const row = { ...data };
+    const row = normalizeEmptyStringsToNull(data);
     if (!row.id) row.id = generateId();
     row.organization_id = orgId;
 
@@ -122,7 +131,7 @@ const createEntity = (tableName) => {
     requireCurrentOrganizationWritable();
 
     let payload = {
-      ...data,
+      ...normalizeEmptyStringsToNull(data),
       organization_id: orgId,
       updated_date: data?.updated_date ?? new Date().toISOString(),
     };
@@ -168,7 +177,7 @@ const createEntity = (tableName) => {
   const bulkCreate = async (records) => {
     const orgId = requireCurrentOrganizationId();
     requireCurrentOrganizationWritable();
-    const rows = (records || []).map((r) => ({ ...r }));
+    const rows = (records || []).map((r) => normalizeEmptyStringsToNull(r));
     for (const row of rows) {
       if (!row.id) row.id = generateId();
       row.organization_id = orgId;

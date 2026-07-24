@@ -1,95 +1,158 @@
 import { api } from '@/api/appApi';
 import { format, lastDayOfMonth } from 'date-fns';
 
+const TAX_ACCOUNT_CODE = '3.2.01';
+const TAX_ENTRY_MARKER = 'ref:billing:';
+
+function parseRatePercent(value) {
+  const rate = Number(value);
+  return Number.isFinite(rate) ? rate : 0;
+}
+
+function buildTaxDescription({ ratePercent, receivedDate, entryId }) {
+  return `Imposto Simples Nacional (${ratePercent}%) — receb. ${receivedDate} — ${TAX_ENTRY_MARKER}${entryId}`;
+}
+
+function buildTaxLoteDescription({ ratePercent, receivedDate, loteKey }) {
+  return `Imposto Simples Nacional em lote (${ratePercent}%) — receb. ${receivedDate} — ${loteKey}`;
+}
+
+async function resolveTaxChartAccount() {
+  const chartAccounts = await api.entities.ChartOfAccounts.list();
+  const expenseAccounts = chartAccounts.filter((a) => a.type === 'expense' && a.active !== false);
+
+  const byCode = expenseAccounts.find((a) => a.code === TAX_ACCOUNT_CODE);
+  if (byCode) return byCode;
+
+  // Fallback por nome (evita match genérico em "Taxas" via substring "tax")
+  return expenseAccounts.find((a) => {
+    const name = a.name?.toLowerCase() || '';
+    return (
+      name.includes('simples nacional')
+      || name.includes('imposto unificado')
+      || (name.includes('das') && name.includes('imposto'))
+      || name.includes('simples')
+    );
+  }) || null;
+}
+
+async function resolveTaxRate(referenceMonth, taxRates) {
+  let rates = Array.isArray(taxRates) ? taxRates : [];
+  if (rates.length === 0) {
+    rates = await api.entities.TaxRate.list();
+  }
+  const taxRate = rates.find((t) => t.month === referenceMonth);
+  return parseRatePercent(taxRate?.rate_percent);
+}
+
+async function hasExpenseForBillingEntry(entryId) {
+  if (!entryId) return false;
+  const expenses = await api.entities.Expense.list();
+  const marker = `${TAX_ENTRY_MARKER}${entryId}`;
+  return expenses.some((e) => (e.description || '').includes(marker));
+}
+
 /**
  * Ao EFETIVAR um recebimento (status -> received), busca a alíquota do mês de referência
- * e cria uma Expense (A Pagar) com vencimento no último dia do mês, lançada na conta
- * do Plano de Contas que contém o nome do imposto (ex: "Simples Nacional").
+ * e cria uma Expense (A Pagar) com vencimento no último dia do mês, na conta 3.2.01
+ * (Imposto Unificado - DAS / Simples Nacional).
  *
  * @param {object} entry - BillingEntry que acabou de ser recebido
  * @param {string} receivedDate - Data do recebimento (yyyy-MM-dd)
- * @param {Array} taxRates - Array de TaxRate já carregado
+ * @param {Array} taxRates - Array de TaxRate já carregado (opcional)
+ * @returns {object|null} despesa criada ou null se não houver alíquota / já existir
  */
 export async function lancaImpostoDespesa(entry, receivedDate, taxRates) {
-  if (!receivedDate || !entry?.amount) return;
+  if (!receivedDate || !entry?.amount || !entry?.id) return null;
 
-  // Mês de referência = mês do recebimento
   const referenceMonth = receivedDate.slice(0, 7); // YYYY-MM
+  const ratePercent = await resolveTaxRate(referenceMonth, taxRates);
+  if (ratePercent <= 0) return null;
 
-  // Busca alíquota do mês
-  const taxRate = taxRates.find(t => t.month === referenceMonth);
-  const ratePercent = taxRate?.rate_percent || 0;
+  if (await hasExpenseForBillingEntry(entry.id)) return null;
 
-  if (ratePercent <= 0) return; // sem alíquota cadastrada, não lança
+  const taxAmount = Math.round((Number(entry.amount) * ratePercent) / 100 * 100) / 100;
+  if (taxAmount <= 0) return null;
 
-  const taxAmount = Math.round((entry.amount * ratePercent) / 100 * 100) / 100;
-
-  // Vencimento = último dia do mês do recebimento
   const [y, m] = referenceMonth.split('-');
-  const lastDay = lastDayOfMonth(new Date(parseInt(y), parseInt(m) - 1, 1));
+  const lastDay = lastDayOfMonth(new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1));
   const dueDate = format(lastDay, 'yyyy-MM-dd');
+  const taxAccount = await resolveTaxChartAccount();
+  const description = buildTaxDescription({ ratePercent, receivedDate, entryId: entry.id });
 
-  // Busca conta do Plano de Contas pelo nome (type = expense)
-  // Tenta encontrar conta com "Simples" no nome, ou "Imposto", ou "Tax"
-  const chartAccounts = await api.entities.ChartOfAccounts.filter({ type: 'expense' });
-  const taxAccount = chartAccounts.find(a =>
-    a.name?.toLowerCase().includes('simples') ||
-    a.name?.toLowerCase().includes('imposto') ||
-    a.name?.toLowerCase().includes('das') ||
-    a.name?.toLowerCase().includes('inss') ||
-    a.name?.toLowerCase().includes('tax')
-  );
-
-  // Verifica se já existe despesa de imposto para este billing_entry
-  const existing = await api.entities.Expense.filter({ description: `Imposto (${ratePercent}%) — receb. ${receivedDate} — ${entry.id}` });
-  if (existing.length > 0) return;
-
-  await api.entities.Expense.create({
-    project_id: entry.project_id || '',
-    chart_account_id: taxAccount?.id || '',
+  const expense = await api.entities.Expense.create({
+    project_id: entry.project_id || null,
+    chart_account_id: taxAccount?.id || null,
     category: 'administrative',
-    description: `Imposto (${ratePercent}%) — receb. ${receivedDate} — ${entry.id}`,
+    description,
     amount: taxAmount,
     due_date: dueDate,
     status: 'to_pay',
   });
+
+  try {
+    await api.entities.TaxExpenseEntry.create({
+      billing_entry_id: entry.id,
+      chart_account_code: taxAccount?.code || TAX_ACCOUNT_CODE,
+      reference_month: referenceMonth,
+      billed_date: receivedDate,
+      revenue_amount: Number(entry.amount),
+      tax_rate_percent: ratePercent,
+      tax_amount: taxAmount,
+      description,
+      project_id: entry.project_id || null,
+    });
+  } catch (err) {
+    // Auditoria é complementar; a despesa a pagar já foi criada.
+    console.warn('Falha ao registrar tax_expense_entry:', err);
+  }
+
+  return expense;
 }
 
 /**
  * Versão para lote: lança imposto sobre um valor total (não por entry individual),
  * agrupando tudo em uma única Expense do mês.
  */
-export async function lancaImpostoDespesaLote(totalAmount, receivedDate, taxRates, projectId) {
-  if (!receivedDate || !totalAmount) return;
+export async function lancaImpostoDespesaLote(totalAmount, receivedDate, taxRates, projectId, entryIds = []) {
+  if (!receivedDate || !totalAmount) return null;
 
   const referenceMonth = receivedDate.slice(0, 7);
-  const taxRate = taxRates.find(t => t.month === referenceMonth);
-  const ratePercent = taxRate?.rate_percent || 0;
+  const ratePercent = await resolveTaxRate(referenceMonth, taxRates);
+  if (ratePercent <= 0) return null;
 
-  if (ratePercent <= 0) return;
+  const taxAmount = Math.round((Number(totalAmount) * ratePercent) / 100 * 100) / 100;
+  if (taxAmount <= 0) return null;
 
-  const taxAmount = Math.round((totalAmount * ratePercent) / 100 * 100) / 100;
+  // Evita duplicar se todas as entradas do lote já tiverem despesa individual
+  if (entryIds.length > 0) {
+    const already = await Promise.all(entryIds.map((id) => hasExpenseForBillingEntry(id)));
+    if (already.every(Boolean)) return null;
+  }
 
   const [y, m] = referenceMonth.split('-');
-  const lastDay = lastDayOfMonth(new Date(parseInt(y), parseInt(m) - 1, 1));
+  const lastDay = lastDayOfMonth(new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1));
   const dueDate = format(lastDay, 'yyyy-MM-dd');
+  const taxAccount = await resolveTaxChartAccount();
 
-  const chartAccounts = await api.entities.ChartOfAccounts.filter({ type: 'expense' });
-  const taxAccount = chartAccounts.find(a =>
-    a.name?.toLowerCase().includes('simples') ||
-    a.name?.toLowerCase().includes('imposto') ||
-    a.name?.toLowerCase().includes('das') ||
-    a.name?.toLowerCase().includes('inss') ||
-    a.name?.toLowerCase().includes('tax')
-  );
+  const loteKey = entryIds.length > 0
+    ? `ref:lote:${entryIds.slice().sort().join(',')}`
+    : `ref:lote:${receivedDate}:${taxAmount}`;
 
-  await api.entities.Expense.create({
-    project_id: projectId || '',
-    chart_account_id: taxAccount?.id || '',
+  const description = buildTaxLoteDescription({ ratePercent, receivedDate, loteKey });
+
+  const expenses = await api.entities.Expense.list();
+  if (expenses.some((e) => (e.description || '').includes(loteKey))) return null;
+
+  const expense = await api.entities.Expense.create({
+    project_id: projectId || null,
+    chart_account_id: taxAccount?.id || null,
     category: 'administrative',
-    description: `Imposto em lote (${ratePercent}%) — receb. ${receivedDate}`,
+    description,
     amount: taxAmount,
     due_date: dueDate,
     status: 'to_pay',
   });
+
+  return expense;
 }

@@ -94,6 +94,22 @@ BEGIN
     RAISE NOTICE '  chart_of_accounts: % linha(s) removida(s)', deleted_count;
   END IF;
 
+  -- Garante plano de contas padrão se o tenant ainda não tiver (ou perdeu is_default).
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'seed_default_chart_of_accounts'
+  ) THEN
+    deleted_count := public.seed_default_chart_of_accounts(target_org_id);
+    IF deleted_count > 0 THEN
+      RAISE NOTICE '  chart_of_accounts (seed padrão): % conta(s) inserida(s)', deleted_count;
+    ELSE
+      RAISE NOTICE '  chart_of_accounts padrão: preservado';
+    END IF;
+  END IF;
+
   RAISE NOTICE '  service_area_config: preservado (seed)';
   RAISE NOTICE '  viability_cost_config: preservado (seed)';
 

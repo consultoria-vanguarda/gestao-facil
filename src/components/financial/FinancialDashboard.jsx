@@ -79,7 +79,7 @@ export default function FinancialDashboard() {
 
   const openPayables = payables.filter(p => p.status === 'open' && (p.due_date || '').startsWith(periodStr)).reduce((s, p) => s + (p.amount || 0), 0);
   const paidPayables = payables.filter(p => p.status === 'paid' && (p.paid_at || '').startsWith(periodStr)).reduce((s, p) => s + (p.amount || 0), 0);
-  const openExpenses = expenses.filter(e => e.status === 'to_pay' && (e.due_date || '').startsWith(periodStr)).reduce((s, e) => s + (e.amount || 0), 0);
+  const openExpenses = expenses.filter(e => (e.status === 'to_pay' || e.status === 'pending') && (e.due_date || '').startsWith(periodStr)).reduce((s, e) => s + (e.amount || 0), 0);
   const totalOpenPayables = openPayables + openExpenses;
 
   const taxAmount = received * (periodTaxRate / 100);

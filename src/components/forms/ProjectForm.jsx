@@ -242,6 +242,30 @@ function generateScheduleRows(formData, activities, skipDates = new Set(), usedP
   return rows;
 }
 
+/** Converte dd/MM/yyyy ou yyyy-MM-dd para yyyy-MM-dd (input type=date). */
+function toIsoDateInput(value) {
+  if (!value) return '';
+  const s = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (s.includes('/')) {
+    const [d, m, y] = s.split('/');
+    if (y?.length === 4) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  return s;
+}
+
+/** Converte yyyy-MM-dd para dd/MM/yyyy (formato de exibição/persistência do cronograma). */
+function toDisplayDate(value) {
+  if (!value) return '';
+  const s = String(value).trim();
+  if (s.includes('/')) return s;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  return s;
+}
+
 export default function ProjectForm({ open, onClose, project, onSave, loading, clients, consultants, serviceModels }) {
   const { organizationId } = useTenant();
   const { toast } = useToast();
@@ -264,6 +288,8 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   // Days-off confirmation state
   const [daysOffProposal, setDaysOffProposal] = useState(null); // array of { date: 'dd/MM/yyyy' } or null
   const [daysOffConfirmed, setDaysOffConfirmed] = useState(false);
+  const [scheduleEdited, setScheduleEdited] = useState(false);
+  const [scheduleEditError, setScheduleEditError] = useState('');
   const [consultantUsedPatterns, setConsultantUsedPatterns] = useState(new Set());
 
   // Public Policies state
@@ -326,9 +352,12 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       if (project.schedule_config && project.schedule_config.length > 0) {
         setScheduleRows(project.schedule_config);
         setDaysOffConfirmed(true);
+        setScheduleEdited(true);
       } else {
         setDaysOffConfirmed(false);
+        setScheduleEdited(false);
       }
+      setScheduleEditError('');
       // Restaurar nextGroupId baseado em grupos existentes
       const maxGroupNum = Math.max(
         0,
@@ -341,6 +370,9 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       setConsultantConflicts([]);
       setScheduleRows([]);
       setNextGroupId(1);
+      setDaysOffConfirmed(false);
+      setScheduleEdited(false);
+      setScheduleEditError('');
     }
   }, [open, project]);
 
@@ -368,16 +400,17 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   useEffect(() => {
     if (formData.project_type === 'consulting' && formData.activities.length > 0) {
       const hasGrouping = Object.keys(formData.activity_groups || {}).length > 0;
+      const hasSavedConfig = formData.schedule_config && formData.schedule_config.length > 0;
 
-      if (hasGrouping && formData.schedule_config && formData.schedule_config.length > 0) {
-        // Se há agrupamento, usar schedule_config customizado
+      if (hasGrouping && hasSavedConfig) {
+        setScheduleRows(formData.schedule_config);
+      } else if (scheduleEdited && hasSavedConfig) {
+        // Edição manual de data/horas: preservar cronograma
         setScheduleRows(formData.schedule_config);
       } else if (!hasGrouping) {
-        // Se NÃO há agrupamento e folgas estão confirmadas, usar schedule_config salvo
-        if (daysOffConfirmed && formData.schedule_config && formData.schedule_config.length > 0) {
+        if (daysOffConfirmed && hasSavedConfig) {
           setScheduleRows(formData.schedule_config);
         } else if (!daysOffConfirmed) {
-          // Auto-gerar o cronograma somente se folgas não foram confirmadas manualmente
           setScheduleRows(
             generateScheduleRows(
               formData,
@@ -394,7 +427,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       formData.max_work_days_per_week,
       formData.activities, formData.project_type, formData.schedule_config, formData.activity_groups,
       formData.estimated_hours, consultantUsedPatterns,
-      daysOffConfirmed]);
+      daysOffConfirmed, scheduleEdited]);
 
   // Auto-calculate estimated hours from activities
   useEffect(() => {
@@ -557,12 +590,24 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const structuralScheduleFields = new Set([
+      'start_date',
+      'max_hours_per_day',
+      'consider_sundays',
+      'consider_holidays',
+      'days_off',
+      'days_off_position',
+      'max_work_days_per_week',
+    ]);
+
     if (name === 'consultant_id') {
       setFormData(prev => ({ ...prev, [name]: value, area: '', subarea: '' }));
     } else if (name === 'days_off' || name === 'days_off_position') {
       const updatedFormData = { ...formData, [name]: value, schedule_config: [] };
       setFormData(updatedFormData);
       setDaysOffConfirmed(false);
+      setScheduleEdited(false);
+      setScheduleEditError('');
       // Generate proposal for days off dates
       if (parseInt(name === 'days_off' ? value : formData.days_off) > 0) {
         const proposal = generateDaysOffProposal(updatedFormData);
@@ -571,7 +616,13 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
         setDaysOffProposal(null);
       }
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      if (structuralScheduleFields.has(name)) {
+        setScheduleEdited(false);
+        setScheduleEditError('');
+        setFormData(prev => ({ ...prev, [name]: value, schedule_config: [] }));
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
     }
   };
 
@@ -617,15 +668,20 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     setScheduleRows(merged);
     setFormData(prev => ({ ...prev, schedule_config: merged }));
     setDaysOffConfirmed(true);
+    setScheduleEdited(true);
+    setScheduleEditError('');
     setDaysOffProposal(null);
   };
 
   const handleAddActivity = () => {
     if (!newActivity.description) return;
     const newActivityId = formData.activities.length;
+    setScheduleEdited(false);
+    setScheduleEditError('');
     setFormData(prev => ({
       ...prev,
-      activities: [...prev.activities, { ...newActivity, id: newActivityId }]
+      activities: [...prev.activities, { ...newActivity, id: newActivityId }],
+      schedule_config: [],
     }));
     setNewActivity({ description: '', days: '', hours: '', modality: '', delivery: '' });
   };
@@ -700,16 +756,22 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   };
 
   const handleActivityFieldChange = (idx, field, value) => {
+    setScheduleEdited(false);
+    setScheduleEditError('');
     setFormData(prev => ({
       ...prev,
-      activities: prev.activities.map((a, i) => i === idx ? { ...a, [field]: value } : a)
+      activities: prev.activities.map((a, i) => i === idx ? { ...a, [field]: value } : a),
+      schedule_config: [],
     }));
   };
 
   const handleRemoveActivity = (idx) => {
+    setScheduleEdited(false);
+    setScheduleEditError('');
     setFormData(prev => ({
       ...prev,
-      activities: prev.activities.filter((_, i) => i !== idx)
+      activities: prev.activities.filter((_, i) => i !== idx),
+      schedule_config: [],
     }));
   };
 
@@ -720,9 +782,12 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
 
   const handleSaveEditActivity = () => {
     if (!editingActivity.description) return;
+    setScheduleEdited(false);
+    setScheduleEditError('');
     setFormData(prev => ({
       ...prev,
-      activities: prev.activities.map((a, i) => i === editingActivityIdx ? { ...editingActivity } : a)
+      activities: prev.activities.map((a, i) => i === editingActivityIdx ? { ...editingActivity } : a),
+      schedule_config: [],
     }));
     setEditingActivityIdx(null);
     setEditingActivity(null);
@@ -736,14 +801,72 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
   const handleScheduleDeliveryChange = (idx, value) => {
     const updatedRows = scheduleRows.map((r, i) => i === idx ? { ...r, delivery: value } : r);
     setScheduleRows(updatedRows);
-    // Persist to schedule_config
+    setScheduleEdited(true);
     setFormData(prev => ({ ...prev, schedule_config: updatedRows }));
   };
 
   const handleScheduleDateChange = (idx, newDate) => {
-    const updatedRows = scheduleRows.map((r, i) => i === idx ? { ...r, date: newDate } : r);
+    if (!newDate) {
+      setScheduleEditError('Informe uma data válida para a fase.');
+      return;
+    }
+    const displayDate = toDisplayDate(newDate);
+    const updatedRows = scheduleRows.map((r, i) =>
+      i === idx ? { ...r, date: displayDate } : r
+    );
+    setScheduleEditError('');
+    setScheduleEdited(true);
     setScheduleRows(updatedRows);
-    // Persist to schedule_config
+    setFormData(prev => ({ ...prev, schedule_config: updatedRows }));
+  };
+
+  const handleScheduleHoursChange = (idx, rawValue) => {
+    const maxHpd = parseMaxHoursPerDay(formData.max_hours_per_day, 8);
+    const totalTarget =
+      Math.round(
+        formData.activities.reduce((sum, act) => sum + (parseFloat(act.hours) || 0), 0),
+      ) || Math.round(parseFloat(formData.estimated_hours) || 0);
+
+    if (rawValue === '' || rawValue == null) {
+      setScheduleEditError('Informe a quantidade de horas da fase.');
+      return;
+    }
+
+    const hours = Math.round(Number(rawValue));
+    if (!Number.isFinite(hours) || hours < 1) {
+      setScheduleEditError('Cada fase deve ter pelo menos 1 hora.');
+      return;
+    }
+    if (hours > maxHpd) {
+      setScheduleEditError(`Máximo de ${maxHpd} h por dia. Ajuste o valor da fase.`);
+      return;
+    }
+
+    const updatedRows = scheduleRows.map((r, i) =>
+      i === idx ? { ...r, hours } : r
+    );
+    const newSum = sumHours(
+      updatedRows.filter((r) => !r.isDayOff).map((r) => r.hours),
+    );
+    const overMax = updatedRows.some(
+      (r) => !r.isDayOff && Math.round(Number(r.hours) || 0) > maxHpd,
+    );
+
+    if (overMax) {
+      setScheduleEditError(`Nenhuma fase pode ultrapassar ${maxHpd} h/dia.`);
+      return;
+    }
+
+    if (totalTarget > 0 && newSum !== totalTarget) {
+      setScheduleEditError(
+        `Soma atual: ${newSum}h de ${totalTarget}h. Ajuste as fases para fechar o total exato.`,
+      );
+    } else {
+      setScheduleEditError('');
+    }
+
+    setScheduleEdited(true);
+    setScheduleRows(updatedRows);
     setFormData(prev => ({ ...prev, schedule_config: updatedRows }));
   };
 
@@ -752,6 +875,7 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
     const updatedRows = scheduleRows.map((r, i) => 
       i === idx ? { ...r, activity: activity.description || `Atividade ${activityIdx + 1}`, activityIdx } : r
     );
+    setScheduleEdited(true);
     setScheduleRows(updatedRows);
     setFormData(prev => ({ ...prev, schedule_config: updatedRows }));
   };
@@ -797,6 +921,35 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
       if (!validation.feasible) {
         alert(validation.message || 'Ajuste os dias das atividades para distribuir as horas corretamente.');
         return;
+      }
+
+      const rowsToValidate =
+        (formData.schedule_config && formData.schedule_config.length > 0)
+          ? formData.schedule_config
+          : scheduleRows;
+      const workRows = rowsToValidate.filter((r) => !r.isDayOff);
+      if (workRows.length > 0) {
+        const distributed = sumHours(workRows.map((r) => r.hours));
+        const overMax = workRows.some(
+          (r) => Math.round(Number(r.hours) || 0) > maxHpd,
+        );
+        const underMin = workRows.some(
+          (r) => Math.round(Number(r.hours) || 0) < 1,
+        );
+        if (overMax) {
+          alert(`Nenhuma fase pode ultrapassar ${maxHpd} h/dia.`);
+          return;
+        }
+        if (underMin) {
+          alert('Cada fase de trabalho deve ter pelo menos 1 hora.');
+          return;
+        }
+        if (totalHours > 0 && distributed !== totalHours) {
+          alert(
+            `A soma das horas do cronograma (${distributed}h) deve ser igual ao total estimado (${totalHours}h).`,
+          );
+          return;
+        }
       }
     }
 
@@ -1979,14 +2132,23 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                 </div>
               )}
 
+              {scheduleEditError && (
+                <div style={{ marginBottom: '12px', padding: '10px 14px', backgroundColor: '#fff7ed', border: '1px solid #fdba74', borderRadius: '6px', fontSize: '13px', color: '#c2410c' }}>
+                  {scheduleEditError}
+                </div>
+              )}
+
               {scheduleRows.length > 0 && (
                 <div style={{ overflowX: 'auto' }}>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
+                    Você pode alterar a data e as horas de cada fase. Limite: {scheduleMaxHpd} h/dia; a soma deve fechar em {scheduleEstimatedHours || 0}h.
+                  </p>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#1e3a5f', color: 'white' }}>
                         <th style={{ padding: '8px 12px', textAlign: 'left', whiteSpace: 'nowrap' }}>Data</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left' }}>Atividade</th>
-                        <th style={{ padding: '8px 12px', textAlign: 'center', width: '60px' }}>Horas</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'center', width: '80px' }}>Horas</th>
                         <th style={{ padding: '8px 12px', textAlign: 'center', width: '120px' }}>Modalidade</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left', width: '200px' }}>Entregas/Relatórios</th>
                       </tr>
@@ -1994,22 +2156,25 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                     <tbody>
                       {scheduleRows.map((row, idx) => {
                         const hasGrouping = Object.keys(formData.activity_groups || {}).length > 0;
-                        const isEditable = hasGrouping;
+                        const dayHours = Math.round(Number(row.hours) || 0);
+                        const hoursInvalid = !row.isDayOff && (dayHours < 1 || dayHours > scheduleMaxHpd);
                         return (
                         <tr key={idx} style={{ backgroundColor: row.isDayOff ? '#fef9c3' : idx % 2 === 0 ? 'white' : '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                           <td style={{ padding: '8px 12px', whiteSpace: 'nowrap', fontWeight: 500 }}>
-                            {row.isDayOff ? row.date : (
-                              isEditable ? (
-                                <input type="date" value={row.date || ''} onChange={e => handleScheduleDateChange(idx, e.target.value)}
-                                  style={{ padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '12px', width: '120px' }} />
-                              ) : (
-                                <span style={{ padding: '4px 6px', fontSize: '12px' }}>{row.date}</span>
-                              )
+                            {row.isDayOff ? (
+                              <span style={{ padding: '4px 6px', fontSize: '12px' }}>{row.date}</span>
+                            ) : (
+                              <input
+                                type="date"
+                                value={toIsoDateInput(row.date)}
+                                onChange={(e) => handleScheduleDateChange(idx, e.target.value)}
+                                style={{ padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '12px', width: '130px' }}
+                              />
                             )}
                           </td>
                           <td style={{ padding: '8px 12px', color: row.isDayOff ? '#ca8a04' : 'inherit' }}>
                             {row.isDayOff ? 'Folga' : (
-                              isEditable ? (
+                              hasGrouping ? (
                                 <select value={row.activityIdx !== undefined ? row.activityIdx : ''} onChange={e => handleScheduleActivityChange(idx, parseInt(e.target.value))}
                                   style={{ width: '100%', padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '12px' }}>
                                   <option value="">Selecione atividade</option>
@@ -2024,7 +2189,23 @@ export default function ProjectForm({ open, onClose, project, onSave, loading, c
                           </td>
                           <td style={{ padding: '8px 12px', textAlign: 'center' }}>
                             {row.isDayOff ? '-' : (
-                              <span style={{ padding: '4px 6px', fontSize: '12px', display: 'block' }}>{row.hours}</span>
+                              <input
+                                type="number"
+                                min={1}
+                                max={scheduleMaxHpd}
+                                step={1}
+                                value={row.hours ?? ''}
+                                onChange={(e) => handleScheduleHoursChange(idx, e.target.value)}
+                                style={{
+                                  width: '64px',
+                                  padding: '4px 6px',
+                                  border: `1px solid ${hoursInvalid ? '#f87171' : '#cbd5e1'}`,
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  textAlign: 'center',
+                                  backgroundColor: hoursInvalid ? '#fef2f2' : 'white',
+                                }}
+                              />
                             )}
                           </td>
                           <td style={{ padding: '8px 12px' }}>

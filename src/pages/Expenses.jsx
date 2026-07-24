@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '@/api/appApi';
+import { api, formatEntitySaveError } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, MoreHorizontal, Pencil, Trash2, Check, X } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,9 +29,11 @@ import EmptyState from '../components/ui/EmptyState';
 import ExpenseForm from '../components/forms/ExpenseForm';
 import { motion } from 'framer-motion';
 import { EXPENSE_CATEGORIES } from '../components/utils/constants';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function Expenses() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectFilter, setProjectFilter] = useState('all');
@@ -59,6 +61,16 @@ export default function Expenses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);
+      setEditingExpense(null);
+      toast({ title: 'Despesa registrada', description: 'O lançamento foi salvo com sucesso.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao criar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível registrar a despesa',
+        description: formatEntitySaveError(error),
+      });
     },
   });
 
@@ -68,6 +80,15 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setFormOpen(false);
       setEditingExpense(null);
+      toast({ title: 'Despesa atualizada', description: 'As alterações foram salvas.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao atualizar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível salvar a despesa',
+        description: formatEntitySaveError(error),
+      });
     },
   });
 
@@ -82,16 +103,31 @@ export default function Expenses() {
   const handleSave = async (data) => {
     if (editingExpense) {
       updateMutation.mutate({ id: editingExpense.id, data });
-    } else if (Array.isArray(data)) {
-      // Recurring: create multiple entries sequentially
-      for (const entry of data) {
-        await api.entities.Expense.create(entry);
-      }
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      setFormOpen(false);
-    } else {
-      createMutation.mutate(data);
+      return;
     }
+    if (Array.isArray(data)) {
+      try {
+        for (const entry of data) {
+          await api.entities.Expense.create(entry);
+        }
+        queryClient.invalidateQueries({ queryKey: ['expenses'] });
+        setFormOpen(false);
+        setEditingExpense(null);
+        toast({
+          title: 'Despesas registradas',
+          description: `${data.length} lançamentos recorrentes foram salvos.`,
+        });
+      } catch (error) {
+        console.error('Erro ao criar despesas recorrentes:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Não foi possível registrar as despesas',
+          description: formatEntitySaveError(error),
+        });
+      }
+      return;
+    }
+    createMutation.mutate(data);
   };
 
   const handleEdit = (expense) => {

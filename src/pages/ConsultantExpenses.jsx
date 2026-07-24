@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '@/api/appApi';
+import { api, formatEntitySaveError } from '@/api/appApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, MoreHorizontal, Pencil, Trash2, Calendar } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,6 +29,7 @@ import EmptyState from '../components/ui/EmptyState';
 import ExpenseForm from '../components/forms/ExpenseForm';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { useToast } from '@/components/ui/use-toast';
 
 const CATEGORIES = {
   travel: "Deslocamento",
@@ -47,6 +48,7 @@ export default function ConsultantExpenses() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -78,6 +80,15 @@ export default function ConsultantExpenses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myExpenses'] });
       setFormOpen(false);
+      toast({ title: 'Despesa registrada', description: 'O lançamento foi salvo com sucesso.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao criar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível registrar a despesa',
+        description: formatEntitySaveError(error),
+      });
     },
   });
 
@@ -87,6 +98,15 @@ export default function ConsultantExpenses() {
       queryClient.invalidateQueries({ queryKey: ['myExpenses'] });
       setFormOpen(false);
       setEditingExpense(null);
+      toast({ title: 'Despesa atualizada', description: 'As alterações foram salvas.' });
+    },
+    onError: (error) => {
+      console.error('Erro ao atualizar despesa:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível salvar a despesa',
+        description: formatEntitySaveError(error),
+      });
     },
   });
 
