@@ -3,7 +3,7 @@ import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
-import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
+import { loadSebraePdfLogo, loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 import { applyRandomHoursToWorkSlots, minDaysForHours, parseMaxHoursPerDay } from '@/lib/scheduleHours';
 
 const LEGACY_AREA_LABELS = {
@@ -351,16 +351,16 @@ export async function downloadConsultingProposal(project, client, pdfLogoUrl = n
   const today = new Date();
   const todayStr = format(today, 'dd/MM/yyyy');
 
-  // Load logo
-  const logo = await loadTenantPdfLogo(pdfLogoUrl);
+  // Logo oficial do Sebrae (fallback para a logo da organização, se houver)
+  const logo = (await loadSebraePdfLogo()) || (await loadTenantPdfLogo(pdfLogoUrl));
 
   // ─── Header ───────────────────────────────────────────────────────────────
   const headerY = 12;
   const headerH = 26;
   const logoX = marginL + 2;
   const logoY = headerY + 2;
-  const logoW = 22;
-  const logoH = 22;
+  const logoBoxW = 40;
+  const logoBoxH = 22;
 
   function drawHeader() {
     // Outer border
@@ -368,11 +368,25 @@ export async function downloadConsultingProposal(project, client, pdfLogoUrl = n
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    // Logo
-    if (logo) doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
+    if (logo) {
+      const aspect = logo.width && logo.height ? logo.width / logo.height : 960 / 519;
+      let drawW = logoBoxW;
+      let drawH = drawW / aspect;
+      if (drawH > logoBoxH) {
+        drawH = logoBoxH;
+        drawW = drawH * aspect;
+      }
+      const drawX = logoX + (logoBoxW - drawW) / 2;
+      const drawY = logoY + (logoBoxH - drawH) / 2;
+      try {
+        doc.addImage(logo.dataUrl, logo.format, drawX, drawY, drawW, drawH);
+      } catch {
+        // Cabeçalho segue sem a imagem se o jsPDF recusar o formato
+      }
+    }
 
     // Vertical divider after logo
-    const divX = logoX + logoW + 2;
+    const divX = logoX + logoBoxW + 2;
     doc.setLineWidth(0.4);
     doc.line(divX, headerY, divX, headerY + headerH);
 

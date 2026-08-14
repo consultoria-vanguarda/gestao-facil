@@ -1,3 +1,4 @@
+import { SEBRAE_LOGO_URL } from '@/lib/branding';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 export const PDF_LOGO_ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
@@ -87,6 +88,45 @@ export async function loadTenantPdfLogo(pdfLogoUrl) {
     return {
       dataUrl,
       format: getImageFormatFromDataUrl(dataUrl),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function loadHtmlImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+/**
+ * Logo oficial do Sebrae para a proposta de consultoria.
+ * Rasteriza em fundo branco para o jsPDF não pintar a transparência de preto.
+ *
+ * @returns {Promise<{ dataUrl: string, format: 'PNG', width: number, height: number } | null>}
+ */
+export async function loadSebraePdfLogo() {
+  try {
+    const dataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL);
+    const img = await loadHtmlImage(dataUrl);
+    const width = img.naturalWidth || 960;
+    const height = img.naturalHeight || 519;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+    return {
+      dataUrl: canvas.toDataURL('image/png'),
+      format: 'PNG',
+      width,
+      height,
     };
   } catch {
     return null;
