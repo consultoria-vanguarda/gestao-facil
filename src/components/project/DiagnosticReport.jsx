@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { format, parseISO } from 'date-fns';
-import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
+import { addPdfLogo, loadSebraePdfLogo, loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 
 /**
  * Generates and downloads the "Relatório de Diagnóstico" PDF.
@@ -15,7 +15,7 @@ export async function downloadDiagnosticReport(project, client, pdfLogoUrl = nul
   const contentW = pageW - marginL - marginR;
   const black = [0, 0, 0];
 
-  const logo = await loadTenantPdfLogo(pdfLogoUrl);
+  const logo = (await loadSebraePdfLogo()) || (await loadTenantPdfLogo(pdfLogoUrl));
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
   function pageBorder() {
@@ -61,26 +61,29 @@ export async function downloadDiagnosticReport(project, client, pdfLogoUrl = nul
 
   // ─── Draw header (logo + title) ───────────────────────────────────────────
   const headerY = 12;
-  const headerH = 22;
+  const headerH = 26;
   const logoX = marginL + 2;
   const logoY = headerY + 2;
-  const logoW = 28;
-  const logoH = 18;
+  const logoBoxW = 40;
+  const logoBoxH = 22;
 
   function drawHeader() {
     doc.setDrawColor(...black);
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    if (logo) {
-      doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
-    }
+    const divX = logoX + logoBoxW + 2;
+    doc.setLineWidth(0.4);
+    doc.line(divX, headerY, divX, headerY + headerH);
+
+    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
 
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...black);
-    const titleX = logoX + logoW + 4 + (contentW - logoW - 8) / 2;
-    doc.text('RELATÓRIO DE DIAGNÓSTICO', titleX, headerY + headerH / 2 + 3, { align: 'center' });
+    const txtX = divX + 4;
+    const rightW = contentW - (divX - marginL) - 4;
+    doc.text('RELATÓRIO DE DIAGNÓSTICO', txtX + rightW / 2, headerY + headerH / 2 + 3, { align: 'center' });
   }
 
   // ═════════════════════════════════════════════════════════════════════════

@@ -107,7 +107,7 @@ function loadHtmlImage(src) {
  * Logo oficial do Sebrae para a proposta de consultoria.
  * Rasteriza em fundo branco para o jsPDF não pintar a transparência de preto.
  *
- * @returns {Promise<{ dataUrl: string, format: 'PNG', width: number, height: number } | null>}
+ * @returns {Promise<{ dataUrl: string, format: 'JPEG', width: number, height: number } | null>}
  */
 export async function loadSebraePdfLogo() {
   try {
@@ -123,12 +123,39 @@ export async function loadSebraePdfLogo() {
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(img, 0, 0, width, height);
     return {
-      dataUrl: canvas.toDataURL('image/png'),
-      format: 'PNG',
+      dataUrl: canvas.toDataURL('image/jpeg', 0.92),
+      format: 'JPEG',
       width,
       height,
     };
   } catch {
     return null;
   }
+}
+
+/**
+ * Desenha a logo no PDF, mantendo a proporção dentro da caixa.
+ *
+ * @param {import('jspdf').jsPDF} doc
+ * @param {{ dataUrl: string, format?: string, width?: number, height?: number } | null | undefined} logo
+ * @param {number} boxX
+ * @param {number} boxY
+ * @param {number} boxW
+ * @param {number} boxH
+ * @param {string} [alias]
+ */
+export function addPdfLogo(doc, logo, boxX, boxY, boxW, boxH, alias = 'sebrae-logo') {
+  if (!logo?.dataUrl) return;
+
+  const aspect = logo.width && logo.height ? logo.width / logo.height : 960 / 519;
+  let width = boxW;
+  let height = width / aspect;
+  if (height > boxH) {
+    height = boxH;
+    width = height * aspect;
+  }
+
+  const x = boxX + (boxW - width) / 2;
+  const y = boxY + (boxH - height) / 2;
+  doc.addImage(logo.dataUrl, logo.format || 'JPEG', x, y, width, height, alias, 'FAST');
 }

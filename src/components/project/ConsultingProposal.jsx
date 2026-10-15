@@ -3,7 +3,7 @@ import autoTable from 'jspdf-autotable';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { SERVICE_AREAS } from '@/components/utils/serviceAreas';
-import { loadSebraePdfLogo, loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
+import { addPdfLogo, loadSebraePdfLogo, loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 import { applyRandomHoursToWorkSlots, minDaysForHours, parseMaxHoursPerDay } from '@/lib/scheduleHours';
 
 const LEGACY_AREA_LABELS = {
@@ -368,22 +368,7 @@ export async function downloadConsultingProposal(project, client, pdfLogoUrl = n
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    if (logo) {
-      const aspect = logo.width && logo.height ? logo.width / logo.height : 960 / 519;
-      let drawW = logoBoxW;
-      let drawH = drawW / aspect;
-      if (drawH > logoBoxH) {
-        drawH = logoBoxH;
-        drawW = drawH * aspect;
-      }
-      const drawX = logoX + (logoBoxW - drawW) / 2;
-      const drawY = logoY + (logoBoxH - drawH) / 2;
-      try {
-        doc.addImage(logo.dataUrl, logo.format, drawX, drawY, drawW, drawH);
-      } catch {
-        // Cabeçalho segue sem a imagem se o jsPDF recusar o formato
-      }
-    }
+    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
 
     // Vertical divider after logo
     const divX = logoX + logoBoxW + 2;
