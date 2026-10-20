@@ -368,8 +368,6 @@ export async function downloadConsultingProposal(project, client, pdfLogoUrl = n
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
-
     // Vertical divider after logo
     const divX = logoX + logoBoxW + 2;
     doc.setLineWidth(0.4);
@@ -392,6 +390,8 @@ export async function downloadConsultingProposal(project, client, pdfLogoUrl = n
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('CONSULTORIA DE GESTÃO SOB DEMANDA', txtX + rightW / 2, headerY + 22, { align: 'center' });
+
+    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
   }
 
   // ─── Footer ───────────────────────────────────────────────────────────────

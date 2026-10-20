@@ -1,5 +1,10 @@
-import { SEBRAE_LOGO_URL } from '@/lib/branding';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
+import {
+  SEBRAE_LOGO_DATA_URL,
+  SEBRAE_LOGO_FORMAT,
+  SEBRAE_LOGO_HEIGHT,
+  SEBRAE_LOGO_WIDTH,
+} from '@/lib/sebraeLogoData';
 
 export const PDF_LOGO_ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
 
@@ -94,43 +99,18 @@ export async function loadTenantPdfLogo(pdfLogoUrl) {
   }
 }
 
-function loadHtmlImage(src) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = src;
-  });
-}
-
 /**
- * Logo oficial do Sebrae para a proposta de consultoria.
- * Rasteriza em fundo branco para o jsPDF não pintar a transparência de preto.
+ * Logo oficial do Sebrae, embutida no bundle para não depender de fetch/canvas.
  *
- * @returns {Promise<{ dataUrl: string, format: 'JPEG', width: number, height: number } | null>}
+ * @returns {Promise<{ dataUrl: string, format: 'JPEG', width: number, height: number }>}
  */
 export async function loadSebraePdfLogo() {
-  try {
-    const dataUrl = await loadImageAsDataUrl(SEBRAE_LOGO_URL);
-    const img = await loadHtmlImage(dataUrl);
-    const width = img.naturalWidth || 960;
-    const height = img.naturalHeight || 519;
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
-    return {
-      dataUrl: canvas.toDataURL('image/jpeg', 0.92),
-      format: 'JPEG',
-      width,
-      height,
-    };
-  } catch {
-    return null;
-  }
+  return {
+    dataUrl: SEBRAE_LOGO_DATA_URL,
+    format: SEBRAE_LOGO_FORMAT,
+    width: SEBRAE_LOGO_WIDTH,
+    height: SEBRAE_LOGO_HEIGHT,
+  };
 }
 
 /**
@@ -142,12 +122,11 @@ export async function loadSebraePdfLogo() {
  * @param {number} boxY
  * @param {number} boxW
  * @param {number} boxH
- * @param {string} [alias]
  */
-export function addPdfLogo(doc, logo, boxX, boxY, boxW, boxH, alias = 'sebrae-logo') {
+export function addPdfLogo(doc, logo, boxX, boxY, boxW, boxH) {
   if (!logo?.dataUrl) return;
 
-  const aspect = logo.width && logo.height ? logo.width / logo.height : 960 / 519;
+  const aspect = logo.width && logo.height ? logo.width / logo.height : SEBRAE_LOGO_WIDTH / SEBRAE_LOGO_HEIGHT;
   let width = boxW;
   let height = width / aspect;
   if (height > boxH) {
@@ -157,5 +136,5 @@ export function addPdfLogo(doc, logo, boxX, boxY, boxW, boxH, alias = 'sebrae-lo
 
   const x = boxX + (boxW - width) / 2;
   const y = boxY + (boxH - height) / 2;
-  doc.addImage(logo.dataUrl, logo.format || 'JPEG', x, y, width, height, alias, 'FAST');
+  doc.addImage(logo.dataUrl, logo.format || 'JPEG', x, y, width, height);
 }

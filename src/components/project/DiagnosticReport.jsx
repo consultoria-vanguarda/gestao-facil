@@ -76,14 +76,14 @@ export async function downloadDiagnosticReport(project, client, pdfLogoUrl = nul
     doc.setLineWidth(0.4);
     doc.line(divX, headerY, divX, headerY + headerH);
 
-    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
-
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...black);
     const txtX = divX + 4;
     const rightW = contentW - (divX - marginL) - 4;
     doc.text('RELATÓRIO DE DIAGNÓSTICO', txtX + rightW / 2, headerY + headerH / 2 + 3, { align: 'center' });
+
+    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
   }
 
   // ═════════════════════════════════════════════════════════════════════════
