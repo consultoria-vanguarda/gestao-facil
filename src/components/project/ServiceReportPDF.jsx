@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
+import { addPdfLogo, loadSebraePdfLogo, loadTenantPdfLogo } from '@/lib/pdfLogoConfig';
 import { loadImageAsDataUrl } from '@/lib/imageDataUrl';
 
 const REPORT_TYPE_LABELS = {
@@ -23,7 +23,7 @@ export async function downloadServiceReport(report, project, client, consultant,
   const today = new Date();
   const todayStr = format(today, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 
-  const logo = await loadTenantPdfLogo(pdfLogoUrl);
+  const logo = (await loadSebraePdfLogo()) || (await loadTenantPdfLogo(pdfLogoUrl));
 
   // Preload result images
   const imageDataUrls = [];
@@ -33,20 +33,18 @@ export async function downloadServiceReport(report, project, client, consultant,
 
   // ─── Header ────────────────────────────────────────────────────────────────
   const headerY = 12;
-  const headerH = 18;
+  const headerH = 26;
   const logoX = marginL + 2;
   const logoY = headerY + 2;
-  const logoW = 22;
-  const logoH = 22;
+  const logoBoxW = 40;
+  const logoBoxH = 22;
 
   function drawHeader() {
     doc.setDrawColor(...black);
     doc.setLineWidth(0.5);
     doc.rect(marginL, headerY, contentW, headerH);
 
-    if (logo) doc.addImage(logo.dataUrl, logo.format, logoX, logoY, logoW, logoH);
-
-    const divX = logoX + logoW + 2;
+    const divX = logoX + logoBoxW + 2;
     doc.setLineWidth(0.4);
     doc.line(divX, headerY, divX, headerY + headerH);
 
@@ -56,9 +54,10 @@ export async function downloadServiceReport(report, project, client, consultant,
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...black);
-    doc.text('RELATÓRIO DE PRESTAÇÃO DE SERVIÇOS', txtX + rightW / 2, headerY + 8, { align: 'center' });
-    doc.text('DE CONSULTORIA REALIZADAS', txtX + rightW / 2, headerY + 14, { align: 'center' });
+    doc.text('RELATÓRIO DE PRESTAÇÃO DE SERVIÇOS', txtX + rightW / 2, headerY + 10, { align: 'center' });
+    doc.text('DE CONSULTORIA REALIZADAS', txtX + rightW / 2, headerY + 17, { align: 'center' });
 
+    addPdfLogo(doc, logo, logoX, logoY, logoBoxW, logoBoxH);
   }
 
   function drawFooter() {
